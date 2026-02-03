@@ -1,0 +1,1 @@
+cmake . && make && ./build/Karbon #Just a quick lil one-liner script to make life easier in console :p

@@ -1,0 +1,74 @@
+#include "window.h"
+
+namespace Karbon {
+
+static bool s_GLFWInit = false;
+static bool s_GladInit = false;
+
+Window::Window(const WindowProperties& properties) {
+    init(properties);
+}
+
+Window::~Window() {
+    shutdown();
+}
+
+bool Window::init(const WindowProperties& properties) {
+    m_data.title = properties.title;
+    m_data.width = properties.width;
+    m_data.height = properties.height;
+
+    //Load GLFW if it hasnt been loaded yet
+    if (!s_GLFWInit) {
+        if(!glfwInit()) {
+            std::cout << "ERROR::Failed to initialize GLFW!!!" << std::endl;
+            return false;
+        }
+        s_GLFWInit = true;
+    }
+
+    m_window = glfwCreateWindow(properties.width, properties.height, properties.title, nullptr, nullptr);
+    if (!m_window) {
+        std::cout << "ERROR::Failed to create Window!!!" << std::endl;
+        return false;
+    }
+
+    glfwMakeContextCurrent(m_window); //Set new window as current context
+
+    //Same for glad
+    if (!s_GladInit) {
+        if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+            std::cout << "ERROR::Failed to initialize GLAD!!!" << std::endl;
+            return false;
+        }
+        s_GladInit = true;
+    }
+
+    glfwSetWindowUserPointer(m_window, &m_data);
+    setVSync(true);
+
+    return true;
+
+}
+
+void Window::clear() {
+    glClearColor(0.16f, 0.16f, 0.18f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Window::update() {
+    glfwSwapBuffers(m_window);
+    glfwPollEvents();
+}
+
+void Window::shutdown() {
+    glfwDestroyWindow(m_window);
+    glfwTerminate(); //Shutdown the app after window is closed
+}
+
+void Window::setVSync(bool enabled) {
+    glfwSwapInterval((int)enabled);
+    m_data.VSync = enabled;
+}
+
+}
