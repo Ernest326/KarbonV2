@@ -4,6 +4,8 @@ CMakeCache.txt
 CMakeFiles
 Makefile
 cmake_install.cmake
-Build
 *.o
 *.a
+
+thirdparty/jolt/JoltPhysics
+Build
