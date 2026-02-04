@@ -1,6 +1,9 @@
+#pragma once
+
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "../events/event.h"
 
 namespace Karbon {
 
@@ -12,9 +15,11 @@ struct WindowProperties {
 
 class Window {
 public:
+    using EventCallbackFn = std::function<void(Event&)>; //Event callback function macro
+
     Window(const WindowProperties& properties);
     ~Window();
-    GLFWwindow* getGLWindow();
+    inline GLFWwindow* getGLWindow() { return m_window };
 
     inline unsigned int getWidth() const { return m_data.width; }
     inline unsigned int getHeight() const { return m_data.height; }
