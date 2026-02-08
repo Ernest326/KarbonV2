@@ -35,7 +35,7 @@ bool Window::init(const WindowProperties& properties) {
 
     glfwMakeContextCurrent(m_window); //Set new window as current context
 
-    //Same for glad
+    //Load GLAD
     if (!s_GladInit) {
         if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             std::cout << "ERROR::Failed to initialize GLAD!!!" << std::endl;
@@ -46,7 +46,12 @@ bool Window::init(const WindowProperties& properties) {
 
     glfwSetWindowUserPointer(m_window, &m_data); //Use a window data structure as a pointer
     setVSync(true);
+    setupEvents();
+    return true;
 
+}
+
+void Window::setupEvents() {
     //Window events
     glfwSetWindowSizeCallback(m_window,
     [](GLFWwindow* window, int width, int height){
@@ -60,7 +65,7 @@ bool Window::init(const WindowProperties& properties) {
     glfwSetWindowCloseCallback(m_window,
     [](GLFWwindow* window) {
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-        WindowCloseEvent event();
+        WindowCloseEvent event;
         data.EventCallback(event);
     });
     glfwSetKeyCallback(m_window,
@@ -77,10 +82,15 @@ bool Window::init(const WindowProperties& properties) {
                 data.EventCallback(event);
                 break;
             }
+            case GLFW_REPEAT: {
+                KeyPressEvent event(key, true);
+                data.EventCallback(event);
+                break;
+            }
         }
     });
     glfwSetMouseButtonCallback(m_window,
-    [](GLFWwindow* window) {
+    [](GLFWwindow* window, int button, int action, int mods) {
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
         switch(action) {
             case GLFW_PRESS: {
@@ -103,11 +113,8 @@ bool Window::init(const WindowProperties& properties) {
     [](GLFWwindow* window, double xPos, double yPos) {
         WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
         MouseMoveEvent event((float)xPos, (float)yPos);
-        data.Eventcallback(event);
+        data.EventCallback(event);
     });
-
-    return true;
-
 }
 
 void Window::clear() {
@@ -117,7 +124,6 @@ void Window::clear() {
 
 void Window::update() {
     glfwSwapBuffers(m_window);
-    glfwPollEvents();
 }
 
 void Window::shutdown() {

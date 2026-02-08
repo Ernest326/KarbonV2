@@ -1,9 +1,9 @@
 #pragma once
-#include <cstdint>
 
 namespace Karbon {
-namespace Key {
-    using KeyCode = uint16_t;
+	using KeyCode = uint16_t;
+
+	namespace Key {
     enum : KeyCode //Key values from glfw3.h
     {
 			Space               = 32,
@@ -136,6 +136,6 @@ namespace Key {
 			RightAlt            = 346,
 			RightSuper          = 347,
 			Menu                = 348
-    }
-}
+    };
+	}
 }

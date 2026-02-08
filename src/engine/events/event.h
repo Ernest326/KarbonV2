@@ -13,7 +13,10 @@ enum class EventType {
     MouseButtonPress,
     MouseButtonRelease,
     KeyPress,
-    KeyRelease
+    KeyRelease,
+    AppTick,
+    AppUpdate,
+    AppRender
 };
 
 enum EventCategory
@@ -32,7 +35,7 @@ enum EventCategory
 	virtual const char* getName() const override { return #type; }
 
 #define EVENT_CLASS_CATEGORY(category) \
-	virtual int GetCategoryFlags() const override { return category; }
+	virtual int getCategoryFlags() const override { return category; }
 
 class Event {
 protected:
@@ -47,16 +50,16 @@ public:
     virtual std::string toString() const { return getName(); }
 
     bool isInCategory(EventCategory category) {
-        return getCategoryFlags & category;
+        return getCategoryFlags() & category;
     }
-}
+};
 
 class EventDispatcher {
 public:
     EventDispatcher(Event& event) : m_event(event) {}
     
-    tempalte <typename T, typename F>
-    bool dispatch(const F& func) {
+    template <typename T, typename F>
+    bool Dispatch(const F& func) {
         if(m_event.getEventType() == T::getStaticType()) {
             m_event.handled |= func(static_cast<T&>(m_event));
             return true;
@@ -66,4 +69,4 @@ public:
 private:
     Event& m_event;
 };
-};
+}

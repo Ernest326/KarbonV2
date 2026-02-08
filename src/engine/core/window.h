@@ -3,7 +3,10 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "../events/event.h"
+#include <functional>
+#include "../events/application_event.h"
+#include "../events/key_event.h"
+#include "../events/mouse_event.h"
 
 namespace Karbon {
 
@@ -19,7 +22,7 @@ public:
 
     Window(const WindowProperties& properties);
     ~Window();
-    inline GLFWwindow* getGLWindow() { return m_window };
+    inline GLFWwindow* getGLWindow() { return m_window; }
 
     inline unsigned int getWidth() const { return m_data.width; }
     inline unsigned int getHeight() const { return m_data.height; }
@@ -28,9 +31,11 @@ public:
 
     inline void setTitle(const char* title) { glfwSetWindowTitle(m_window, title); }
     void setVSync(bool enabled);
+    void setEventCallback(const EventCallbackFn& callback) { m_data.EventCallback = callback; }
 
     void clear();
     void update();
+    void setupEvents();
 
 private:
     virtual bool init(const WindowProperties& properties);
@@ -42,6 +47,7 @@ private:
         const char* title;
         unsigned int width, height;
         bool VSync;
+        EventCallbackFn EventCallback;
     };
     WindowData m_data;
 };
