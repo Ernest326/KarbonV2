@@ -36,6 +36,9 @@ add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/stb_image)
 add_subdirectory(thirdparty/imgui)
 add_subdirectory(thirdparty/jolt)
+
+# Disable assimp unit tests
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable assimp unit tests" FORCE)
 add_subdirectory(thirdparty/assimp)
 
 #Define source files as "SOURCES"
@@ -64,12 +67,10 @@ if(MSVC) #If we are using VS compiler
 endif()
 
 #force remove unicode
-if (WIN32)
-	target_compile_options("${CMAKE_PROJECT_NAME}" PRIVATE /UUNICODE /U_UNICODE)
-endif()
+# if (WIN32)
+    # target_compile_options("${CMAKE_PROJECT_NAME}" PRIVATE /DUNICODE=0 /D_UNICODE=0)
+# endif()
 
 
 #Link all libs
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glm glfw glad stb_image imgui jolt assimp)
-
-#TODO:Add enet later on when we get to networking!
