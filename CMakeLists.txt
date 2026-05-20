@@ -29,6 +29,13 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
+#Disable unnecessary Jolt stuff
+set(JPH_USE_DX12 OFF CACHE BOOL "Disable DirectX 12 in Jolt" FORCE)
+
+#Disable unnecessary Assimp stuff
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Disable assimp tools" FORCE)
+set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "Disable assimp samples" FORCE)
+
 #Includes
 add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/glad)

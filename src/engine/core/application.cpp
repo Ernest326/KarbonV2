@@ -1,6 +1,8 @@
 #include "application.h"
 #include "base.h"
 #include "../events/application_event.h"
+#include "../graphics/shader.h"
+#include "../graphics/buffers/buffers.h"
 
 namespace Karbon {
 
@@ -18,12 +20,40 @@ namespace Karbon {
 
     void Application::run() {
         std::cout << "Running application..." << std::endl;
-        
+       
+        GLfloat* vertices = new GLfloat[9] {
+            -0.5f, -0.5f, 0.0f,
+             0.5f, -0.5f, 0.0f,
+             0.0f,  0.5f, 0.0f
+        };
+
+        GLfloat* colors = new GLfloat[9] {
+            1.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 1.0f
+        };
+
+        VBO vertexBuffer(vertices, 9*sizeof(GLfloat));
+        VBO colorBuffer(colors, 9*sizeof(GLfloat));
+        VAO vertexArray;
+        vertexArray.addBuffer(vertexBuffer, 0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), 0);
+        vertexArray.addBuffer(colorBuffer, 1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), 0);
+
+        Shader test_shader("resources/test_triangle.vert", "resources/test_triangle.frag");
+
         while(m_running) {
             glfwPollEvents();
             m_window->clear();
             if(!m_minimised) {
                 //Loop
+
+                //Create a triangle
+                test_shader.bind();
+                vertexArray.bind();
+                glDrawArrays(GL_TRIANGLES, 0, 3);
+                test_shader.unbind();
+                vertexArray.unbind();
+
             }
             m_window->update();
             

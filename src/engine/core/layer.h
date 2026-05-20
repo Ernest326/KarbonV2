@@ -9,6 +9,5 @@ public:
     virtual void OnUpdate();
     virtual void OnEvent(Event& e);
     virtual void OnRender();
-    
 };
 }
