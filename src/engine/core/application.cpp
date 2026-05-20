@@ -3,6 +3,7 @@
 #include "../events/application_event.h"
 #include "../graphics/shader.h"
 #include "../graphics/buffers/buffers.h"
+#include "../graphics/texture.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -87,11 +88,48 @@ namespace Karbon {
             20, 21, 22, 22, 23, 20
         };
 
+        GLfloat* glTexCoords = new GLfloat[72] {
+            // Front face
+            0.0f, 0.0f,
+            1.0f, 0.0f,
+            1.0f, 1.0f,
+            0.0f, 1.0f,
+            // Back face
+            0.0f, 0.0f,
+            1.0f, 0.0f,
+            1.0f, 1.0f,
+            0.0f, 1.0f,
+            // Left face
+            0.0f, 0.0f,
+            1.0f, 0.0f,
+            1.0f, 1.0f,
+            0.0f, 1.0f,
+            // Right face
+            0.0f, 0.0f,
+            1.0f, 0.0f,
+            1.0f, 1.0f,
+            0.0f, 1.0f,
+            // Top face
+            0.0f, 0.0f,
+            1.0f, 0.0f,
+            1.0f, 1.0f,
+            0.0f, 1.0f,
+            // Bottom face
+            0.0f, 0.0f,
+            1.0f, 0.0f,
+            1.0f, 1.0f,
+            0.0f, 1.0f
+        };
+
         IBO indexBuffer(indices, 36);
-        Shader test_shader("resources/test_cube.vert", "resources/test_cube.frag");
+        Shader test_shader("resources/test_texture.vert", "resources/test_texture.frag");
         VBO vertexBuffer(cube_verts, 108*sizeof(GLfloat));
         VAO vertexArray;
         vertexArray.addBuffer(vertexBuffer, 0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), 0);
+        VBO texCoordBuffer(glTexCoords, 72*sizeof(GLfloat));
+        vertexArray.addBuffer(texCoordBuffer, 1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), 0);
+
+        Texture test_texture("resources/texture.png");
 
         glEnable(GL_DEPTH_TEST);
 
@@ -124,6 +162,7 @@ namespace Karbon {
                 test_shader.unbind();
                 vertexArray.unbind();
                 */
+                test_texture.bind(0);
                 test_shader.bind();
                 vertexArray.bind();
                 indexBuffer.bind();
@@ -131,6 +170,7 @@ namespace Karbon {
                 indexBuffer.unbind();
                 vertexArray.unbind();
                 test_shader.unbind();
+                test_texture.unbind();
 
 
             }
