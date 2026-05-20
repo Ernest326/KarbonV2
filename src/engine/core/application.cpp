@@ -6,6 +6,7 @@
 #include "../graphics/texture.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "../ui/kbimgui.h"
 
 namespace Karbon {
 
@@ -23,7 +24,9 @@ namespace Karbon {
 
     void Application::run() {
         std::cout << "Running application..." << std::endl;
-       
+
+        KarbonImGUI::init();
+
         /*
         GLfloat* vertices = new GLfloat[9] {
             -0.5f, -0.5f, 0.0f,
@@ -147,7 +150,12 @@ namespace Karbon {
         while(m_running) {
             glfwPollEvents();
             m_window->clear();
+            KarbonImGUI::begin();
             if(!m_minimised) {
+
+                ImGui::Begin("Test Window");
+                ImGui::Text("Hello, world!");
+                ImGui::End();
                 //Loop
                 model = glm::mat4(1.0f);
                 model = glm::rotate(model, static_cast<float>(glfwGetTime()), glm::vec3(1.0f, 1.0f, 0.0f));
@@ -174,9 +182,11 @@ namespace Karbon {
 
 
             }
+            KarbonImGUI::end();
             m_window->update();
             
         }
+        KarbonImGUI::shutdown();
         std::cout << "Closing application..." << std::endl;
     }
 
