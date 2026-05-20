@@ -1,5 +1,9 @@
 #include "shader.h"
 #include <fstream>
+#include <iostream>
+#include <sstream>
+#include <type_traits>
+#include <glm/glm.hpp>
 
 namespace Karbon {
 
@@ -65,6 +69,10 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
         std::cout << "ERROR: SHADER PROGRAM LINKING FAILED\n" << infoLog << std::endl;
     }
 
+    // shaders are linked into program; we can delete the shader objects
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+
 }
 
 Shader::~Shader() {
@@ -79,21 +87,31 @@ void Shader::unbind() const {
     glUseProgram(0);
 }
 
+//bindUniform(value, name) - Detect type and bind it to correct uniform function
 template<typename T>
 void Shader::bindUniform(const T& value, const char* name) {
-    if(std::is_same<T, int>::value) {
+    if constexpr (std::is_same_v<T, int>) {
         glUniform1i(glGetUniformLocation(m_shaderID, name), value);
-    } else if(std::is_same<T, float>::value) {
+    } else if constexpr (std::is_same_v<T, float>) {
         glUniform1f(glGetUniformLocation(m_shaderID, name), value);
-    } else if(std::is_same<T, glm::vec3>::value) {
+    } else if constexpr (std::is_same_v<T, glm::vec3>) {
         glUniform3fv(glGetUniformLocation(m_shaderID, name), 1, &value[0]);
-    } else if(std::is_same<T, glm::vec4>::value) {
+    } else if constexpr (std::is_same_v<T, glm::vec4>) {
         glUniform4fv(glGetUniformLocation(m_shaderID, name), 1, &value[0]);
-    } else if(std::is_same<T, glm::mat4>::value) {
+    } else if constexpr (std::is_same_v<T, glm::mat4>) {
         glUniformMatrix4fv(glGetUniformLocation(m_shaderID, name), 1, GL_FALSE, &value[0][0]);
     } else {
-        std::cout << "ERROR: UNSUPPORTED UNIFORM TYPE" << std::endl;
+        static_assert(!std::is_same_v<T, T>, "ERROR: UNSUPPORTED UNIFORM TYPE");
     }
 }
 
+// Explicit instantiations for commonly used uniform types so the template
+// defined in this translation unit is available to callers.
+template void Shader::bindUniform<int>(const int& , const char*);
+template void Shader::bindUniform<float>(const float& , const char*);
+template void Shader::bindUniform<glm::vec3>(const glm::vec3& , const char*);
+template void Shader::bindUniform<glm::vec4>(const glm::vec4& , const char*);
+template void Shader::bindUniform<glm::mat4>(const glm::mat4& , const char*);
+
 }
+
