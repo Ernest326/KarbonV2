@@ -33,9 +33,8 @@ const glm::mat4& Camera::getProjectionMatrix() const {
 }
 
 void Camera::updateViewMatrix() {
-    // Use left-handed coordinate system: use glm::lookAtLH
     glm::vec3 front = forward();
-    viewMatrix = glm::lookAtLH(position, position + front, glm::vec3(0.0f, 1.0f, 0.0f));
+    viewMatrix = glm::lookAt(position, position + front, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 }
 

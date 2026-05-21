@@ -7,6 +7,8 @@ namespace Karbon {
 class MouseMoveEvent : public Event {
 public:
     MouseMoveEvent(const float x, const float y) : m_mouseX(x), m_mouseY(y) {}
+    float getX() const { return m_mouseX; }
+    float getY() const { return m_mouseY; }
     EVENT_CLASS_TYPE(MouseMove);
     EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput);
 private:
@@ -17,6 +19,8 @@ private:
 class MouseScrollEvent : public Event {
 public:
     MouseScrollEvent(const float xOffset, const float yOffset) : m_xOffset(xOffset), m_yOffset(yOffset) {}
+    float getXOffset() const { return m_xOffset; }
+    float getYOffset() const { return m_yOffset; }
     EVENT_CLASS_TYPE(MouseScroll);
     EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput);
 private:

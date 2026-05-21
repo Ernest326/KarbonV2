@@ -96,10 +96,12 @@ void Window::setupEvents() {
             case GLFW_PRESS: {
                 MouseButtonPressEvent event(button);
                 data.EventCallback(event);
+                break;
             }
             case GLFW_RELEASE: {
-                MouseButtonPressEvent event(button);
+                MouseButtonReleaseEvent event(button);
                 data.EventCallback(event);
+                break;
             }
         }
     });

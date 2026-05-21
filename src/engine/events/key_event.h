@@ -16,7 +16,7 @@ protected:
 class KeyPressEvent : public KeyEvent {
 public:
     KeyPressEvent(const KeyCode key, bool isRepeat=false) : KeyEvent(key), m_isRepeat(isRepeat) {}
-    bool isRepeat() { return m_isRepeat; }
+    bool isRepeat() const { return m_isRepeat; }
     EVENT_CLASS_TYPE(KeyPress);
 private:
     bool m_isRepeat;
@@ -25,7 +25,7 @@ private:
 class KeyReleaseEvent : public KeyEvent {
 public:
     KeyReleaseEvent(const KeyCode key) : KeyEvent(key) {}
-    EVENT_CLASS_TYPE(KeyPress);
+    EVENT_CLASS_TYPE(KeyRelease);
 };
 
 }

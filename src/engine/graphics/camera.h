@@ -20,7 +20,7 @@ public:
         float yaw = glm::radians(rotation.y);
         return glm::normalize(glm::vec3(
             sin(yaw) * cos(pitch),
-            -sin(pitch),
+            sin(pitch),
             -cos(yaw) * cos(pitch)
         ));
     }

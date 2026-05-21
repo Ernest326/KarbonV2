@@ -1,6 +1,8 @@
 //Event dispatcher class created while using Cherno's Hazel as a reference
 #pragma once
 
+#include <string>
+
 namespace Karbon {
 enum class EventType {
     None=0,

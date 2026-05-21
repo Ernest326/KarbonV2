@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Karbon {
 	using KeyCode = uint16_t;
 

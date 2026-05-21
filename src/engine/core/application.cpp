@@ -2,16 +2,18 @@
 #include "base.h"
 #include <iostream>
 #include "../events/application_event.h"
+#include "../input/inputsystem.h"
 #include "../graphics/shader.h"
 #include "../graphics/buffers/buffers.h"
 #include "../graphics/texture.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../ui/kbimgui.h"
-#include "../graphics/camera.h"
+#include "../graphics/spectator_camera.h"
 
 namespace Karbon {
 
+    float deltaTime = 0.0f;
     Application* Application::s_instance = nullptr;
     Application& Application::Get() { return *Application::s_instance; }
 
@@ -28,28 +30,6 @@ namespace Karbon {
         std::cout << "Running application..." << std::endl;
 
         KarbonImGUI::init();
-
-        /*
-        GLfloat* vertices = new GLfloat[9] {
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.0f,  0.5f, 0.0f
-        };
-
-        GLfloat* colors = new GLfloat[9] {
-            1.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 1.0f
-        };
-
-        VBO vertexBuffer(vertices, 9*sizeof(GLfloat));
-        VBO colorBuffer(colors, 9*sizeof(GLfloat));
-        VAO vertexArray;
-        vertexArray.addBuffer(vertexBuffer, 0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), 0);
-        vertexArray.addBuffer(colorBuffer, 1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), 0);
-
-        Shader test_shader("resources/test_triangle.vert", "resources/test_triangle.frag");
-        */
 
         GLfloat* cube_verts = new GLfloat[108] {
             // Front face
@@ -138,19 +118,29 @@ namespace Karbon {
 
         glm::mat4 model = glm::mat4(1.0f);
 
-        Camera camera(glm::vec3(0.0f, 0.0f, -5.0f));
-        camera.setRotation(glm::vec3(10.0f, 20.0f, 0.0f));
+        SpectatorCamera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+        float lastFrameTime = getTime();
 
         glEnable(GL_DEPTH_TEST);
 
         while(m_running) {
+            float currentFrameTime = getTime();
+            deltaTime = currentFrameTime - lastFrameTime;
+            lastFrameTime = currentFrameTime;
+ 
+            InputSystem::Get().BeginFrame();
             glfwPollEvents();
+            camera.update(deltaTime);
             m_window->clear();
             KarbonImGUI::begin();
             if(!m_minimised) {
 
                 ImGui::Begin("Test Window");
                 ImGui::Text("Hello, world!");
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                ImGui::Text("Position: (%.2f, %.2f, %.2f)", camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
+                ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", camera.getRotation().x, camera.getRotation().y, camera.getRotation().z);
                 ImGui::End();
                 //Loop
                 model = glm::mat4(1.0f);
@@ -159,15 +149,6 @@ namespace Karbon {
                 test_shader.bindUniform(model, "model");
                 test_shader.bindUniform(camera.getViewMatrix(), "view");
                 test_shader.bindUniform(camera.getProjectionMatrix(), "projection");
-
-                //Create a triangle
-                /*
-                test_shader.bind();
-                vertexArray.bind();
-                glDrawArrays(GL_TRIANGLES, 0, 3);
-                test_shader.unbind();
-                vertexArray.unbind();
-                */
                 test_texture.bind(0);
                 test_shader.bind();
                 vertexArray.bind();
@@ -182,7 +163,7 @@ namespace Karbon {
             }
             KarbonImGUI::end();
             m_window->update();
-            
+ 
         }
         KarbonImGUI::shutdown();
         std::cout << "Closing application..." << std::endl;
@@ -210,14 +191,33 @@ namespace Karbon {
 
     bool Application::OnKeyPress(KeyPressEvent& e) {
         if(e.getKeyCode() == GLFW_KEY_Q) quit();
+        if(e.getKeyCode() == GLFW_KEY_ESCAPE) {
+            //Toggle mouse visible
+            GLFWwindow* window = m_window->getGLWindow();
+            int mode = glfwGetInputMode(window, GLFW_CURSOR);
+            if (mode == GLFW_CURSOR_NORMAL) {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            } else {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
+        }
         return true;
     }
 
     void Application::OnEvent(Event& e) {
+        InputSystem::Get().OnEvent(e);
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(KB_BIND_EVENT_FN(Application::OnWindowClose));
         dispatcher.Dispatch<WindowResizeEvent>(KB_BIND_EVENT_FN(Application::OnWindowResize));
         dispatcher.Dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(Application::OnKeyPress));
+    }
+    
+    float Application::getTime() {
+        return static_cast<float>(glfwGetTime());
+    }
+
+    float Application::getDeltaTime() {
+        return deltaTime;
     }
 
 }

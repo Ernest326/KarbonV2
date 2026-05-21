@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <memory>
 #include "window.h"
@@ -16,6 +18,9 @@ public:
 
     static Application& Get();
     inline Window& getWindow() { return *m_window; }
+
+    static float getTime();
+    static float getDeltaTime();
 
 private:
     bool OnWindowClose(WindowCloseEvent& e);
