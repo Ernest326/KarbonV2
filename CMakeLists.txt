@@ -47,6 +47,7 @@ add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/stb_image)
 add_subdirectory(thirdparty/imgui)
 add_subdirectory(thirdparty/jolt)
+add_subdirectory(thirdparty/entt)
 
 # Disable assimp unit tests
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable assimp unit tests" FORCE)
@@ -84,4 +85,4 @@ endif()
 
 
 #Link all libs
-target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glm glfw glad stb_image imgui jolt assimp)
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glm glfw glad stb_image imgui jolt assimp EnTT::EnTT)
