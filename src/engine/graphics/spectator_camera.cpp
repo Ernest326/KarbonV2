@@ -43,8 +43,7 @@ void SpectatorCamera::update(float deltaTime) {
 
     const auto [mouseDeltaX, mouseDeltaY] = input.getMouseDelta();
     m_yaw += static_cast<float>(mouseDeltaX) * m_mouseSensitivity;
-    m_pitch += static_cast<float>(mouseDeltaY) * m_mouseSensitivity;
-    m_pitch = glm::clamp(m_pitch, -89.0f, 89.0f);
+    m_pitch -= static_cast<float>(mouseDeltaY) * m_mouseSensitivity;
 
     syncCamera();
 }
