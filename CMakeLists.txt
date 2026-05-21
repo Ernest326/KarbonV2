@@ -30,7 +30,11 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
 #Disable unnecessary Jolt stuff
-set(JPH_USE_DX12 OFF CACHE BOOL "Disable DirectX 12 in Jolt" FORCE)
+set(JPH_COMPILE_SHADERS OFF CACHE BOOL "Disable Jolt shader compilation" FORCE)
+set(JPH_USE_DXC OFF CACHE BOOL "Don't use DXC for shader compilation" FORCE)
+set(JPH_USE_VK OFF CACHE BOOL "Disable Vulkan support in Jolt" FORCE)
+set(JPH_USE_CPU_COMPUTE OFF CACHE BOOL "Disable CPU compute support in Jolt" FORCE)
+set(JPH_BUILD_RENDERER OFF CACHE BOOL "Disable Jolt renderer" FORCE)
 
 #Disable unnecessary Assimp stuff
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Disable assimp tools" FORCE)
