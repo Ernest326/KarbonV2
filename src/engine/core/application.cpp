@@ -10,7 +10,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "../ui/kbimgui.h"
 #include "../graphics/spectator_camera.h"
-#include "../graphics/cube.h"
+#include "../graphics/primitives/cube.h"
+#include "../graphics/primitives/plane.h"
 
 namespace Karbon {
 
@@ -34,7 +35,10 @@ namespace Karbon {
 
         Shader test_shader("resources/test_texture.vert", "resources/test_texture.frag");
         Texture test_texture("resources/texture.png");
+        Texture test_texture2("resources/texture2.jpg");
+
         Cube test_cube(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+        Plane test_plane(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), glm::vec3(10.0f));
 
         SpectatorCamera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
@@ -72,6 +76,9 @@ namespace Karbon {
                 test_texture.bind(0);
                 test_shader.bind();
                 test_cube.draw();
+                test_shader.bindUniform(test_plane.getModelMatrix(), "model");
+                test_texture2.bind(0);
+                test_plane.draw();
                 test_shader.unbind();
                 test_texture.unbind();
 
