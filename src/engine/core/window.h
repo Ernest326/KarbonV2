@@ -26,6 +26,7 @@ public:
 
     inline unsigned int getWidth() const { return m_data.width; }
     inline unsigned int getHeight() const { return m_data.height; }
+    inline float getAspectRatio() const { return (float)m_data.width / (float)m_data.height; }
     inline bool getVSync() const { return m_data.VSync; }
     inline bool close() const { return glfwWindowShouldClose(m_window); }
 

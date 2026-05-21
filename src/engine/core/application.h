@@ -15,7 +15,7 @@ public:
     void OnEvent(Event& e);
 
     static Application& Get();
-    inline Window& GetWindow() { return *m_window; }
+    inline Window& getWindow() { return *m_window; }
 
 private:
     bool OnWindowClose(WindowCloseEvent& e);

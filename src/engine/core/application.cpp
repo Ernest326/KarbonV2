@@ -1,5 +1,6 @@
 #include "application.h"
 #include "base.h"
+#include <iostream>
 #include "../events/application_event.h"
 #include "../graphics/shader.h"
 #include "../graphics/buffers/buffers.h"
@@ -7,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../ui/kbimgui.h"
+#include "../graphics/camera.h"
 
 namespace Karbon {
 
@@ -134,18 +136,12 @@ namespace Karbon {
 
         Texture test_texture("resources/texture.png");
 
-        glEnable(GL_DEPTH_TEST);
-
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
 
-        test_shader.bind();
-        test_shader.bindUniform(model, "model");
-        test_shader.bindUniform(view, "view");
-        test_shader.bindUniform(projection, "projection");
-        test_shader.unbind();
+        Camera camera(glm::vec3(0.0f, 0.0f, -5.0f));
+        camera.setRotation(glm::vec3(10.0f, 20.0f, 0.0f));
+
+        glEnable(GL_DEPTH_TEST);
 
         while(m_running) {
             glfwPollEvents();
@@ -161,6 +157,8 @@ namespace Karbon {
                 model = glm::rotate(model, static_cast<float>(glfwGetTime()), glm::vec3(1.0f, 1.0f, 0.0f));
                 test_shader.bind();
                 test_shader.bindUniform(model, "model");
+                test_shader.bindUniform(camera.getViewMatrix(), "view");
+                test_shader.bindUniform(camera.getProjectionMatrix(), "projection");
 
                 //Create a triangle
                 /*

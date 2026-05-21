@@ -8,7 +8,7 @@ void KarbonImGUI::init() {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(Application::Get().GetWindow().getGLWindow(), true);
+    ImGui_ImplGlfw_InitForOpenGL(Application::Get().getWindow().getGLWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
