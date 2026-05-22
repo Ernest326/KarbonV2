@@ -14,10 +14,10 @@ Plane::Plane(glm::vec3 position, glm::quat rotation, glm::vec3 scale) : position
     if (!buffersInitialized) {
         GLfloat* plane_verts = new GLfloat[18] {
             // Front face
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f
+            -0.5f, 0.0f,-0.5f, 
+             0.5f, 0.0f,-0.5f, 
+             0.5f, 0.0f, 0.5f, 
+            -0.5f, 0.0f, 0.5f 
         };
 
         GLuint indices[6] = {

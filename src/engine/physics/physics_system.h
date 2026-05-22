@@ -32,12 +32,25 @@ public:
     //EnTT hooks
     void OnRigidbodyAdded(entt::registry& registry, entt::entity entity);
     void OnRigidbodyRemoved(entt::registry& registry, entt::entity entity);
+    void OnColliderAdded(entt::registry& registry, entt::entity entity);
+    void OnColliderRemoved(entt::registry& registry, entt::entity entity);
+    void OnTransformAdded(entt::registry& registry, entt::entity entity);
+    void OnTransformRemoved(entt::registry& registry, entt::entity entity);
+
+    // Helpers
+    void TryCreateBody(entt::registry& registry, entt::entity entity);
+    void RemoveBody(entt::entity entity);
 
     std::unordered_map<entt::entity, JPH::BodyID> m_EntityToBodyMap;
     std::unordered_map<JPH::BodyID, entt::entity> m_BodyToEntityMap;
 
     float m_Accum = 0.0f;
     const float m_FixedTimeStep = 1.0f / 60.0f; // 60 FPS
+
+    inline int getBodyCount() const { return bodyCounter; }
+
+private:
+    int bodyCounter = 0;
 };
 
 }

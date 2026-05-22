@@ -9,6 +9,8 @@ struct RigidbodyComponent {
     float friction = 0.5f;
     float restitution = 0.0f;
     bool isTrigger = false;
+    JPH::BodyID bodyID; // Store the associated Jolt BodyID
+    bool initialized = false; // Flag to check if the physics body has been created
 };
 
 }
