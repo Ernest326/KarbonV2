@@ -40,6 +40,20 @@ set(JPH_BUILD_RENDERER OFF CACHE BOOL "Disable Jolt renderer" FORCE)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Disable assimp tools" FORCE)
 set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "Disable assimp samples" FORCE)
 
+# Weird fix for assimp minizip include dir, since it doesn't set it properly on CachyOS
+find_path(ASSIMP_MINIZIP_INCLUDE_DIR
+    NAMES unzip.h
+    PATH_SUFFIXES minizip
+)
+
+if(ASSIMP_MINIZIP_INCLUDE_DIR AND EXISTS "${ASSIMP_MINIZIP_INCLUDE_DIR}/minizip/unzip.h")
+    set(ASSIMP_MINIZIP_INCLUDE_DIR "${ASSIMP_MINIZIP_INCLUDE_DIR}/minizip")
+endif()
+
+if(ASSIMP_MINIZIP_INCLUDE_DIR)
+    set(UNZIP_INCLUDE_DIRS "${UNZIP_INCLUDE_DIRS};${ASSIMP_MINIZIP_INCLUDE_DIR}" CACHE STRING "Assimp unzip include dirs" FORCE)
+endif()
+
 #Includes
 add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/glad)
@@ -52,6 +66,10 @@ add_subdirectory(thirdparty/entt)
 # Disable assimp unit tests
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable assimp unit tests" FORCE)
 add_subdirectory(thirdparty/assimp)
+
+if(ASSIMP_MINIZIP_INCLUDE_DIR)
+    target_include_directories(assimp PRIVATE "${ASSIMP_MINIZIP_INCLUDE_DIR}")
+endif()
 
 #Define source files as "SOURCES"
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
