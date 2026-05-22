@@ -3,16 +3,12 @@
 
 namespace Karbon {
 
-struct RigidBodyComponent {
+struct RigidbodyComponent {
     enum class Type { Static, Kinematic, Dynamic } type = Type::Static;
     float mass = 1.0f;
     float friction = 0.5f;
     float restitution = 0.0f;
     bool isTrigger = false;
-    
-    // Runtime-populated by PhysicsSystem. Do not set manually.
-    JPH::BodyID bodyID;
-    bool initialized = false;
 };
 
 }
