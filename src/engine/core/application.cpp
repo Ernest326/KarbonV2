@@ -111,8 +111,8 @@ void Application::run() {
   registry.emplace<RigidbodyComponent>(floor_entity, f_rb);
 
   ColliderComponent f_col;
-  f_col.type = ColliderComponent::Type::Box;
-  f_col.halfExtents = glm::vec3(10.0f, 0.5f, 10.0f);
+  f_col.type = ColliderComponent::Type::Plane;
+  f_col.halfExtents = glm::vec3(10.0f, 1.0f, 10.0f);
   registry.emplace<ColliderComponent>(floor_entity, f_col);
 
   //Cube generation
@@ -136,8 +136,9 @@ void Application::run() {
     registry.emplace<RigidbodyComponent>(cube_entity, cube_rb);
 
     ColliderComponent cube_col;
-    cube_col.type = ColliderComponent::Type::Box;
-    cube_col.halfExtents = glm::vec3(0.5f);
+    cube_col.type = ColliderComponent::Type::Sphere;
+    cube_col.radius = 0.5f;
+    //cube_col.halfExtents = glm::vec3(0.5f);
     registry.emplace<ColliderComponent>(cube_entity, cube_col);
 
     registry.emplace<Cube>(cube_entity, cube_t.position, cube_t.rotation,

@@ -233,11 +233,8 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
     break;
   }
   case ColliderComponent::Type::Plane: {
-    JPH::Plane plane = JPH::Plane::sFromPointAndNormal(
-        JPH::Vec3(transform.position.x, transform.position.y,
-                  transform.position.z),
-        JPH::Vec3(0.0f, 1.0f, 0.0f));
-    JPH::PlaneShapeSettings shape_settings(plane);
+    JPH::BoxShapeSettings shape_settings(
+        JPH::Vec3(transform.scale.x/2, 0.05f, transform.scale.z/2));
     shape_settings.SetEmbedded();
     auto result = shape_settings.Create();
     shape = result.Get();
