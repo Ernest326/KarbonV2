@@ -11,6 +11,7 @@ private:
     static std::unique_ptr<VBO> vertexBuffer;
     static std::unique_ptr<IBO> indexBuffer;
     static std::unique_ptr<VBO> texCoordBuffer;
+    static std::unique_ptr<VBO> normalBuffer;
     static std::unique_ptr<VAO> vertexArray;
 public:
     Cube(glm::vec3 position, glm::quat rotation, glm::vec3 scale);

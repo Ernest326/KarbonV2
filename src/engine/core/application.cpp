@@ -18,6 +18,8 @@
 #include "../graphics/primitives/plane.h"
 #include "../graphics/spectator_camera.h"
 
+#include "../scene/empty.h"
+
 // Physics incldues
 #include "../physics/physics_system.h"
 #include "../scene/components/collider_component.h"
@@ -26,6 +28,10 @@
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/RegisterTypes.h>
+
+//Lighting
+#include "../graphics/lighting_system.h"
+#include "../scene/components/pointlight_component.h"
 
 namespace Karbon {
 
@@ -69,9 +75,13 @@ void Application::run() {
   PhysicsSystem physicsSystem(&registry, &jobSystem);
   physicsSystem.Initialize();
 
+  // lighting system
+  LightingSystem lightingSystem(&registry);
+  lightingSystem.Initialize();
+
   // Shader + texture setup
-  Shader test_shader("resources/test_texture.vert",
-                     "resources/test_texture.frag");
+  Shader test_shader("resources/test_lighting.vert",
+                     "resources/test_lighting.frag");
   Texture test_texture("resources/texture.png");
   Texture test_texture2("resources/texture2.jpg");
 
@@ -85,7 +95,7 @@ void Application::run() {
   SpectatorCamera camera(glm::vec3(0.0f, 0.0f, 5.0f),
                          glm::vec3(0.0f, 0.0f, 0.0f));
 
-  // Entities with physics ----------------------------
+  // Entities ----------------------------
 
   // Floor
   auto floor_entity = registry.create();
@@ -105,11 +115,9 @@ void Application::run() {
   f_col.halfExtents = glm::vec3(10.0f, 0.5f, 10.0f);
   registry.emplace<ColliderComponent>(floor_entity, f_col);
 
+  //Cube generation
   std::vector<entt::entity> cube_entities;
   for (int i = 0; i < 1000; i++) {
-
-    // Create some cubes with physics
-    // Cube
     int x = rand() % 10 - 5;
     int z = rand() % 10 - 5;
 
@@ -138,6 +146,21 @@ void Application::run() {
     cube_entities.push_back(cube_entity);
   }
 
+  //Create a light
+  Empty light(&registry, glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+  PointLightComponent &pointlight = light.AddComponent<PointLightComponent>();
+  pointlight.color = glm::vec3(1.0f, 1.0f, 1.0f);
+  pointlight.intensity = 2.0f;
+  pointlight.radius = 5.0f;
+ 
+  Empty light2(&registry, glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+  PointLightComponent &pointlight2 = light2.AddComponent<PointLightComponent>();
+  pointlight2.color = glm::vec3(1.0f, 0.0f, 0.0f);
+  pointlight2.intensity = 5.0f;
+  pointlight2.radius = 15.0f;
+
+  //---------------------------------
+
   // Some defaults
   float lastFrameTime = getTime();
 
@@ -159,6 +182,7 @@ void Application::run() {
     if (!m_minimised) {
 
       physicsSystem.Update(deltaTime);
+      lightingSystem.Update();
 
       ImGui::Begin("Test Window");
       ImGui::Text("Hello, world!");
@@ -171,21 +195,31 @@ void Application::run() {
       ImGui::Text("Body count: %d", physicsSystem.getBodyCount());
       ImGui::End();
 
+      //Update floor position
       auto &floor_transform = registry.get<TransformComponent>(floor_entity);
       floor_transform.position =
-          glm::vec3(0.0f, sin(glfwGetTime() * 5.0f) * 5.0f - 0.5f, 0.0f);
+          glm::vec3(0.0f, sin(glfwGetTime() * 2.0f) * 2.0f - 1.0f, 0.0f);
       test_plane.setPosition(floor_transform.position -
                              glm::vec3(0.0, 1.0f, 0.0f));
       test_plane.setScale(floor_transform.scale);
       test_plane.setRotation(floor_transform.rotation);
 
       test_shader.bind();
-      test_shader.bindUniform(test_cube.getModelMatrix(), "model");
       test_shader.bindUniform(camera.getViewMatrix(), "view");
       test_shader.bindUniform(camera.getProjectionMatrix(), "projection");
-      test_texture.bind(0);
-      test_shader.bind();
+      test_shader.bindUniform(camera.getPosition(), "viewPos");
 
+      //Lighting UBO binding
+      GLuint lights = glGetUniformBlockIndex(test_shader.getID(), "Lights");
+      glUniformBlockBinding(test_shader.getID(), lights, 1);
+      glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightingSystem.getUBO());
+
+      //Update light position
+      auto &light_transform = light2.GetComponent<TransformComponent>();
+      light_transform.position = glm::vec3(sin(glfwGetTime() * 5.0f) * 5.0f, 2.0f, cos(glfwGetTime() * 5.0f) * 5.0f);
+      
+      //Draw Cubes
+      test_texture.bind(0);
       for (const auto &cube_entity : cube_entities) {
         auto &cube_transform = registry.get<TransformComponent>(cube_entity);
         auto &graphic = registry.get<Cube>(cube_entity);
@@ -196,6 +230,7 @@ void Application::run() {
         graphic.draw();
       }
 
+      //Draw plane
       test_shader.bindUniform(test_plane.getModelMatrix(), "model");
       test_texture2.bind(0);
       test_plane.draw();

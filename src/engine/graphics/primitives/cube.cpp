@@ -6,6 +6,7 @@ namespace Karbon {
 std::unique_ptr<VBO> Cube::vertexBuffer = nullptr;
 std::unique_ptr<IBO> Cube::indexBuffer = nullptr;
 std::unique_ptr<VBO> Cube::texCoordBuffer = nullptr;
+std::unique_ptr<VBO> Cube::normalBuffer = nullptr;
 std::unique_ptr<VAO> Cube::vertexArray = nullptr;
 
 Cube::Cube(glm::vec3 position, glm::quat rotation, glm::vec3 scale) : position(position), rotation(rotation), scale(scale) {
@@ -87,15 +88,51 @@ Cube::Cube(glm::vec3 position, glm::quat rotation, glm::vec3 scale) : position(p
             0.0f, 1.0f
         };
 
+        GLfloat* normals = new GLfloat[108] {
+            // Front face
+            0.0f, 0.0f, -1.0f,
+            0.0f, 0.0f, -1.0f,
+            0.0f, 0.0f, -1.0f,
+            0.0f, 0.0f, -1.0f,
+            // Back face
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+            // Left face
+            -1.0f, 0.0f, 0.0f,
+            -1.0f, 0.0f, 0.0f,
+            -1.0f, 0.0f, 0.0f,
+            -1.0f, 0.0f, 0.0f,
+            // Right face
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            // Top face
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            // Bottom face
+            0.0f, -1.0f, 0.0f,
+            0.0f, -1.0f, 0.0f,
+            0.0f, -1.0f, 0.0f,
+            0.0f, -1.0f, 0.0f
+        };
+
         buffersInitialized = true;
         this->vertexBuffer = std::make_unique<VBO>(cube_verts, 108*sizeof(GLfloat));
         this->indexBuffer = std::make_unique<IBO>(indices, 36);
         this->texCoordBuffer = std::make_unique<VBO>(glTexCoords, 72*sizeof(GLfloat));
+        this->normalBuffer = std::make_unique<VBO>(normals, 108*sizeof(GLfloat));
         this->vertexArray = std::make_unique<VAO>();
         this->vertexArray->addBuffer(*this->vertexBuffer, 0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), 0);
-        this->vertexArray->addBuffer(*this->texCoordBuffer, 1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), 0);
+        this->vertexArray->addBuffer(*this->normalBuffer, 1, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), 0);
+        this->vertexArray->addBuffer(*this->texCoordBuffer, 2, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), 0);
         delete[] cube_verts;
         delete[] glTexCoords;
+        delete[] normals;
     }    
 }
 
