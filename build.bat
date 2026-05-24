@@ -1,1 +1,1 @@
-cmake -G "MinGW Makefiles" && mingw32-make && .\build\Karbon
+cmake . -G "MinGW Makefiles" && mingw32-make && .\build\Karbon

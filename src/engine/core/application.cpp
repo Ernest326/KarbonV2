@@ -92,19 +92,22 @@ void Application::run() {
   auto &floor_t = registry.emplace<TransformComponent>(floor_entity);
   floor_t.position = glm::vec3(0.0f, -1.0f, 0.0f);
   floor_t.rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-  floor_t.scale = glm::vec3(20.0f, 0.0f, 20.0f);
+  floor_t.scale = glm::vec3(20.0f, 0.1f, 20.0f);
 
-  auto &floor_rb = registry.emplace<RigidbodyComponent>(floor_entity);
-  floor_rb.type = RigidbodyComponent::Type::Static;
-  floor_rb.mass = 0.0f;
-  floor_rb.friction = 0.5f;
+  RigidbodyComponent f_rb;
+  f_rb.type = RigidbodyComponent::Type::Kinematic;
+  f_rb.mass = 0.0f;
+  f_rb.friction = 0.5f;
+  registry.emplace<RigidbodyComponent>(floor_entity, f_rb);
 
-  auto &floor_col = registry.emplace<ColliderComponent>(floor_entity);
-  floor_col.type = ColliderComponent::Type::Box;
-  floor_col.halfExtents = glm::vec3(5.0f, 0.1f, 5.0f);
+  ColliderComponent f_col;
+  f_col.type = ColliderComponent::Type::Box;
+  f_col.halfExtents = glm::vec3(10.0f, 0.5f, 10.0f);
+  registry.emplace<ColliderComponent>(floor_entity, f_col);
 
   std::vector<entt::entity> cube_entities;
-  for (int i = 0; i < 50; i++) {
+  for (int i = 0; i < 1000; i++) {
+
     // Create some cubes with physics
     // Cube
     int x = rand() % 10 - 5;
@@ -112,22 +115,25 @@ void Application::run() {
 
     auto cube_entity = registry.create();
     auto &cube_t = registry.emplace<TransformComponent>(cube_entity);
-    cube_t.position = glm::vec3((float)x, 5.0f, (float)z);
+    cube_t.position = glm::vec3((float)x, 15.0f + (float)i * 1.5f, (float)z);
     cube_t.rotation = quatFromDegrees(
         glm::vec3(rand() * 360.0, rand() * 360.0, rand() * 360.0));
     cube_t.scale = glm::vec3(1.0f);
 
-    auto &cube_rb = registry.emplace<RigidbodyComponent>(cube_entity);
+    RigidbodyComponent cube_rb;
     cube_rb.type = RigidbodyComponent::Type::Dynamic;
+    cube_rb.physicsType = RigidbodyComponent::PhysicsType::Continuous;
     cube_rb.mass = 1.0f;
     cube_rb.friction = 0.5f;
+    registry.emplace<RigidbodyComponent>(cube_entity, cube_rb);
 
-    auto &cube_col = registry.emplace<ColliderComponent>(cube_entity);
+    ColliderComponent cube_col;
     cube_col.type = ColliderComponent::Type::Box;
     cube_col.halfExtents = glm::vec3(0.5f);
+    registry.emplace<ColliderComponent>(cube_entity, cube_col);
 
-    auto &cube_graphic = registry.emplace<Cube>(cube_entity, cube_t.position,
-                                                cube_t.rotation, cube_t.scale);
+    registry.emplace<Cube>(cube_entity, cube_t.position, cube_t.rotation,
+                           cube_t.scale);
 
     cube_entities.push_back(cube_entity);
   }
@@ -166,7 +172,10 @@ void Application::run() {
       ImGui::End();
 
       auto &floor_transform = registry.get<TransformComponent>(floor_entity);
-      test_plane.setPosition(floor_transform.position);
+      floor_transform.position =
+          glm::vec3(0.0f, sin(glfwGetTime() * 5.0f) * 5.0f - 0.5f, 0.0f);
+      test_plane.setPosition(floor_transform.position -
+                             glm::vec3(0.0, 1.0f, 0.0f));
       test_plane.setScale(floor_transform.scale);
       test_plane.setRotation(floor_transform.rotation);
 
@@ -179,7 +188,7 @@ void Application::run() {
 
       for (const auto &cube_entity : cube_entities) {
         auto &cube_transform = registry.get<TransformComponent>(cube_entity);
-        Cube graphic = registry.get<Cube>(cube_entity);
+        auto &graphic = registry.get<Cube>(cube_entity);
         graphic.setPosition(cube_transform.position);
         graphic.setRotation(cube_transform.rotation);
         graphic.setScale(cube_transform.scale);

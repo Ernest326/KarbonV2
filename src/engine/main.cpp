@@ -4,5 +4,5 @@
 int main() {
     Karbon::Application app("Karbon");
     app.run();
-    return 1;
+    return 0;
 }

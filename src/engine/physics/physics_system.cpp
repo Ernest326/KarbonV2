@@ -90,10 +90,13 @@ void PhysicsSystem::Initialize() {
       std::make_unique<ObjectVsBroadPhaseLayerFilterImpl>();
   m_ObjectLayerPairFilter = std::make_unique<ObjectLayerPairFilterImpl>();
 
-  m_PhysicsSystem->Init(1024, 1024, 1024, 1024, *m_BroadPhaseLayerInterface,
+  // Init(max_bodies, num_body_mutexes, max_body_pairs, max_contact_constraints,
+  // ...)
+  m_PhysicsSystem->Init(65536, 0, 65536, 10240, *m_BroadPhaseLayerInterface,
                         *m_ObjectVsBroadPhaseLayerFilter,
                         *m_ObjectLayerPairFilter);
   m_PhysicsSystem->SetGravity(JPH::Vec3(0.0f, -9.81f, 0.0f));
+
 
   // Register EnTT hooks
   m_Registry->on_construct<RigidbodyComponent>()
@@ -207,42 +210,39 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
   // Set shape based on ColliderComponent
   JPH::ShapeRefC shape;
   switch (col.type) {
-      case ColliderComponent::Type::Box:
-      {
-          JPH::BoxShapeSettings shape_settings(JPH::Vec3(col.halfExtents.x, col.halfExtents.y, col.halfExtents.z));
-          shape_settings.SetEmbedded();
-          auto result = shape_settings.Create();
-          shape = result.Get();
-          break;
-      }
-      case ColliderComponent::Type::Sphere:
-      {
-          JPH::SphereShapeSettings shape_settings(col.radius);
-          shape_settings.SetEmbedded();
-          auto result = shape_settings.Create();
-          shape = result.Get();
-          break;
-      }
-      case ColliderComponent::Type::Capsule:
-      {
-          JPH::CapsuleShapeSettings shape_settings(col.halfExtents.y, col.radius);
-          shape_settings.SetEmbedded();
-          auto result = shape_settings.Create();
-          shape = result.Get();
-          break;
-      }
-      case ColliderComponent::Type::Plane:
-      {
-          JPH::Plane plane = JPH::Plane::sFromPointAndNormal(
-              JPH::Vec3(transform.position.x, transform.position.y, transform.position.z),
-              JPH::Vec3(0.0f, 1.0f, 0.0f)
-          );
-          JPH::PlaneShapeSettings shape_settings(plane);
-          shape_settings.SetEmbedded();
-          auto result = shape_settings.Create();
-          shape = result.Get();
-          break;
-      }
+  case ColliderComponent::Type::Box: {
+    JPH::BoxShapeSettings shape_settings(
+        JPH::Vec3(col.halfExtents.x, col.halfExtents.y, col.halfExtents.z));
+    shape_settings.SetEmbedded();
+    auto result = shape_settings.Create();
+    shape = result.Get();
+    break;
+  }
+  case ColliderComponent::Type::Sphere: {
+    JPH::SphereShapeSettings shape_settings(col.radius);
+    shape_settings.SetEmbedded();
+    auto result = shape_settings.Create();
+    shape = result.Get();
+    break;
+  }
+  case ColliderComponent::Type::Capsule: {
+    JPH::CapsuleShapeSettings shape_settings(col.halfExtents.y, col.radius);
+    shape_settings.SetEmbedded();
+    auto result = shape_settings.Create();
+    shape = result.Get();
+    break;
+  }
+  case ColliderComponent::Type::Plane: {
+    JPH::Plane plane = JPH::Plane::sFromPointAndNormal(
+        JPH::Vec3(transform.position.x, transform.position.y,
+                  transform.position.z),
+        JPH::Vec3(0.0f, 1.0f, 0.0f));
+    JPH::PlaneShapeSettings shape_settings(plane);
+    shape_settings.SetEmbedded();
+    auto result = shape_settings.Create();
+    shape = result.Get();
+    break;
+  }
   case ColliderComponent::Type::Mesh:
     // Mesh colliders would require additional handling to create a triangle
     // mesh shape
@@ -277,18 +277,25 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
   // Finalize body creation settings
   JPH::BodyCreationSettings settings(
       shape,
-      JPH::RVec3(transform.position.x, transform.position.y, transform.position.z),
-      JPH::Quat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w),
-      motionType,
-      objectLayer
-  );
-  settings.mFriction    = rb.friction;
+      JPH::RVec3(transform.position.x, transform.position.y,
+                 transform.position.z),
+      JPH::Quat(transform.rotation.x, transform.rotation.y,
+                transform.rotation.z, transform.rotation.w),
+      motionType, objectLayer);
+  settings.mFriction = rb.friction;
   settings.mRestitution = rb.restitution;
-  settings.mIsSensor    = rb.isTrigger;
+  settings.mIsSensor = rb.isTrigger;
+
+  if (rb.physicsType == RigidbodyComponent::PhysicsType::Continuous) {
+    settings.mMotionQuality = JPH::EMotionQuality::LinearCast;
+  } else {
+    settings.mMotionQuality = JPH::EMotionQuality::Discrete;
+  }
 
   if (rb.type == RigidbodyComponent::Type::Dynamic) {
-      settings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
-      settings.mMassPropertiesOverride.mMass = rb.mass;
+    settings.mOverrideMassProperties =
+        JPH::EOverrideMassProperties::CalculateInertia;
+    settings.mMassPropertiesOverride.mMass = rb.mass;
   }
 
   // Create body and store mapping
@@ -355,18 +362,18 @@ void PhysicsSystem::SyncEntitiesToPhysics() {
     JPH::BodyID bodyID = pair.second;
 
     auto &rb = m_Registry->get<RigidbodyComponent>(entity);
-    if (rb.type == RigidbodyComponent::Type::Dynamic)
+    if (rb.type != RigidbodyComponent::Type::Kinematic)
       continue;
 
     // Update physics body based on entity transform
     auto &transform = m_Registry->get<TransformComponent>(entity);
-    m_PhysicsSystem->GetBodyInterface().SetPositionAndRotation(
+    m_PhysicsSystem->GetBodyInterface().MoveKinematic(
         bodyID,
         JPH::RVec3(transform.position.x, transform.position.y,
                    transform.position.z),
         JPH::Quat(transform.rotation.x, transform.rotation.y,
                   transform.rotation.z, transform.rotation.w),
-        JPH::EActivation::DontActivate);
+        m_FixedTimeStep);
   }
 }
 
