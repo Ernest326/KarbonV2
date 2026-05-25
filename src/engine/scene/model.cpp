@@ -7,7 +7,7 @@
 
 namespace Karbon {
 
-Model::Model(const char* filepath) { loadModel(filepath); }
+Model::Model(const char* filepath, MaterialSystem* materialSystem) { loadModel(filepath, materialSystem); }
 
 void Model::draw() const {
     for (const auto& mesh : m_meshes) {
@@ -15,7 +15,7 @@ void Model::draw() const {
     }
 }
 
-void Model::loadModel(const char* filepath) {
+void Model::loadModel(const char* filepath, MaterialSystem* materialSystem) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
@@ -23,20 +23,20 @@ void Model::loadModel(const char* filepath) {
         std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
         return;
     }
-    processAiNode(scene->mRootNode, scene);
+    processAiNode(scene->mRootNode, scene, materialSystem);
 }
 
-void Model::processAiNode(aiNode* node, const aiScene* scene) {
+void Model::processAiNode(aiNode* node, const aiScene* scene, MaterialSystem* materialSystem) {
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        m_meshes.push_back(processAiMesh(mesh, scene));
+        m_meshes.push_back(processAiMesh(mesh, scene, materialSystem));
     }
     for (unsigned int i = 0; i < node->mNumChildren; i++) {
-        processAiNode(node->mChildren[i], scene);
+        processAiNode(node->mChildren[i], scene, materialSystem);
     }
 }
 
-Mesh Model::processAiMesh(aiMesh* aiMesh, const aiScene* scene) {
+Mesh Model::processAiMesh(aiMesh* aiMesh, const aiScene* scene, MaterialSystem* materialSystem) {
     Mesh mesh;
 
     for (unsigned int i = 0; i < aiMesh->mNumVertices; i++) {
@@ -63,29 +63,52 @@ Mesh Model::processAiMesh(aiMesh* aiMesh, const aiScene* scene) {
     }
 
     if (aiMesh->mMaterialIndex >= 0) {
-        mesh.material = processAiMaterial(scene->mMaterials[aiMesh->mMaterialIndex], scene);
+        mesh.material = processAiMaterial(scene->mMaterials[aiMesh->mMaterialIndex], scene, materialSystem);
     }
     return mesh;
 }
 
-MaterialHandle Model::processAiMaterial(aiMaterial* aiMaterial, const aiScene* scene) {
-    Material material;
-    aiColor3D color(0.0f, 0.0f, 0.0f);
+MaterialHandle Model::processAiMaterial(aiMaterial* aiMaterial, const aiScene* scene, MaterialSystem* materialSystem) {
+    if (!materialSystem) return 0;
+
+    aiColor3D color(1.0f, 1.0f, 1.0f);
+    aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+
+    float metallic = 0.0f;
+    float roughness = 0.5f;
+    aiMaterial->Get(AI_MATKEY_METALLIC_FACTOR, metallic);
+    aiMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness);
+
+    glm::vec4 albedo = glm::vec4(color.r, color.g, color.b, 1.0f);
+
+    Texture* albedoMap = nullptr;
+    Texture* normalMap = nullptr;
+    Texture* metallicMap = nullptr;
+    Texture* roughnessMap = nullptr;
+
+    if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+        aiString path;
+        aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+        albedoMap = new Texture(path.C_Str());
+    }
+    if (aiMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+        aiString path;
+        aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &path);
+        normalMap = new Texture(path.C_Str());
+    }
+    if (aiMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+        aiString path;
+        aiMaterial->GetTexture(aiTextureType_SPECULAR, 0, &path);
+        metallicMap = new Texture(path.C_Str());
+    }
+    if (aiMaterial->GetTextureCount(aiTextureType_SHININESS) > 0) {
+        aiString path;
+        aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &path);
+        roughnessMap = new Texture(path.C_Str());
+    }
+
+    return materialSystem->createTextured(albedo, metallic, roughness, albedoMap, normalMap, metallicMap, roughnessMap);
     
-    if (AI_SUCCESS == aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color)) {
-        material.albedoColor = glm::vec4(color.r, color.g, color.b, 1.0f);
-    }
-
-    float metallic, roughness;
-    if (AI_SUCCESS == aiMaterial->Get(AI_MATKEY_METALLIC_FACTOR, metallic)) {
-        material.metallic = metallic;
-    }
-    if (AI_SUCCESS == aiMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness)) {
-        material.roughness = roughness;
-    }
-
-    m_materials.push_back(material);
-    return m_materials.size() - 1;
 }
 
 }

@@ -33,6 +33,14 @@
 #include "../graphics/lighting_system.h"
 #include "../scene/components/pointlight_component.h"
 
+//Rendering
+#include "../graphics/render_system.h"
+#include "../graphics/material_system.h"
+#include "../scene/plane_mesh.h"
+#include "../scene/cube_mesh.h"
+#include "../scene/sphere_mesh.h"
+#include "../scene/components/meshrenderer_component.h"
+
 namespace Karbon {
 
 namespace {
@@ -68,83 +76,79 @@ void Application::run() {
 
   KarbonImGUI::init();
 
-  // EnTT + Physics registry
+  // EnTT registry
   entt::registry registry;
+
+  // Physics system
   JPH::JobSystemThreadPool jobSystem(2048, 8,
                                      std::thread::hardware_concurrency() - 1);
   PhysicsSystem physicsSystem(&registry, &jobSystem);
   physicsSystem.Initialize();
 
-  // lighting system
+  // Renderer system
   LightingSystem lightingSystem(&registry);
   lightingSystem.Initialize();
+  MaterialSystem materialSystem; 
+  RenderSystem renderSystem(&registry, &materialSystem, &lightingSystem); 
 
   // Shader + texture setup
-  Shader test_shader("resources/test_lighting.vert",
-                     "resources/test_lighting.frag");
+  Shader test_shader("resources/test_standard.vert",
+                     "resources/test_standard.frag");
   Texture test_texture("resources/texture.png");
   Texture test_texture2("resources/texture2.jpg");
 
   // Visual primitives
-  Cube test_cube(glm::vec3(0.0f),
-                 quatFromDegrees(
-                     glm::vec3(rand() * 360.0, rand() * 360.0, rand() * 360.0)),
-                 glm::vec3(1.0f));
-  Plane test_plane(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f),
-                   glm::vec3(10.0f));
   SpectatorCamera camera(glm::vec3(0.0f, 0.0f, 5.0f),
                          glm::vec3(0.0f, 0.0f, 0.0f));
 
   // Entities ----------------------------
+  
+  MaterialHandle floor_material = materialSystem.createTextured(glm::vec4(1.0f), 0.0f, 1.0f, &test_texture);
 
   // Floor
-  auto floor_entity = registry.create();
-  auto &floor_t = registry.emplace<TransformComponent>(floor_entity);
-  floor_t.position = glm::vec3(0.0f, -1.0f, 0.0f);
-  floor_t.rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-  floor_t.scale = glm::vec3(20.0f, 0.1f, 20.0f);
+  PlaneMesh floor_mesh;
+  Empty floor_entity(&registry, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(20.0f, 0.1f, 20.0f));
 
-  RigidbodyComponent f_rb;
-  f_rb.type = RigidbodyComponent::Type::Kinematic;
-  f_rb.mass = 0.0f;
-  f_rb.friction = 0.5f;
-  registry.emplace<RigidbodyComponent>(floor_entity, f_rb);
+  floor_entity.AddComponent<RigidbodyComponent>();
+  floor_entity.GetComponent<RigidbodyComponent>().type = RigidbodyComponent::Type::Kinematic;
+  floor_entity.GetComponent<RigidbodyComponent>().mass = 0.0f;
+  floor_entity.GetComponent<RigidbodyComponent>().friction = 0.5f;
 
-  ColliderComponent f_col;
-  f_col.type = ColliderComponent::Type::Plane;
-  f_col.halfExtents = glm::vec3(10.0f, 1.0f, 10.0f);
-  registry.emplace<ColliderComponent>(floor_entity, f_col);
+  floor_entity.AddComponent<ColliderComponent>();
+  floor_entity.GetComponent<ColliderComponent>().type = ColliderComponent::Type::Plane;
+  floor_entity.GetComponent<ColliderComponent>().halfExtents = glm::vec3(10.0f, 1.0f, 10.0f);
 
-  //Cube generation
-  std::vector<entt::entity> cube_entities;
+  floor_entity.AddComponent<MeshRendererComponent>();
+  floor_entity.GetComponent<MeshRendererComponent>().mesh = &floor_mesh;
+  floor_entity.GetComponent<MeshRendererComponent>().material = floor_material;
+
+
+  //Sphere generation
+  SphereMesh sphere_mesh;
+  MaterialHandle sphere_material = materialSystem.create(glm::vec4(0.8f, 0.2f, 0.2f, 1.0f), 0.0f, 0.2f);
+
+  std::vector<entt::entity> sphere_entities;
   for (int i = 0; i < 1000; i++) {
     int x = rand() % 10 - 5;
     int z = rand() % 10 - 5;
 
-    auto cube_entity = registry.create();
-    auto &cube_t = registry.emplace<TransformComponent>(cube_entity);
-    cube_t.position = glm::vec3((float)x, 15.0f + (float)i * 1.5f, (float)z);
-    cube_t.rotation = quatFromDegrees(
-        glm::vec3(rand() * 360.0, rand() * 360.0, rand() * 360.0));
-    cube_t.scale = glm::vec3(1.0f);
+    Empty sphere_entity(&registry, glm::vec3((float)x, 15.0f + (float)i * 1.5f, (float)z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
 
-    RigidbodyComponent cube_rb;
-    cube_rb.type = RigidbodyComponent::Type::Dynamic;
-    cube_rb.physicsType = RigidbodyComponent::PhysicsType::Continuous;
-    cube_rb.mass = 1.0f;
-    cube_rb.friction = 0.5f;
-    registry.emplace<RigidbodyComponent>(cube_entity, cube_rb);
+    sphere_entity.AddComponent<RigidbodyComponent>();
+    sphere_entity.GetComponent<RigidbodyComponent>().type = RigidbodyComponent::Type::Dynamic;
+    sphere_entity.GetComponent<RigidbodyComponent>().physicsType = RigidbodyComponent::PhysicsType::Continuous;
+    sphere_entity.GetComponent<RigidbodyComponent>().mass = 1.0f;
+    sphere_entity.GetComponent<RigidbodyComponent>().friction = 0.5f;
 
-    ColliderComponent cube_col;
-    cube_col.type = ColliderComponent::Type::Sphere;
-    cube_col.radius = 0.5f;
-    //cube_col.halfExtents = glm::vec3(0.5f);
-    registry.emplace<ColliderComponent>(cube_entity, cube_col);
+    sphere_entity.AddComponent<ColliderComponent>();
+    sphere_entity.GetComponent<ColliderComponent>().type = ColliderComponent::Type::Sphere;
+    sphere_entity.GetComponent<ColliderComponent>().radius = 0.5f;
 
-    registry.emplace<Cube>(cube_entity, cube_t.position, cube_t.rotation,
-                           cube_t.scale);
+    sphere_entity.AddComponent<MeshRendererComponent>();
+    sphere_entity.GetComponent<MeshRendererComponent>().mesh = &sphere_mesh;
+    sphere_entity.GetComponent<MeshRendererComponent>().material = sphere_material;
 
-    cube_entities.push_back(cube_entity);
+    sphere_entities.push_back(sphere_entity.getID());
   }
 
   //Create a light
@@ -197,18 +201,8 @@ void Application::run() {
       ImGui::End();
 
       //Update floor position
-      auto &floor_transform = registry.get<TransformComponent>(floor_entity);
-      floor_transform.position =
-          glm::vec3(0.0f, sin(glfwGetTime() * 2.0f) * 2.0f - 1.0f, 0.0f);
-      test_plane.setPosition(floor_transform.position -
-                             glm::vec3(0.0, 1.0f, 0.0f));
-      test_plane.setScale(floor_transform.scale);
-      test_plane.setRotation(floor_transform.rotation);
-
-      test_shader.bind();
-      test_shader.bindUniform(camera.getViewMatrix(), "view");
-      test_shader.bindUniform(camera.getProjectionMatrix(), "projection");
-      test_shader.bindUniform(camera.getPosition(), "viewPos");
+      auto &floor_transform = floor_entity.GetComponent<TransformComponent>();
+      floor_transform.position = glm::vec3(0.0f, sin(glfwGetTime() * 2.0f) * 2.0f - 1.0f, 0.0f);
 
       //Lighting UBO binding
       GLuint lights = glGetUniformBlockIndex(test_shader.getID(), "Lights");
@@ -218,25 +212,9 @@ void Application::run() {
       //Update light position
       auto &light_transform = light2.GetComponent<TransformComponent>();
       light_transform.position = glm::vec3(sin(glfwGetTime() * 5.0f) * 5.0f, 2.0f, cos(glfwGetTime() * 5.0f) * 5.0f);
-      
-      //Draw Cubes
-      test_texture.bind(0);
-      for (const auto &cube_entity : cube_entities) {
-        auto &cube_transform = registry.get<TransformComponent>(cube_entity);
-        auto &graphic = registry.get<Cube>(cube_entity);
-        graphic.setPosition(cube_transform.position);
-        graphic.setRotation(cube_transform.rotation);
-        graphic.setScale(cube_transform.scale);
-        test_shader.bindUniform(graphic.getModelMatrix(), "model");
-        graphic.draw();
-      }
 
-      //Draw plane
-      test_shader.bindUniform(test_plane.getModelMatrix(), "model");
-      test_texture2.bind(0);
-      test_plane.draw();
-      test_shader.unbind();
-      test_texture.unbind();
+      renderSystem.Draw(&test_shader, camera.getViewMatrix(), camera.getProjectionMatrix(), camera.getPosition());
+
     }
 
     KarbonImGUI::end();

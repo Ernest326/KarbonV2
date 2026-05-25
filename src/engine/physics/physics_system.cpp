@@ -12,6 +12,8 @@
 
 namespace Karbon {
 
+struct PhysicsBodyTag {};
+
 // Layer filters for collision
 namespace {
 constexpr JPH::ObjectLayer NON_MOVING = 0;
@@ -99,16 +101,10 @@ void PhysicsSystem::Initialize() {
 
 
   // Register EnTT hooks
-  m_Registry->on_construct<RigidbodyComponent>()
-      .connect<&PhysicsSystem::OnRigidbodyAdded>(this);
   m_Registry->on_destroy<RigidbodyComponent>()
       .connect<&PhysicsSystem::OnRigidbodyRemoved>(this);
-  m_Registry->on_construct<ColliderComponent>()
-      .connect<&PhysicsSystem::OnColliderAdded>(this);
   m_Registry->on_destroy<ColliderComponent>()
       .connect<&PhysicsSystem::OnColliderRemoved>(this);
-  m_Registry->on_construct<TransformComponent>()
-      .connect<&PhysicsSystem::OnTransformAdded>(this);
   m_Registry->on_destroy<TransformComponent>()
       .connect<&PhysicsSystem::OnTransformRemoved>(this);
 }
@@ -117,6 +113,12 @@ void PhysicsSystem::Update(float deltaTime) {
 
   if (!m_PhysicsSystem || !m_JobSystem)
     return;
+
+  // Create pending bodies
+  auto view = m_Registry->view<RigidbodyComponent, ColliderComponent, TransformComponent>(entt::exclude<PhysicsBodyTag>);
+  for (auto entity : view) {
+    TryCreateBody(*m_Registry, entity);
+  }
 
   m_Accum += deltaTime;
 
@@ -134,16 +136,10 @@ void PhysicsSystem::Shutdown() {
   }
 
   if (m_Registry) {
-    m_Registry->on_construct<RigidbodyComponent>()
-        .disconnect<&PhysicsSystem::OnRigidbodyAdded>(this);
     m_Registry->on_destroy<RigidbodyComponent>()
         .disconnect<&PhysicsSystem::OnRigidbodyRemoved>(this);
-    m_Registry->on_construct<ColliderComponent>()
-        .disconnect<&PhysicsSystem::OnColliderAdded>(this);
     m_Registry->on_destroy<ColliderComponent>()
         .disconnect<&PhysicsSystem::OnColliderRemoved>(this);
-    m_Registry->on_construct<TransformComponent>()
-        .disconnect<&PhysicsSystem::OnTransformAdded>(this);
     m_Registry->on_destroy<TransformComponent>()
         .disconnect<&PhysicsSystem::OnTransformRemoved>(this);
   }
@@ -158,22 +154,6 @@ void PhysicsSystem::Shutdown() {
 
   delete m_PhysicsSystem;
   m_PhysicsSystem = nullptr;
-}
-
-void PhysicsSystem::OnRigidbodyAdded(entt::registry &registry,
-                                     entt::entity entity) {
-  // Try to create body only if all required components exist
-  TryCreateBody(registry, entity);
-}
-
-void PhysicsSystem::OnColliderAdded(entt::registry &registry,
-                                    entt::entity entity) {
-  TryCreateBody(registry, entity);
-}
-
-void PhysicsSystem::OnTransformAdded(entt::registry &registry,
-                                     entt::entity entity) {
-  TryCreateBody(registry, entity);
 }
 
 void PhysicsSystem::OnColliderRemoved(entt::registry &registry,
@@ -312,6 +292,7 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
 
   m_EntityToBodyMap[entity] = bodyID;
   m_BodyToEntityMap[bodyID] = entity;
+  registry.emplace<PhysicsBodyTag>(entity);
   bodyCounter++;
 }
 
@@ -323,6 +304,7 @@ void PhysicsSystem::RemoveBody(entt::entity entity) {
     bodyInterface.DestroyBody(it->second);
     m_BodyToEntityMap.erase(it->second);
     m_EntityToBodyMap.erase(it);
+    m_Registry->erase<PhysicsBodyTag>(entity);
     bodyCounter--;
   }
 }

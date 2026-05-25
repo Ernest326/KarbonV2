@@ -1,5 +1,6 @@
 #pragma once
 #include "mesh.h"
+#include "../graphics/material_system.h"
 #include <string>
 #include <vector>
 #include <assimp/scene.h>
@@ -8,7 +9,7 @@ namespace Karbon {
 
 class Model {
 public:
-    explicit Model(const char* filepath);
+    explicit Model(const char* filepath, MaterialSystem* materialSystem);
     ~Model() = default;
     
     void draw() const;
@@ -17,12 +18,11 @@ public:
 
 private:
     std::vector<Mesh> m_meshes;
-    std::vector<Material> m_materials;
 
-    void loadModel(const char* filepath);
-    void processAiNode(aiNode* node, const aiScene* scene);
-    Mesh processAiMesh(aiMesh* mesh, const aiScene* scene);
-    MaterialHandle processAiMaterial(aiMaterial* material, const aiScene* scene);
+    void loadModel(const char* filepath, MaterialSystem* materialSystem);
+    void processAiNode(aiNode* node, const aiScene* scene, MaterialSystem* materialSystem);
+    Mesh processAiMesh(aiMesh* mesh, const aiScene* scene, MaterialSystem* materialSystem);
+    MaterialHandle processAiMaterial(aiMaterial* material, const aiScene* scene, MaterialSystem* materialSystem);
 };
 
 }

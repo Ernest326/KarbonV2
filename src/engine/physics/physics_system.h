@@ -30,11 +30,8 @@ public:
     std::unique_ptr<JPH::ObjectVsBroadPhaseLayerFilter> m_ObjectVsBroadPhaseLayerFilter;
 
     //EnTT hooks
-    void OnRigidbodyAdded(entt::registry& registry, entt::entity entity);
     void OnRigidbodyRemoved(entt::registry& registry, entt::entity entity);
-    void OnColliderAdded(entt::registry& registry, entt::entity entity);
     void OnColliderRemoved(entt::registry& registry, entt::entity entity);
-    void OnTransformAdded(entt::registry& registry, entt::entity entity);
     void OnTransformRemoved(entt::registry& registry, entt::entity entity);
 
     // Helpers

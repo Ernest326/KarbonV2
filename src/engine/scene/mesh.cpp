@@ -1,4 +1,3 @@
-#pragma once
 #include "mesh.h"
 #include <glad/glad.h>
 
