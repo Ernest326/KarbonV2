@@ -15,13 +15,14 @@ public:
     void draw() const;
     
     inline const std::vector<Mesh>& getMeshes() const { return m_meshes; }
+    inline Mesh& getMesh(size_t index) { return m_meshes.at(index); }
 
 private:
     std::vector<Mesh> m_meshes;
 
     void loadModel(const char* filepath, MaterialSystem* materialSystem);
-    void processAiNode(aiNode* node, const aiScene* scene, MaterialSystem* materialSystem);
-    Mesh processAiMesh(aiMesh* mesh, const aiScene* scene, MaterialSystem* materialSystem);
+    void processAiNode(aiNode* node, const aiScene* scene, MaterialSystem* materialSystem, const glm::mat4& parentTransform);
+    Mesh processAiMesh(aiMesh* mesh, const aiScene* scene, MaterialSystem* materialSystem, const glm::mat4& transform);
     MaterialHandle processAiMaterial(aiMaterial* material, const aiScene* scene, MaterialSystem* materialSystem);
 };
 

@@ -40,6 +40,7 @@
 #include "../scene/cube_mesh.h"
 #include "../scene/sphere_mesh.h"
 #include "../scene/components/meshrenderer_component.h"
+#include "../scene/model.h"
 
 namespace Karbon {
 
@@ -159,6 +160,18 @@ void Application::run() {
     sphere_entity.GetComponent<MeshRendererComponent>().material = sphere_material;
 
     sphere_entities.push_back(sphere_entity.getID());
+  }
+
+  // Mesh test
+  MaterialHandle mat = materialSystem.create(glm::vec4(0.2f, 0.8f, 0.2f, 1.0f), 0.0f, 0.5f);
+  Model monkey_model("resources/models/monke.fbx", &materialSystem);
+  Empty monkey_entity(&registry, glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+  monkey_entity.AddComponent<MeshRendererComponent>();
+  if (!monkey_model.getMeshes().empty()) {
+    monkey_entity.GetComponent<MeshRendererComponent>().mesh = &monkey_model.getMesh(0);
+    monkey_entity.GetComponent<MeshRendererComponent>().material = mat;
+  } else {
+    std::cerr << "Failed to load monke.fbx or model has no meshes; skipping monkey entity" << std::endl;
   }
 
   //Create a light

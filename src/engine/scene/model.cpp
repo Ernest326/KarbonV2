@@ -7,6 +7,31 @@
 
 namespace Karbon {
 
+namespace {
+glm::mat4 aiToGlm(const aiMatrix4x4& matrix) {
+    return glm::mat4(
+        matrix.a1, matrix.b1, matrix.c1, matrix.d1,
+        matrix.a2, matrix.b2, matrix.c2, matrix.d2,
+        matrix.a3, matrix.b3, matrix.c3, matrix.d3,
+        matrix.a4, matrix.b4, matrix.c4, matrix.d4
+    );
+}
+
+glm::mat4 removeScale(const glm::mat4& matrix) {
+    glm::mat4 result = matrix;
+
+    const glm::vec3 xAxis = glm::vec3(matrix[0]);
+    const glm::vec3 yAxis = glm::vec3(matrix[1]);
+    const glm::vec3 zAxis = glm::vec3(matrix[2]);
+
+    if (glm::length(xAxis) > 0.0f) result[0] = glm::vec4(glm::normalize(xAxis), 0.0f);
+    if (glm::length(yAxis) > 0.0f) result[1] = glm::vec4(glm::normalize(yAxis), 0.0f);
+    if (glm::length(zAxis) > 0.0f) result[2] = glm::vec4(glm::normalize(zAxis), 0.0f);
+
+    return result;
+}
+}
+
 Model::Model(const char* filepath, MaterialSystem* materialSystem) { loadModel(filepath, materialSystem); }
 
 void Model::draw() const {
@@ -23,27 +48,32 @@ void Model::loadModel(const char* filepath, MaterialSystem* materialSystem) {
         std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
         return;
     }
-    processAiNode(scene->mRootNode, scene, materialSystem);
+    processAiNode(scene->mRootNode, scene, materialSystem, glm::mat4(1.0f));
 }
 
-void Model::processAiNode(aiNode* node, const aiScene* scene, MaterialSystem* materialSystem) {
+void Model::processAiNode(aiNode* node, const aiScene* scene, MaterialSystem* materialSystem, const glm::mat4& parentTransform) {
+    const glm::mat4 nodeTransform = removeScale(parentTransform * aiToGlm(node->mTransformation));
+
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        m_meshes.push_back(processAiMesh(mesh, scene, materialSystem));
+        m_meshes.push_back(processAiMesh(mesh, scene, materialSystem, nodeTransform));
     }
     for (unsigned int i = 0; i < node->mNumChildren; i++) {
-        processAiNode(node->mChildren[i], scene, materialSystem);
+        processAiNode(node->mChildren[i], scene, materialSystem, nodeTransform);
     }
 }
 
-Mesh Model::processAiMesh(aiMesh* aiMesh, const aiScene* scene, MaterialSystem* materialSystem) {
+Mesh Model::processAiMesh(aiMesh* aiMesh, const aiScene* scene, MaterialSystem* materialSystem, const glm::mat4& transform) {
     Mesh mesh;
+    const glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(transform)));
 
     for (unsigned int i = 0; i < aiMesh->mNumVertices; i++) {
         Vertex vertex;
-        vertex.position = glm::vec3(aiMesh->mVertices[i].x, aiMesh->mVertices[i].y, aiMesh->mVertices[i].z);
+        glm::vec4 worldPosition = transform * glm::vec4(aiMesh->mVertices[i].x, aiMesh->mVertices[i].y, aiMesh->mVertices[i].z, 1.0f);
+        vertex.position = glm::vec3(worldPosition);
         if (aiMesh->HasNormals()) {
-            vertex.normal = glm::vec3(aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z);
+            glm::vec3 localNormal(aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z);
+            vertex.normal = glm::normalize(normalMatrix * localNormal);
         } else {
             vertex.normal = glm::vec3(0.0f, 0.0f, 0.0f);
         }
@@ -65,6 +95,9 @@ Mesh Model::processAiMesh(aiMesh* aiMesh, const aiScene* scene, MaterialSystem* 
     if (aiMesh->mMaterialIndex >= 0) {
         mesh.material = processAiMaterial(scene->mMaterials[aiMesh->mMaterialIndex], scene, materialSystem);
     }
+
+    // Imported meshes need their GPU buffers created before they can be drawn.
+    mesh.uploadToGPU();
     return mesh;
 }
 
