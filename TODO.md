@@ -3,11 +3,12 @@
 ENGINE LAYER:
 
 Core:
+- Logging system i.e. logger.info(),warn(),debug() + save logs if needed, better observability + same formatting for messages etc.
 - Audio system implementation
 
-- Assimp mesh loading system + animation system
-- Some sort of material interface + allow assigning materials to material slots in a mesh
-- Simple character controller1
+- Assimp mesh loading system + animation system -> test to see if models load corretly
+- Some sort of material interface + allow assigning materials to material slots in a mesh [X]
+- Simple character controller
 
 Physics:
 - Add a addVelocity, addTorque, addImpulse, addForce functions to the RigidbodyComponent, which delegate to the Jolt physics system
@@ -15,7 +16,7 @@ Physics:
 
 Shading/Lighting:
 - Skybox (cubemap + hdr skyboxes)
-- Add a lighting system which grabs point lights and passes them as needed into shader
+- Add a lighting system which grabs point lights and passes them as needed into shader [X]
 - PBR material system
 - Shadow maps maybe, or some sort of dynamic shadow system
 - Volumetric fog, fog effects
@@ -35,7 +36,7 @@ Extra gimmicks:
 -- Stuff to add in the future...
 - Navigation system, navmesh baking
 - Crossplatform compability
-
+- Networking
 
 
 

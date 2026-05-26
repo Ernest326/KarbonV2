@@ -5,6 +5,10 @@
 #include "window.h"
 #include "layer.h"
 
+#ifndef STBI_IMAGE_IMPLEMENTATION
+#define STBI_IMAGE_IMPLEMENTATION
+#endif
+
 namespace Karbon {
 
 class Application {

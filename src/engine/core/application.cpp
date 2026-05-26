@@ -90,12 +90,22 @@ void Application::run() {
   lightingSystem.Initialize();
   MaterialSystem materialSystem; 
   RenderSystem renderSystem(&registry, &materialSystem, &lightingSystem); 
+  
+  Cubemap skybox({
+    "resources/textures/skybox/right.jpg",
+    "resources/textures/skybox/left.jpg",
+    "resources/textures/skybox/top.jpg",
+    "resources/textures/skybox/bottom.jpg",
+    "resources/textures/skybox/front.jpg",
+    "resources/textures/skybox/back.jpg"
+  });
+  renderSystem.setSkybox(&skybox);
 
   // Shader + texture setup
-  Shader test_shader("resources/test_standard.vert",
-                     "resources/test_standard.frag");
-  Texture test_texture("resources/texture.png");
-  Texture test_texture2("resources/texture2.jpg");
+  Shader test_shader("resources/shaders/test_standard.vert",
+                     "resources/shaders/test_standard.frag");
+  Texture test_texture("resources/textures/texture.png");
+  Texture test_texture2("resources/textures/texture2.jpg");
 
   // Visual primitives
   SpectatorCamera camera(glm::vec3(0.0f, 0.0f, 5.0f),

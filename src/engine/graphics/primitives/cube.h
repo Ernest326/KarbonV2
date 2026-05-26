@@ -14,7 +14,7 @@ private:
     static std::unique_ptr<VBO> normalBuffer;
     static std::unique_ptr<VAO> vertexArray;
 public:
-    Cube(glm::vec3 position, glm::quat rotation, glm::vec3 scale);
+    Cube(glm::vec3 position = glm::vec3(0.0f), glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f), glm::vec3 scale = glm::vec3(1.0f));
     glm::mat4 getModelMatrix() const;
 
     glm::vec3 getPosition() const { return position; }
@@ -24,6 +24,9 @@ public:
     void setPosition(const glm::vec3& position) { this->position = position; }
     void setRotation(const glm::quat& rotation) { this->rotation = rotation; }
     void setScale(const glm::vec3& scale) { this->scale = scale; }
+
+    VBO &getVertexBuffer() const { return *vertexBuffer; }
+    IBO &getIndexBuffer() const { return *indexBuffer; }
 
     void draw() const;
 private:

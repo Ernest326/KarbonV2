@@ -2,10 +2,6 @@
 #include <glad/glad.h>
 #include <stb_image/stb_image.h>
 
-#ifndef STBI_IMAGE_IMPLEMENTATION
-#define STBI_IMAGE_IMPLEMENTATION
-#endif
-
 namespace Karbon {
 class Texture {
 public:
