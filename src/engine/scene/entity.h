@@ -9,6 +9,8 @@ public:
     Entity(entt::entity handle, entt::registry* registry);
     Entity(const Entity& other) = default;
 
+    operator entt::entity() const { return m_EntityHandle; }
+
     template<typename T, typename... Args>
     T& AddComponent(Args&&... args) {
         return m_Registry->emplace<T>(m_EntityHandle, std::forward<Args>(args)...);

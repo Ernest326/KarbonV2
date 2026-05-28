@@ -1,5 +1,6 @@
 #include "physics_system.h"
 #include "../scene/components/collider_component.h"
+#include "../scene/components/hierarchy_component.h"
 #include "../scene/components/rigidbody_component.h"
 #include "../scene/components/transform.h"
 #include <Jolt/Geometry/Plane.h>
@@ -177,9 +178,10 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
   if (m_EntityToBodyMap.find(entity) != m_EntityToBodyMap.end())
     return;
 
-  auto &rb = registry.get<RigidbodyComponent>(entity);
-  auto &col = registry.get<ColliderComponent>(entity);
-  auto &transform = registry.get<TransformComponent>(entity);
+  auto &localTransform  = registry.get<TransformComponent>(entity);
+  auto &worldTransform  = registry.get<WorldTransformComponent>(entity);
+  auto &col             = registry.get<ColliderComponent>(entity);
+  auto &rb              = registry.get<RigidbodyComponent>(entity);
 
   if (rb.isTrigger) {
     std::cout
@@ -192,21 +194,21 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
   switch (col.type) {
   case ColliderComponent::Type::Box: {
     JPH::BoxShapeSettings shape_settings(
-        JPH::Vec3(col.halfExtents.x, col.halfExtents.y, col.halfExtents.z));
+        JPH::Vec3(col.halfExtents.x * worldTransform.worldScale.x, col.halfExtents.y * worldTransform.worldScale.y, col.halfExtents.z * worldTransform.worldScale.z));
     shape_settings.SetEmbedded();
     auto result = shape_settings.Create();
     shape = result.Get();
     break;
   }
   case ColliderComponent::Type::Sphere: {
-    JPH::SphereShapeSettings shape_settings(col.radius);
+    JPH::SphereShapeSettings shape_settings(col.radius * glm::max(worldTransform.worldScale.x, glm::max(worldTransform.worldScale.y, worldTransform.worldScale.z)));
     shape_settings.SetEmbedded();
     auto result = shape_settings.Create();
     shape = result.Get();
     break;
   }
   case ColliderComponent::Type::Capsule: {
-    JPH::CapsuleShapeSettings shape_settings(col.halfExtents.y, col.radius);
+    JPH::CapsuleShapeSettings shape_settings(col.halfExtents.y * worldTransform.worldScale.y, col.radius * glm::max(worldTransform.worldScale.x, worldTransform.worldScale.z));
     shape_settings.SetEmbedded();
     auto result = shape_settings.Create();
     shape = result.Get();
@@ -214,7 +216,7 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
   }
   case ColliderComponent::Type::Plane: {
     JPH::BoxShapeSettings shape_settings(
-        JPH::Vec3(transform.scale.x/2, 0.05f, transform.scale.z/2));
+        JPH::Vec3(worldTransform.worldScale.x/2, 0.05f * worldTransform.worldScale.y, worldTransform.worldScale.z/2));
     shape_settings.SetEmbedded();
     auto result = shape_settings.Create();
     shape = result.Get();
@@ -254,10 +256,10 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
   // Finalize body creation settings
   JPH::BodyCreationSettings settings(
       shape,
-      JPH::RVec3(transform.position.x, transform.position.y,
-                 transform.position.z),
-      JPH::Quat(transform.rotation.x, transform.rotation.y,
-                transform.rotation.z, transform.rotation.w),
+      JPH::RVec3(worldTransform.worldPosition.x, worldTransform.worldPosition.y,
+                 worldTransform.worldPosition.z),
+      JPH::Quat(worldTransform.worldRotation.x, worldTransform.worldRotation.y,
+                worldTransform.worldRotation.z, worldTransform.worldRotation.w),
       motionType, objectLayer);
   settings.mFriction = rb.friction;
   settings.mRestitution = rb.restitution;
@@ -324,14 +326,49 @@ void PhysicsSystem::SyncPhysicsToEntities() {
     auto &bodyInterface = m_PhysicsSystem->GetBodyInterface();
     bodyInterface.GetPositionAndRotation(bodyID, pos, rot);
 
-    // Update entity transform based on physics body
+    auto& hierarchy = m_Registry->get<HierarchyComponent>(entity);
+    glm::vec3 worldPos(
+        static_cast<float>(pos.GetX()),
+        static_cast<float>(pos.GetY()),
+        static_cast<float>(pos.GetZ()));
+    glm::quat worldRot(
+        static_cast<float>(rot.GetW()),
+        static_cast<float>(rot.GetX()),
+        static_cast<float>(rot.GetY()),
+        static_cast<float>(rot.GetZ()));
+
     auto &transform = m_Registry->get<TransformComponent>(entity);
-    transform.position = glm::vec3(static_cast<float>(pos.GetX()),
-                                   static_cast<float>(pos.GetY()),
-                                   static_cast<float>(pos.GetZ()));
-    transform.rotation = glm::quat(
-        static_cast<float>(rot.GetW()), static_cast<float>(rot.GetX()),
-        static_cast<float>(rot.GetY()), static_cast<float>(rot.GetZ()));
+
+    if (hierarchy.parent != entt::null) {
+        auto& parentWorld = m_Registry->get<WorldTransformComponent>(hierarchy.parent);
+        auto& worldTransform = m_Registry->get<WorldTransformComponent>(entity);
+
+        glm::mat4 worldMatrix =
+            glm::translate(glm::mat4(1.0f), worldPos) *
+            glm::mat4_cast(worldRot) *
+            glm::scale(glm::mat4(1.0f), worldTransform.worldScale);
+
+        glm::mat4 localMatrix = glm::inverse(parentWorld.matrix) * worldMatrix;
+
+        transform.position = glm::vec3(localMatrix[3]);
+
+        glm::mat3 rotMat(
+            glm::normalize(glm::vec3(localMatrix[0])),
+            glm::normalize(glm::vec3(localMatrix[1])),
+            glm::normalize(glm::vec3(localMatrix[2]))
+        );
+        transform.rotation = glm::normalize(glm::quat_cast(rotMat));
+
+    } else {
+        transform.position = worldPos;
+        transform.rotation = worldRot;
+    }
+
+    entt::entity current = entity;
+    while(m_Registry->get<HierarchyComponent>(current).parent != entt::null) {
+        m_Registry->get<HierarchyComponent>(current).dirty = true;
+        current = m_Registry->get<HierarchyComponent>(current).parent;
+    }
   }
 }
 
@@ -345,13 +382,13 @@ void PhysicsSystem::SyncEntitiesToPhysics() {
       continue;
 
     // Update physics body based on entity transform
-    auto &transform = m_Registry->get<TransformComponent>(entity);
+    auto &transform = m_Registry->get<WorldTransformComponent>(entity);
     m_PhysicsSystem->GetBodyInterface().MoveKinematic(
         bodyID,
-        JPH::RVec3(transform.position.x, transform.position.y,
-                   transform.position.z),
-        JPH::Quat(transform.rotation.x, transform.rotation.y,
-                  transform.rotation.z, transform.rotation.w),
+        JPH::RVec3(transform.worldPosition.x, transform.worldPosition.y,
+                   transform.worldPosition.z),
+        JPH::Quat(transform.worldRotation.x, transform.worldRotation.y,
+                  transform.worldRotation.z, transform.worldRotation.w),
         m_FixedTimeStep);
   }
 }

@@ -51,14 +51,14 @@ void RenderSystem::Draw(Shader* shader, const glm::mat4& view, const glm::mat4& 
         glBindBufferBase(GL_UNIFORM_BUFFER, 3, m_materials->getUBO());
     }
 
-    auto entt_view = m_registry->view<MeshRendererComponent, TransformComponent>();
+    auto entt_view = m_registry->view<MeshRendererComponent, WorldTransformComponent>();
     for (auto entity : entt_view) {
-        const auto& transform = entt_view.get<TransformComponent>(entity);
+        const auto& transform = entt_view.get<WorldTransformComponent>(entity);
         const auto& renderer = entt_view.get<MeshRendererComponent>(entity);
 
         if (!renderer.visible || !renderer.mesh) continue;
         
-        shader->bindUniform(transform.getModel(), "model");
+        shader->bindUniform(transform.matrix, "model");
         shader->bindUniform(static_cast<int>(renderer.material), "materialIndex");
         m_materials->bindAlbedoMap(renderer.material, 2);
         shader->bindUniform(2, "albedoMap");

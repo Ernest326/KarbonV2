@@ -26,16 +26,16 @@ void LightingSystem::Update() {
     m_gpuLights.clear();
     m_activeLightCount = 0;
 
-    auto view = m_registry->view<TransformComponent, PointLightComponent>();
+    auto view = m_registry->view<WorldTransformComponent, PointLightComponent>();
     for (auto entity : view) {
-        auto &transform = view.get<TransformComponent>(entity);
+        auto &transform = view.get<WorldTransformComponent>(entity);
         auto &light = view.get<PointLightComponent>(entity);
 
         if (m_activeLightCount >= MAX_POINT_LIGHTS)
             break;
 
         GPUPointLight gpuLight;
-        gpuLight.position = transform.position;
+        gpuLight.position = transform.worldPosition;
         gpuLight.color = light.color;
         gpuLight.intensity = light.intensity;
         gpuLight.radius = light.radius;

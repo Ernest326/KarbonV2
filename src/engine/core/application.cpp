@@ -63,6 +63,31 @@ Application::Application(const char *title) {
   WindowProperties specification(title);
   m_window = std::make_unique<Window>(specification);
   m_window->setEventCallback(KB_BIND_EVENT_FN(Application::OnEvent));
+
+  // Jolt physics one-time global init
+  JPH::RegisterDefaultAllocator();
+  JPH::Factory::sInstance = new JPH::Factory();
+  JPH::RegisterTypes();
+
+  // Job system
+  m_jobSystem = std::make_unique<JPH::JobSystemThreadPool>(2048, 8, std::thread::hardware_concurrency() - 1);
+
+  // Scene
+  m_activeScene = std::make_unique<Scene>();
+
+  // Physics system
+  m_physicsSystem = std::make_unique<PhysicsSystem>(&m_activeScene->getRegistry(), m_jobSystem.get());
+  m_physicsSystem->Initialize();
+
+  // Lighting system
+  m_lightingSystem = std::make_unique<LightingSystem>(&m_activeScene->getRegistry());
+  m_lightingSystem->Initialize();
+
+  // Material system
+  m_materialSystem = std::make_unique<MaterialSystem>();
+
+  // Render system
+  m_renderSystem = std::make_unique<RenderSystem>(&m_activeScene->getRegistry(), m_materialSystem.get(), m_lightingSystem.get());
 }
 
 Application::~Application() {}
@@ -70,28 +95,8 @@ Application::~Application() {}
 void Application::run() {
   std::cout << "Running application..." << std::endl;
 
-  // Jolt physics one-time global init
-  JPH::RegisterDefaultAllocator();
-  JPH::Factory::sInstance = new JPH::Factory();
-  JPH::RegisterTypes();
-
   KarbonImGUI::init();
 
-  // EnTT registry
-  entt::registry registry;
-
-  // Physics system
-  JPH::JobSystemThreadPool jobSystem(2048, 8,
-                                     std::thread::hardware_concurrency() - 1);
-  PhysicsSystem physicsSystem(&registry, &jobSystem);
-  physicsSystem.Initialize();
-
-  // Renderer system
-  LightingSystem lightingSystem(&registry);
-  lightingSystem.Initialize();
-  MaterialSystem materialSystem; 
-  RenderSystem renderSystem(&registry, &materialSystem, &lightingSystem); 
-  
   Cubemap skybox({
     "resources/textures/skybox/right.jpg",
     "resources/textures/skybox/left.jpg",
@@ -100,7 +105,7 @@ void Application::run() {
     "resources/textures/skybox/front.jpg",
     "resources/textures/skybox/back.jpg"
   });
-  renderSystem.setSkybox(&skybox);
+  m_renderSystem->setSkybox(&skybox);
 
   // Shader + texture setup
   Shader test_shader("resources/shaders/test_standard.vert",
@@ -112,13 +117,24 @@ void Application::run() {
   SpectatorCamera camera(glm::vec3(0.0f, 0.0f, 5.0f),
                          glm::vec3(0.0f, 0.0f, 0.0f));
 
+  m_activeScene->setPrimaryCamera(&camera.getCamera());
+
   // Entities ----------------------------
+  auto createEntity = [&](const std::string& name, glm::vec3 pos, glm::vec3 rot = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f)) {
+      entt::entity id = m_activeScene->createEntity(name);
+      Entity e(id, &m_activeScene->getRegistry());
+      auto& transform = e.GetComponent<TransformComponent>();
+      transform.position = pos;
+      transform.rotation = quatFromDegrees(rot);
+      transform.scale = scale;
+      return e;
+  };
   
-  MaterialHandle floor_material = materialSystem.createTextured(glm::vec4(1.0f), 0.0f, 1.0f, &test_texture);
+  MaterialHandle floor_material = m_materialSystem->createTextured(glm::vec4(1.0f), 0.0f, 1.0f, &test_texture);
 
   // Floor
   PlaneMesh floor_mesh;
-  Empty floor_entity(&registry, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(20.0f, 0.1f, 20.0f));
+  Entity floor_entity = createEntity("Floor", glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(20.0f, 0.1f, 20.0f));
 
   floor_entity.AddComponent<RigidbodyComponent>();
   floor_entity.GetComponent<RigidbodyComponent>().type = RigidbodyComponent::Type::Kinematic;
@@ -133,17 +149,34 @@ void Application::run() {
   floor_entity.GetComponent<MeshRendererComponent>().mesh = &floor_mesh;
   floor_entity.GetComponent<MeshRendererComponent>().material = floor_material;
 
+  //Parent test cube
+  CubeMesh cube_mesh;
+  Entity cube_entity = createEntity("Cube", glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(45.0f, 45.0f, 60.0f), glm::vec3(0.5f, 0.1f, 0.5f));
+  cube_entity.AddComponent<MeshRendererComponent>();
+  cube_entity.GetComponent<MeshRendererComponent>().mesh = &cube_mesh;
+  cube_entity.GetComponent<MeshRendererComponent>().material = floor_material;
+
+  cube_entity.AddComponent<RigidbodyComponent>();
+  cube_entity.GetComponent<RigidbodyComponent>().type = RigidbodyComponent::Type::Kinematic;
+  cube_entity.GetComponent<RigidbodyComponent>().mass = 1.0f;
+  cube_entity.GetComponent<RigidbodyComponent>().friction = 0.5f;
+
+  cube_entity.AddComponent<ColliderComponent>();
+  cube_entity.GetComponent<ColliderComponent>().type = ColliderComponent::Type::Box;
+  cube_entity.GetComponent<ColliderComponent>().halfExtents = glm::vec3(1.0f, 1.0f, 1.0f);
+
+  m_activeScene->setParent(cube_entity, floor_entity);
 
   //Sphere generation
   SphereMesh sphere_mesh;
-  MaterialHandle sphere_material = materialSystem.create(glm::vec4(0.8f, 0.2f, 0.2f, 1.0f), 0.0f, 0.2f);
+  MaterialHandle sphere_material = m_materialSystem->create(glm::vec4(0.8f, 0.2f, 0.2f, 1.0f), 0.0f, 0.2f);
 
   std::vector<entt::entity> sphere_entities;
   for (int i = 0; i < 1000; i++) {
     int x = rand() % 10 - 5;
     int z = rand() % 10 - 5;
 
-    Empty sphere_entity(&registry, glm::vec3((float)x, 15.0f + (float)i * 1.5f, (float)z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+    Entity sphere_entity = createEntity("Sphere", glm::vec3((float)x, 15.0f + (float)i * 1.5f, (float)z));
 
     sphere_entity.AddComponent<RigidbodyComponent>();
     sphere_entity.GetComponent<RigidbodyComponent>().type = RigidbodyComponent::Type::Dynamic;
@@ -159,13 +192,13 @@ void Application::run() {
     sphere_entity.GetComponent<MeshRendererComponent>().mesh = &sphere_mesh;
     sphere_entity.GetComponent<MeshRendererComponent>().material = sphere_material;
 
-    sphere_entities.push_back(sphere_entity.getID());
+    sphere_entities.push_back(sphere_entity);
   }
 
   // Mesh test
-  MaterialHandle mat = materialSystem.create(glm::vec4(0.2f, 0.8f, 0.2f, 1.0f), 0.0f, 0.5f);
-  Model monkey_model("resources/models/monke.fbx", &materialSystem);
-  Empty monkey_entity(&registry, glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+  MaterialHandle mat = m_materialSystem->create(glm::vec4(0.2f, 0.2f, 0.8f, 1.0f), 0.5f, 0.1f);
+  Model monkey_model("resources/models/monke.fbx", m_materialSystem.get());
+  Entity monkey_entity = createEntity("Monkey", glm::vec3(0.0f, 3.0f, 0.0f));
   monkey_entity.AddComponent<MeshRendererComponent>();
   if (!monkey_model.getMeshes().empty()) {
     monkey_entity.GetComponent<MeshRendererComponent>().mesh = &monkey_model.getMesh(0);
@@ -175,19 +208,21 @@ void Application::run() {
   }
 
   //Create a light
-  Empty light(&registry, glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+  Entity light = createEntity("Light1", glm::vec3(0.0f, 2.0f, 0.0f));
   PointLightComponent &pointlight = light.AddComponent<PointLightComponent>();
   pointlight.color = glm::vec3(1.0f, 1.0f, 1.0f);
   pointlight.intensity = 2.0f;
   pointlight.radius = 5.0f;
  
-  Empty light2(&registry, glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+  Entity light2 = createEntity("Light2", glm::vec3(0.0f, 20.0f, 0.0f));
   PointLightComponent &pointlight2 = light2.AddComponent<PointLightComponent>();
   pointlight2.color = glm::vec3(1.0f, 0.0f, 0.0f);
   pointlight2.intensity = 5.0f;
   pointlight2.radius = 15.0f;
 
   //---------------------------------
+
+  m_activeScene->onUpdate();
 
   // Some defaults
   float lastFrameTime = getTime();
@@ -209,9 +244,6 @@ void Application::run() {
 
     if (!m_minimised) {
 
-      physicsSystem.Update(deltaTime);
-      lightingSystem.Update();
-
       ImGui::Begin("Test Window");
       ImGui::Text("Hello, world!");
       ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
@@ -220,7 +252,7 @@ void Application::run() {
                   camera.getPosition().y, camera.getPosition().z);
       ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", camera.getRotation().x,
                   camera.getRotation().y, camera.getRotation().z);
-      ImGui::Text("Body count: %d", physicsSystem.getBodyCount());
+      ImGui::Text("Body count: %d", m_physicsSystem->getBodyCount());
       ImGui::End();
 
       //Update floor position
@@ -230,13 +262,18 @@ void Application::run() {
       //Lighting UBO binding
       GLuint lights = glGetUniformBlockIndex(test_shader.getID(), "Lights");
       glUniformBlockBinding(test_shader.getID(), lights, 1);
-      glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightingSystem.getUBO());
+      glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_lightingSystem->getUBO());
 
       //Update light position
       auto &light_transform = light2.GetComponent<TransformComponent>();
       light_transform.position = glm::vec3(sin(glfwGetTime() * 5.0f) * 5.0f, 2.0f, cos(glfwGetTime() * 5.0f) * 5.0f);
 
-      renderSystem.Draw(&test_shader, camera.getViewMatrix(), camera.getProjectionMatrix(), camera.getPosition());
+      //Updates
+      m_activeScene->onUpdate();
+      m_physicsSystem->Update(deltaTime);
+
+      m_lightingSystem->Update();
+      m_renderSystem->Draw(&test_shader, m_activeScene->getPrimaryCamera().getViewMatrix(), m_activeScene->getPrimaryCamera().getProjectionMatrix(), m_activeScene->getPrimaryCamera().getPosition());
 
     }
 
@@ -245,7 +282,7 @@ void Application::run() {
   }
 
   // Shutdown
-  physicsSystem.Shutdown();
+  m_physicsSystem->Shutdown();
   JPH::UnregisterTypes();
   delete JPH::Factory::sInstance;
   JPH::Factory::sInstance = nullptr;
