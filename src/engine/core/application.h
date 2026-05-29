@@ -8,7 +8,7 @@
 #include "../graphics/material_system.h"
 #include <memory>
 #include "window.h"
-#include "layer.h"
+#include "layer_stack.h"
 
 #ifndef STBI_IMAGE_IMPLEMENTATION
 #define STBI_IMAGE_IMPLEMENTATION
@@ -41,18 +41,6 @@ private:
     bool OnKeyPress(KeyPressEvent& e);
 
 private:
-    // template<typename TLayer>
-    // requires(std::is_base_of<Layer, TLayer>)
-    // TLayer* GetLayer()
-    // {
-    //     for (const auto& layer : m_layerStack) {
-    //         if (auto casted = dynamic_cast<TLayer*>(layer.get()))
-    //             return casted;
-    //     }
-    //     return nullptr;
-    // }
-
-private:
     std::unique_ptr<Window> m_window;
     std::unique_ptr<Scene> m_activeScene;
 
@@ -66,7 +54,7 @@ private:
     bool m_minimised = false;
     static Application* s_instance;
 
-    std::vector<std::unique_ptr<Layer>> m_layerStack;
+    std::unique_ptr<LayerStack> m_layerStack;
 
 };
 

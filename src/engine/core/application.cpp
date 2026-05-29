@@ -69,6 +69,9 @@ Application::Application(const char *title) {
   JPH::Factory::sInstance = new JPH::Factory();
   JPH::RegisterTypes();
 
+  //Create Layer Stack
+  m_layerStack = std::make_unique<LayerStack>();
+
   // Job system
   m_jobSystem = std::make_unique<JPH::JobSystemThreadPool>(2048, 8, std::thread::hardware_concurrency() - 1);
 
@@ -165,9 +168,10 @@ void Application::run() {
   cube_entity.GetComponent<ColliderComponent>().type = ColliderComponent::Type::Box;
   cube_entity.GetComponent<ColliderComponent>().halfExtents = glm::vec3(1.0f, 1.0f, 1.0f);
 
+  //Check if world transform is kept correctly when parenting/unparenting
   m_activeScene->setParent(cube_entity, floor_entity);
   m_activeScene->unparent(cube_entity);
-  //m_activeScene->setParent(cube_entity, floor_entity);
+  m_activeScene->setParent(cube_entity, floor_entity);
 
   //Sphere generation
   SphereMesh sphere_mesh;
@@ -245,7 +249,7 @@ void Application::run() {
     KarbonImGUI::begin();
 
     if (!m_minimised) {
-
+      m_layerStack->imGuiRender();
       ImGui::Begin("Test Window");
       ImGui::Text("Hello, world!");
       ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
@@ -269,6 +273,8 @@ void Application::run() {
       //Update light position
       auto &light_transform = light2.GetComponent<TransformComponent>();
       light_transform.position = glm::vec3(sin(glfwGetTime() * 5.0f) * 5.0f, 2.0f, cos(glfwGetTime() * 5.0f) * 5.0f);
+
+      m_layerStack->update(deltaTime);
 
       //Updates
       m_activeScene->onUpdate();
@@ -330,6 +336,7 @@ bool Application::OnKeyPress(KeyPressEvent &e) {
 void Application::OnEvent(Event &e) {
   InputSystem::Get().OnEvent(e);
   EventDispatcher dispatcher(e);
+  m_layerStack->event(e);
   dispatcher.Dispatch<WindowCloseEvent>(
       KB_BIND_EVENT_FN(Application::OnWindowClose));
   dispatcher.Dispatch<WindowResizeEvent>(
