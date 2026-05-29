@@ -6,7 +6,8 @@ namespace Karbon {
 void KarbonImGUI::init() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(Application::Get().getWindow().getGLWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 330");
