@@ -62,6 +62,24 @@ Application::Application(const char *title) {
 
 Application::~Application() {}
 
+void Application::pushLayer(Layer* layer) {
+    if (m_layerStack) {
+        m_layerStack->pushLayer(layer);
+    }
+}
+
+void Application::pushOverlay(Layer* overlay) {
+    if (m_layerStack) {
+        m_layerStack->pushOverlay(overlay);
+    }
+}
+
+Scene& Application::getActiveScene() { return *m_activeScene; }
+RenderSystem& Application::getRenderSystem() { return *m_renderSystem; }
+PhysicsSystem& Application::getPhysicsSystem() { return *m_physicsSystem; }
+LightingSystem& Application::getLightingSystem() { return *m_lightingSystem; }
+MaterialSystem& Application::getMaterialSystem() { return *m_materialSystem; }
+
 void Application::run() {
 
     std::cout << "Running application..." << std::endl;
@@ -74,7 +92,7 @@ void Application::run() {
     Shader test_shader("resources/shaders/test_standard.vert",
                          "resources/shaders/test_standard.frag");
 
-    bool enableTestLayer = true;
+    bool enableTestLayer = false;
     if (enableTestLayer) {
         m_layerStack->pushLayer(new TestLayer(m_activeScene.get(), m_renderSystem.get(), m_physicsSystem.get(),
                                     m_lightingSystem.get(), m_materialSystem.get(), &camera));

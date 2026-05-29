@@ -32,6 +32,15 @@ public:
     static Application& Get();
     inline Window& getWindow() { return *m_window; }
 
+    void pushLayer(Layer* layer);
+    void pushOverlay(Layer* overlay);
+
+    Scene& getActiveScene();
+    RenderSystem& getRenderSystem();
+    PhysicsSystem& getPhysicsSystem();
+    LightingSystem& getLightingSystem();
+    MaterialSystem& getMaterialSystem();
+
     static float getTime();
     static float getDeltaTime();
 

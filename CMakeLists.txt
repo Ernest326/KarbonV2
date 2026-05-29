@@ -73,36 +73,6 @@ if(ASSIMP_MINIZIP_INCLUDE_DIR)
     target_include_directories(assimp PRIVATE "${ASSIMP_MINIZIP_INCLUDE_DIR}")
 endif()
 
-#Define source files as "SOURCES"
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-
-add_executable("${CMAKE_PROJECT_NAME}")
-set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 17)
-target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC GLFW_INCLUDE_NONE=1)
-
-#Some defines
-if(PRODUCTION_BUILD)
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="./resources")
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=1)
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC DEVELOPMENT_BUILD=0)    
-else()
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources")
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0)
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC DEVELOPMENT_BUILD=1)    
-endif()
-
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${SOURCES})
-
-if(MSVC) #If we are using VS compiler
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
-    set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-endif()
-
-#force remove unicode
-# if (WIN32)
-    # target_compile_options("${CMAKE_PROJECT_NAME}" PRIVATE /DUNICODE=0 /D_UNICODE=0)
-# endif()
-
-
-#Link all libs
-target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glm glfw glad stb_image imgui jolt assimp EnTT::EnTT)
+#Engine and Editor
+add_subdirectory(src/engine)
+add_subdirectory(src/editor)

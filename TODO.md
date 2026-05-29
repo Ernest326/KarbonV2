@@ -12,17 +12,21 @@ Core:
 
 Physics:
 - Add a addVelocity, addTorque, addImpulse, addForce functions to the RigidbodyComponent, which delegate to the Jolt physics system
+- Add physics event handlers for OnTriggerEnter/OnTriggerExit, OnCollisionEnter/OnCollisionExit, etc.
 - Mesh collision system
 
+Rendering:
+- Framebuffer system
+- Anti-aliasing
+
 Shading/Lighting:
-- Skybox (cubemap + hdr skyboxes)
+- Skybox (cubemap + hdr skyboxes) [X]
 - Add a lighting system which grabs point lights and passes them as needed into shader [X]
 - PBR material system
 - Shadow maps maybe, or some sort of dynamic shadow system
 - Volumetric fog, fog effects
 - Bloom effect
 - Ambient Occlusion
-- Anti-aliasing
 
 Optimizations:
 - Backface culling
@@ -46,5 +50,5 @@ EDITOR:
 - Some way to compile game engine and allow editor to use the game engine
 - Asset system
 - Compiler system
-- Scene system
+- Scene system [X]
 - Script compiling system of some sort?

@@ -1,143 +1,5 @@
 [
 {
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\core\\application.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\core\\application.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/core/application.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/core/application.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\core\\window.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\core\\window.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/core/window.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/core/window.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\buffers\\ibo.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\buffers\\ibo.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/buffers/ibo.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/buffers/ibo.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\buffers\\vao.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\buffers\\vao.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/buffers/vao.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/buffers/vao.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\buffers\\vbo.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\buffers\\vbo.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/buffers/vbo.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/buffers/vbo.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\camera.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\camera.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/camera.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/camera.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\cubemap.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\cubemap.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/cubemap.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/cubemap.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\lighting_system.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\lighting_system.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/lighting_system.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/lighting_system.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\material_system.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\material_system.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/material_system.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/material_system.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\primitives\\cube.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\primitives\\cube.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/primitives/cube.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/primitives/cube.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\primitives\\plane.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\primitives\\plane.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/primitives/plane.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/primitives/plane.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\render_system.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\render_system.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/render_system.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/render_system.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\shader.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\shader.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/shader.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/shader.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\spectator_camera.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\spectator_camera.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/spectator_camera.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/spectator_camera.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\graphics\\texture.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\texture.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/texture.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/graphics/texture.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\input\\inputsystem.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\input\\inputsystem.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/input/inputsystem.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/input/inputsystem.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\main.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\main.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/main.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/main.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\physics\\physics_system.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\physics\\physics_system.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/physics/physics_system.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/physics/physics_system.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\scene\\entity.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\scene\\entity.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/scene/entity.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/scene/entity.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\scene\\mesh.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\scene\\mesh.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/scene/mesh.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/scene/mesh.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\scene\\model.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\scene\\model.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/scene/model.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/scene/model.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\scene\\scene.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\scene\\scene.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/scene/scene.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/scene/scene.cpp.obj"
-},
-{
-  "directory": "C:/Users/Ernest/Documents/KarbonV2",
-  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\src\\engine\\ui\\kbimgui.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\ui\\kbimgui.cpp",
-  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/ui/kbimgui.cpp",
-  "output": "CMakeFiles/Karbon.dir/src/engine/ui/kbimgui.cpp.obj"
-},
-{
   "directory": "C:/Users/Ernest/Documents/KarbonV2/thirdparty/glfw/src",
   "command": "C:\\msys64\\ucrt64\\bin\\cc.exe -DUNICODE -D_GLFW_WIN32 -D_UNICODE @CMakeFiles/glfw.dir/includes_C.rsp -std=c99 -Wall -o CMakeFiles\\glfw.dir\\context.c.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\thirdparty\\glfw\\src\\context.c",
   "file": "C:/Users/Ernest/Documents/KarbonV2/thirdparty/glfw/src/context.c",
@@ -2650,5 +2512,167 @@
   "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DASSIMP_BUILD_NO_C4D_IMPORTER -DASSIMP_BUILD_NO_M3D_EXPORTER -DASSIMP_BUILD_NO_M3D_IMPORTER -DASSIMP_BUILD_NO_USD_IMPORTER -DASSIMP_BUILD_NO_VRML_IMPORTER -DASSIMP_IMPORTER_GLTF_USE_OPEN3DGC=1 -DMINIZ_USE_UNALIGNED_LOADS_AND_STORES=0 -DOPENDDLPARSER_BUILD -DOPENDDL_STATIC_LIBARY -DP2T_STATIC_EXPORTS -DRAPIDJSON_HAS_STDSTRING=1 -DRAPIDJSON_NOMEMBERITERATORCLASS -DWIN32_LEAN_AND_MEAN @CMakeFiles/assimp.dir/includes_CXX.rsp -fvisibility=hidden -fno-strict-aliasing -Wno-dangling-reference -Wall -Wno-long-long -Wa,-mbig-obj -O3 -std=gnu++17  -std=gnu++17 -Wall -Werror -o CMakeFiles\\assimp.dir\\__\\contrib\\pugixml\\src\\pugixml.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\thirdparty\\assimp\\contrib\\pugixml\\src\\pugixml.cpp",
   "file": "C:/Users/Ernest/Documents/KarbonV2/thirdparty/assimp/contrib/pugixml/src/pugixml.cpp",
   "output": "thirdparty/assimp/code/CMakeFiles/assimp.dir/__/contrib/pugixml/src/pugixml.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\core\\application.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\core\\application.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/core/application.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/core/application.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\core\\layer_stack.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\core\\layer_stack.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/core/layer_stack.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/core/layer_stack.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\core\\testlayer.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\core\\testlayer.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/core/testlayer.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/core/testlayer.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\core\\window.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\core\\window.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/core/window.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/core/window.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\buffers\\ibo.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\buffers\\ibo.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/buffers/ibo.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/buffers/ibo.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\buffers\\vao.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\buffers\\vao.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/buffers/vao.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/buffers/vao.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\buffers\\vbo.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\buffers\\vbo.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/buffers/vbo.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/buffers/vbo.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\camera.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\camera.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/camera.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/camera.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\cubemap.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\cubemap.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/cubemap.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/cubemap.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\lighting_system.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\lighting_system.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/lighting_system.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/lighting_system.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\material_system.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\material_system.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/material_system.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/material_system.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\primitives\\cube.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\primitives\\cube.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/primitives/cube.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/primitives/cube.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\primitives\\plane.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\primitives\\plane.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/primitives/plane.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/primitives/plane.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\render_system.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\render_system.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/render_system.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/render_system.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\shader.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\shader.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/shader.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/shader.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\spectator_camera.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\spectator_camera.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/spectator_camera.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/spectator_camera.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\graphics\\texture.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\graphics\\texture.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/graphics/texture.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/graphics/texture.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\input\\inputsystem.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\input\\inputsystem.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/input/inputsystem.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/input/inputsystem.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\physics\\physics_system.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\physics\\physics_system.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/physics/physics_system.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/physics/physics_system.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\scene\\entity.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\scene\\entity.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/scene/entity.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/scene/entity.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\scene\\mesh.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\scene\\mesh.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/scene/mesh.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/scene/mesh.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\scene\\model.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\scene\\model.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/scene/model.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/scene/model.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\scene\\scene.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\scene\\scene.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/scene/scene.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/scene/scene.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_engine.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_engine.dir\\ui\\kbimgui.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\ui\\kbimgui.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/ui/kbimgui.cpp",
+  "output": "src/engine/CMakeFiles/karbon_engine.dir/ui/kbimgui.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/engine",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/Karbon.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\Karbon.dir\\main.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\engine\\main.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/engine/main.cpp",
+  "output": "src/engine/CMakeFiles/Karbon.dir/main.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/editor",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_editor.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_editor.dir\\core\\editor_layer.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\editor\\core\\editor_layer.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/editor/core/editor_layer.cpp",
+  "output": "src/editor/CMakeFiles/karbon_editor.dir/core/editor_layer.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/editor",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_editor.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_editor.dir\\core\\main.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\editor\\core\\main.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/editor/core/main.cpp",
+  "output": "src/editor/CMakeFiles/karbon_editor.dir/core/main.cpp.obj"
 }
 ]
