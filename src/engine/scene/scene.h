@@ -6,6 +6,7 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include "components/id_component.h"
+#include "components/transform.h"
 
 namespace Karbon {
 
@@ -37,7 +38,7 @@ private:
     Camera* m_primaryCamera;
 
     void updateHierarchy();
-    void updateWorldTransform(entt::entity entity, const glm::mat4& parentMatrix);
+    void updateWorldTransform(entt::entity entity, const WorldTransformComponent& parentWorld);
     void markDirtyUpward(entt::entity entity);
     void markDirtyDownward(entt::entity entity);
 

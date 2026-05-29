@@ -2,15 +2,15 @@
 #include "components/transform.h"
 #include "components/hierarchy_component.h"
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/matrix_decompose.hpp>
+#include <algorithm>
+#include <cmath>
 
-static void decomposeTransform(const glm::mat4& matrix, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
-    glm::vec3 skew;
-    glm::vec4 perspective;
-
-    glm::decompose(matrix,scale,rotation,position,skew,perspective);
-    rotation = glm::normalize(rotation);
+static glm::vec3 safeDiv(const glm::vec3& numerator, const glm::vec3& denominator) {
+    return glm::vec3(
+        std::abs(denominator.x) > 0.000001f ? numerator.x / denominator.x : 0.0f,
+        std::abs(denominator.y) > 0.000001f ? numerator.y / denominator.y : 0.0f,
+        std::abs(denominator.z) > 0.000001f ? numerator.z / denominator.z : 0.0f
+    );
 }
 
 namespace Karbon {
@@ -74,45 +74,45 @@ namespace Karbon {
     void Scene::setParent(entt::entity child, entt::entity parent) {
         if(child == parent || !m_registry.valid(child)) return;
 
-        auto& childHierarchy = m_registry.get<HierarchyComponent>(child);
+        auto& childHierarchy = m_registry.get_or_emplace<HierarchyComponent>(child);
+        if(childHierarchy.parent == parent) return;
 
-        updateWorldTransform(child, glm::mat4(1.0f)); // Force recompute of child beforehand to prevent stale transform
+        updateHierarchy(); // Ensure current world transforms are up to date
         auto& childWorld = m_registry.get<WorldTransformComponent>(child);
-        glm::mat4 childWorldMatrix = childWorld.matrix;
 
         unparent(child);
 
+        auto& childLocal = m_registry.get_or_emplace<TransformComponent>(child);
+
         if(m_registry.valid(parent)) {
-            updateWorldTransform(parent, glm::mat4(1.0f)); // Force recompute of parent beforehand to prevent stale transform
             auto& parentWorld = m_registry.get_or_emplace<WorldTransformComponent>(parent);
-            glm::mat4 newLocal = glm::inverse(parentWorld.matrix) * childWorldMatrix;
+            glm::quat parentInvRot = glm::inverse(parentWorld.worldRotation);
+            glm::vec3 invParentScale = safeDiv(glm::vec3(1.0f), parentWorld.worldScale);
 
-            auto& childLocal = m_registry.get_or_emplace<TransformComponent>(child);
-            childLocal.position = glm::vec3(newLocal[3]);
+            childLocal.rotation = glm::normalize(parentInvRot * childWorld.worldRotation);
+            childLocal.position = parentInvRot * ((childWorld.worldPosition - parentWorld.worldPosition) * invParentScale);
+            childLocal.scale = safeDiv(childWorld.worldScale, parentWorld.worldScale);
 
-            childLocal.scale = glm::vec3(
-                glm::length(glm::vec3(newLocal[0])),
-                glm::length(glm::vec3(newLocal[1])),
-                glm::length(glm::vec3(newLocal[2]))
-            );
+            auto& parentHierarchy = m_registry.get<HierarchyComponent>(parent);
+            if(std::find(parentHierarchy.children.begin(), parentHierarchy.children.end(), child) == parentHierarchy.children.end()) {
+                parentHierarchy.children.push_back(child);
+            }
 
-            glm::mat3 rotMat(
-                childLocal.scale.x > 0.0001f ? glm::vec3(newLocal[0]) / childLocal.scale.x : glm::vec3(1,0,0),
-                childLocal.scale.y > 0.0001f ? glm::vec3(newLocal[1]) / childLocal.scale.y : glm::vec3(0,1,0),
-                childLocal.scale.z > 0.0001f ? glm::vec3(newLocal[2]) / childLocal.scale.z : glm::vec3(0,0,1)
-            );
-            childLocal.rotation = glm::normalize(glm::quat_cast(rotMat));
-
-            auto& parent_hierarchy = m_registry.get<HierarchyComponent>(parent);
-            parent_hierarchy.children.push_back(child);
-
-            auto& childHierarchy = m_registry.get_or_emplace<HierarchyComponent>(child);
             childHierarchy.parent = parent;
             childHierarchy.dirty = true;
 
             markDirtyUpward(parent);
-        
-    };
+            updateWorldTransform(child, parentWorld);
+        } else {
+            childLocal.position = childWorld.worldPosition;
+            childLocal.rotation = childWorld.worldRotation;
+            childLocal.scale = childWorld.worldScale;
+
+            childHierarchy.parent = entt::null;
+            childHierarchy.dirty = true;
+            updateWorldTransform(child, WorldTransformComponent{});
+        }
+    }
 
     void Scene::onUpdate() {
         updateHierarchy();
@@ -120,36 +120,38 @@ namespace Karbon {
 
     void Scene::updateHierarchy() {
         auto view = m_registry.view<HierarchyComponent, WorldTransformComponent, TransformComponent>();
+        WorldTransformComponent rootWorld;
         for (auto entity : view) {
             auto& hierarchy = view.get<HierarchyComponent>(entity);
             if(hierarchy.parent == entt::null) {
-                updateWorldTransform(entity, glm::mat4(1.0f));
+                updateWorldTransform(entity, rootWorld);
             }
         }
     }
 
-    void Scene::updateWorldTransform(entt::entity entity, const glm::mat4& parentMatrix) {
+    void Scene::updateWorldTransform(entt::entity entity, const WorldTransformComponent& parentWorld) {
+        if(!m_registry.valid(entity)) return;
 
-        glm::mat4 local = transform.getLocalMatrix();
-        worldTransform.matrix = parentMatrix * local;
-        worldTransform.worldPosition = glm::vec3(worldTransform.matrix[3]);
-        worldTransform.worldScale = glm::vec3(
-            glm::length(glm::vec3(worldTransform.matrix[0])),
-            glm::length(glm::vec3(worldTransform.matrix[1])),
-            glm::length(glm::vec3(worldTransform.matrix[2]))
-        );
-        glm::mat3 rotMat(
-            worldTransform.worldScale.x > 0.0001f ? glm::vec3(worldTransform.matrix[0]) / worldTransform.worldScale.x : glm::vec3(1,0,0),
-            worldTransform.worldScale.y > 0.0001f ? glm::vec3(worldTransform.matrix[1]) / worldTransform.worldScale.y : glm::vec3(0,1,0),
-            worldTransform.worldScale.z > 0.0001f ? glm::vec3(worldTransform.matrix[2]) / worldTransform.worldScale.z : glm::vec3(0,0,1)
-        );
-        worldTransform.worldRotation = glm::normalize(glm::quat_cast(rotMat));
+        auto& transform = m_registry.get<TransformComponent>(entity);
+        auto& worldTransform = m_registry.get<WorldTransformComponent>(entity);
+        auto& hierarchy = m_registry.get<HierarchyComponent>(entity);
+
+        worldTransform.worldRotation = glm::normalize(parentWorld.worldRotation * transform.rotation);
+        worldTransform.worldScale = parentWorld.worldScale * transform.scale;
+
+        glm::vec3 scaledLocalPos = parentWorld.worldScale * transform.position;
+        worldTransform.worldPosition = parentWorld.worldPosition + (parentWorld.worldRotation * scaledLocalPos);
+
+        worldTransform.matrix = glm::translate(glm::mat4(1.0f), worldTransform.worldPosition)
+            * glm::mat4_cast(worldTransform.worldRotation)
+            * glm::scale(glm::mat4(1.0f), worldTransform.worldScale);
 
         hierarchy.dirty = false;
 
         for(auto child : hierarchy.children) {
+            if(!m_registry.valid(child)) continue;
             m_registry.get<HierarchyComponent>(child).dirty = true;
-            updateWorldTransform(child, worldTransform.matrix);
+            updateWorldTransform(child, worldTransform);
         }
     }
 

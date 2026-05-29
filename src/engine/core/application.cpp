@@ -151,7 +151,7 @@ void Application::run() {
 
   //Parent test cube
   CubeMesh cube_mesh;
-  Entity cube_entity = createEntity("Cube", glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(45.0f, 45.0f, 60.0f), glm::vec3(0.5f, 0.1f, 0.5f));
+  Entity cube_entity = createEntity("Cube", glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(45.0f, 45.0f, 60.0f), glm::vec3(1.5f, 0.1f, 2.5f));
   cube_entity.AddComponent<MeshRendererComponent>();
   cube_entity.GetComponent<MeshRendererComponent>().mesh = &cube_mesh;
   cube_entity.GetComponent<MeshRendererComponent>().material = floor_material;
@@ -166,6 +166,9 @@ void Application::run() {
   cube_entity.GetComponent<ColliderComponent>().halfExtents = glm::vec3(1.0f, 1.0f, 1.0f);
 
   m_activeScene->setParent(cube_entity, floor_entity);
+  //TODO: Fix unparent logic
+  //m_activeScene->unparent(cube_entity);
+  //m_activeScene->setParent(cube_entity, floor_entity);
 
   //Sphere generation
   SphereMesh sphere_mesh;
