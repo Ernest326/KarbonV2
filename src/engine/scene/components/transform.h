@@ -8,7 +8,22 @@ struct TransformComponent {
     glm::vec3 position{0.0f};
     glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f};
     glm::vec3 scale{1.0f};
+    glm::mat4 localMatrix{1.0f};
+    bool useLocalMatrix{false};
+
+    void setLocalMatrix(const glm::mat4& matrix) {
+        localMatrix = matrix;
+        useLocalMatrix = true;
+    }
+
+    void clearLocalMatrix() {
+        useLocalMatrix = false;
+    }
+
     glm::mat4 getLocalMatrix() const {
+        if (useLocalMatrix) {
+            return localMatrix;
+        }
         return glm::translate(glm::mat4(1.0f), position) * glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.0f), scale);
     }
 };

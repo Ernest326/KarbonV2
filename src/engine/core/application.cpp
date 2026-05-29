@@ -166,8 +166,7 @@ void Application::run() {
   cube_entity.GetComponent<ColliderComponent>().halfExtents = glm::vec3(1.0f, 1.0f, 1.0f);
 
   m_activeScene->setParent(cube_entity, floor_entity);
-  //TODO: Fix unparent logic
-  //m_activeScene->unparent(cube_entity);
+  m_activeScene->unparent(cube_entity);
   //m_activeScene->setParent(cube_entity, floor_entity);
 
   //Sphere generation
