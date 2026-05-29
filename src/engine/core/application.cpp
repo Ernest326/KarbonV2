@@ -27,6 +27,7 @@
 #include "../graphics/material_system.h"
 
 #include "testlayer.h"
+#include "../scene/components/camera_component.h"
 
 namespace Karbon {
 
@@ -86,16 +87,22 @@ void Application::run() {
 
     KarbonImGUI::init();
 
-    SpectatorCamera camera(glm::vec3(0.0f, 0.0f, 5.0f),
-                             glm::vec3(0.0f, 0.0f, 0.0f));
-    m_activeScene->setPrimaryCamera(&camera.getCamera());
+    std::unique_ptr<SpectatorCamera> spectatorCamera;
+    if (m_enableSpectatorCamera) {
+        entt::entity runtimeCamera = m_activeScene->createEntity("Runtime Camera");
+        auto& cameraComponent = m_activeScene->getRegistry().emplace<CameraComponent>(runtimeCamera);
+        m_activeScene->setPrimaryCamera(runtimeCamera);
+        spectatorCamera = std::make_unique<SpectatorCamera>(&cameraComponent.camera,
+                                                            glm::vec3(0.0f, 0.0f, 5.0f),
+                                                            glm::vec3(0.0f, 0.0f, 0.0f));
+    }
     Shader test_shader("resources/shaders/test_standard.vert",
                          "resources/shaders/test_standard.frag");
 
     bool enableTestLayer = false;
-    if (enableTestLayer) {
+    if (enableTestLayer && spectatorCamera) {
         m_layerStack->pushLayer(new TestLayer(m_activeScene.get(), m_renderSystem.get(), m_physicsSystem.get(),
-                                    m_lightingSystem.get(), m_materialSystem.get(), &camera));
+                                    m_lightingSystem.get(), m_materialSystem.get(), spectatorCamera.get()));
     }
 
     // Some defaults
@@ -113,7 +120,9 @@ void Application::run() {
         InputSystem::Get().BeginFrame();
         glfwPollEvents();
 
-        camera.update(deltaTime);
+        if (spectatorCamera) {
+            spectatorCamera->update(deltaTime);
+        }
         m_window->clear();
         KarbonImGUI::begin();
 
@@ -131,7 +140,17 @@ void Application::run() {
             m_activeScene->onUpdate();
             m_physicsSystem->Update(deltaTime);
             m_lightingSystem->Update();
-            m_renderSystem->Draw(&test_shader, m_activeScene->getPrimaryCamera().getViewMatrix(), m_activeScene->getPrimaryCamera().getProjectionMatrix(), m_activeScene->getPrimaryCamera().getPosition());
+            Camera* activeCamera = m_activeScene->getPrimaryCamera();
+            if (activeCamera) {
+                if(m_viewportFramebuffer) {
+                    m_viewportFramebuffer->bind();
+                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                }
+                m_renderSystem->Draw(&test_shader, activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix(), activeCamera->getPosition());
+                if(m_viewportFramebuffer) {
+                    m_viewportFramebuffer->unbind();
+                }
+            }
 
         }
 

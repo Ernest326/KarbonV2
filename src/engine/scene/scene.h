@@ -2,7 +2,7 @@
 #include <entt/entt.hpp>
 #include <unordered_map>
 #include <string>
-#include "../graphics/camera.h"
+#include "components/camera_component.h"
 #include <memory>
 #include <glm/glm.hpp>
 #include "components/id_component.h"
@@ -23,8 +23,9 @@ public:
     void unparent(entt::entity child);
     void setParent(entt::entity child, entt::entity parent);
 
-    void setPrimaryCamera(Camera* camera) { m_primaryCamera = camera; }
-    Camera& getPrimaryCamera() { return *m_primaryCamera; }
+    void setPrimaryCamera(entt::entity entity);
+    Camera* getPrimaryCamera();
+    entt::entity getPrimaryCameraEntity() const { return m_primaryCamera; }
     entt::registry& getRegistry() { return m_registry; }
 
     void onUpdate();
@@ -35,7 +36,7 @@ private:
     std::unordered_map<UUID, entt::entity> m_entityMap;
     std::unordered_map<std::string, entt::entity> m_tagMap;
     UUID m_nextUUID = 1;
-    Camera* m_primaryCamera;
+    entt::entity m_primaryCamera = entt::null;
 
     void updateHierarchy();
     void updateWorldTransform(entt::entity entity, const WorldTransformComponent& parentWorld);

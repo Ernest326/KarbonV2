@@ -13,6 +13,13 @@ public:
                     float nearPlane = 0.1f,
                     float farPlane = 100.0f);
 
+    SpectatorCamera(Camera* target,
+                    const glm::vec3& position = glm::vec3(0.0f),
+                    const glm::vec3& rotation = glm::vec3(0.0f),
+                    float fov = 45.0f,
+                    float nearPlane = 0.1f,
+                    float farPlane = 100.0f);
+
     void update(float deltaTime);
 
     void setMovementSpeed(float speed);
@@ -26,13 +33,14 @@ public:
     const glm::mat4& getViewMatrix() const;
     const glm::mat4& getProjectionMatrix() const;
 
-    Camera& getCamera() { return m_camera; }
+    Camera& getCamera() { return *m_camera; }
 
 private:
     void syncCamera();
 
 private:
-    Camera m_camera;
+    Camera m_ownedCamera;
+    Camera* m_camera = nullptr;
     float m_moveSpeed;
     float m_mouseSensitivity;
     float m_fov;

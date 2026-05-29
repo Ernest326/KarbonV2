@@ -1,7 +1,13 @@
 #include "editor_layer.h"
 
+#include "karbon.h"
+#include <iostream>
 #include <imgui.h>
+#include "scene/cube_mesh.h"
+#include "scene/components/meshrenderer_component.h"
 #include "scene/components/id_component.h"
+#include "scene/components/camera_component.h"
+#include "scene/components/pointlight_component.h"
 
 namespace Karbon {
 
@@ -14,9 +20,22 @@ void EditorLayer::onAttach() {
         return;
     }
 
+    m_viewportFramebuffer = std::make_unique<Framebuffer>(1280, 720);
+    Application::Get().setViewportFramebuffer(m_viewportFramebuffer.get());
+
     entt::entity camera = m_scene->createEntity("Editor Camera");
-    m_scene->createEntity("Directional Light");
-    m_scene->createEntity("Cube");
+    m_scene->getRegistry().emplace<CameraComponent>(camera);
+    m_scene->setPrimaryCamera(camera);
+
+    entt::entity directionalLight = m_scene->createEntity("Point Light");
+    m_scene->getRegistry().get<TransformComponent>(directionalLight).position = glm::vec3(0.0f, 4.0f, 0.0f);
+    m_scene->getRegistry().emplace<PointLightComponent>(directionalLight);
+    
+    entt::entity cube_id = m_scene->createEntity("Test Cube");
+    m_testCube = Entity(cube_id, &m_scene->getRegistry());
+    m_testCube.AddComponent<MeshRendererComponent>();
+    m_cubeMesh = CubeMesh();
+    m_testCube.GetComponent<MeshRendererComponent>().mesh = &m_cubeMesh;
 
     m_selectedEntity = camera;
 
@@ -207,7 +226,20 @@ void EditorLayer::drawStats() {
 }
 
 void EditorLayer::drawViewport() {
-    //TODO: Implement framebuffer in the engine and render to it
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+    ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+    m_viewportFocused = ImGui::IsWindowFocused();
+    m_viewportHovered = ImGui::IsWindowHovered();
+
+    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+    m_viewportSize = viewportPanelSize;
+
+    uint32_t textureID = m_viewportFramebuffer->getColorAttachment();
+    ImGui::Image((void*)(uintptr_t)textureID, viewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
+
+    ImGui::End();
+    ImGui::PopStyleVar();
 }
 
 }

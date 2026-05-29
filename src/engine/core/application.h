@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt/entt.hpp>
+#include "../graphics/framebuffer.h"
 #include "../scene/scene.h"
 #include "../physics/physics_system.h"
 #include "../graphics/render_system.h"
@@ -35,6 +36,10 @@ public:
     void pushLayer(Layer* layer);
     void pushOverlay(Layer* overlay);
 
+    void setViewportFramebuffer(Framebuffer* framebuffer) { m_viewportFramebuffer = framebuffer; }
+    void setSpectatorCameraEnabled(bool enabled) { m_enableSpectatorCamera = enabled; }
+    bool isSpectatorCameraEnabled() const { return m_enableSpectatorCamera; }
+
     Scene& getActiveScene();
     RenderSystem& getRenderSystem();
     PhysicsSystem& getPhysicsSystem();
@@ -64,6 +69,9 @@ private:
     static Application* s_instance;
 
     std::unique_ptr<LayerStack> m_layerStack;
+    Framebuffer* m_viewportFramebuffer = nullptr;
+
+    bool m_enableSpectatorCamera = true;
 
 };
 

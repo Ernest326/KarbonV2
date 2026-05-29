@@ -1,6 +1,7 @@
 #include "scene.h"
 #include "components/transform.h"
 #include "components/hierarchy_component.h"
+#include "components/camera_component.h"
 
 #include <algorithm>
 #include <cmath>
@@ -56,6 +57,10 @@ namespace Karbon {
     void Scene::destroyEntity(entt::entity entity) {
         if(!m_registry.valid(entity)) return;
 
+        if (entity == m_primaryCamera) {
+            m_primaryCamera = entt::null;
+        }
+
         unparent(entity);
 
         auto& hierarchy = m_registry.get<HierarchyComponent>(entity);
@@ -66,6 +71,44 @@ namespace Karbon {
 
         m_entityMap.erase(m_registry.get<IDComponent>(entity).id);
         m_registry.destroy(entity);
+    }
+
+    void Scene::setPrimaryCamera(entt::entity entity) {
+        if (!m_registry.valid(entity) || !m_registry.all_of<CameraComponent>(entity)) {
+            return;
+        }
+
+        if (m_primaryCamera != entt::null && m_registry.valid(m_primaryCamera) &&
+            m_registry.all_of<CameraComponent>(m_primaryCamera)) {
+            m_registry.get<CameraComponent>(m_primaryCamera).primary = false;
+        }
+
+        m_primaryCamera = entity;
+        m_registry.get<CameraComponent>(entity).primary = true;
+    }
+
+    Camera* Scene::getPrimaryCamera() {
+        if (m_primaryCamera != entt::null && m_registry.valid(m_primaryCamera) &&
+            m_registry.all_of<CameraComponent>(m_primaryCamera)) {
+            return &m_registry.get<CameraComponent>(m_primaryCamera).camera;
+        }
+
+        auto view = m_registry.view<CameraComponent>();
+        for (auto entity : view) {
+            auto& component = view.get<CameraComponent>(entity);
+            if (component.primary) {
+                m_primaryCamera = entity;
+                return &component.camera;
+            }
+        }
+
+        for (auto entity : view) {
+            auto& component = view.get<CameraComponent>(entity);
+            m_primaryCamera = entity;
+            return &component.camera;
+        }
+
+        return nullptr;
     }
 
     entt::entity Scene::findByTag(const std::string& tag) {
