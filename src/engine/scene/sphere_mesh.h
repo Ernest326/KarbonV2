@@ -1,3 +1,4 @@
+#pragma once
 #include "mesh.h"
 #include <glm/gtc/constants.hpp>
 
