@@ -20,6 +20,13 @@ public:
                     float nearPlane = 0.1f,
                     float farPlane = 100.0f);
 
+    // Non-copyable and non-movable: m_camera may point to m_ownedCamera,
+    // so copying/moving would leave m_camera dangling.
+    SpectatorCamera(const SpectatorCamera&) = delete;
+    SpectatorCamera& operator=(const SpectatorCamera&) = delete;
+    SpectatorCamera(SpectatorCamera&&) = delete;
+    SpectatorCamera& operator=(SpectatorCamera&&) = delete;
+
     void update(float deltaTime);
 
     void setMovementSpeed(float speed);

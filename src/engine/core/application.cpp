@@ -120,13 +120,14 @@ void Application::run() {
         InputSystem::Get().BeginFrame();
         glfwPollEvents();
 
-        if (spectatorCamera) {
-            spectatorCamera->update(deltaTime);
-        }
         m_window->clear();
         KarbonImGUI::begin();
 
         if (!m_minimised) {
+
+            if (spectatorCamera) {
+                spectatorCamera->update(deltaTime);
+            }
 
             m_layerStack->update(deltaTime);
 

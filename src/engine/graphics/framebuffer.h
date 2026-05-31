@@ -12,6 +12,7 @@ public:
 
     void bind();
     void unbind();
+    void resize(uint32_t width, uint32_t height);
 
     GLuint getColorAttachment() const { return m_colorAttachment; }
     GLuint getDepthAttachment() const { return m_depthAttachment; }

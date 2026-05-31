@@ -168,13 +168,12 @@ void EditorLayer::drawHierarchy() {
     ImGui::Begin("Hierarchy", &m_showHierarchy);
     
     if (m_scene) {
-        // TODO: Iterate scene entities, display tree
         ImGui::Text("Scene Entities");
         ImGui::Separator();
         
-        for(auto entity : m_scene->getRegistry().view<IDComponent>()) {
-            auto& id = m_scene->getRegistry().get<IDComponent>(entity);
-            auto& tag = m_scene->getRegistry().get<TagComponent>(entity);
+        auto view = m_scene->getRegistry().view<IDComponent, TagComponent>();
+        for (auto entity : view) {
+            auto [id, tag] = view.get<IDComponent, TagComponent>(entity);
             ImGui::Text("%s (ID: %d)", tag.tag.c_str(), id.id);
         }
     } else {
@@ -233,7 +232,14 @@ void EditorLayer::drawViewport() {
     m_viewportHovered = ImGui::IsWindowHovered();
 
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-    m_viewportSize = viewportPanelSize;
+    if (viewportPanelSize.x != m_viewportSize.x || viewportPanelSize.y != m_viewportSize.y) {
+        m_viewportSize = viewportPanelSize;
+        if (m_viewportFramebuffer && viewportPanelSize.x > 0 && viewportPanelSize.y > 0) {
+            m_viewportFramebuffer->resize(
+                static_cast<uint32_t>(viewportPanelSize.x),
+                static_cast<uint32_t>(viewportPanelSize.y));
+        }
+    }
 
     uint32_t textureID = m_viewportFramebuffer->getColorAttachment();
     ImGui::Image((void*)(uintptr_t)textureID, viewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));

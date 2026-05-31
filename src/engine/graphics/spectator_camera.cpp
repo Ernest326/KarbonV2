@@ -41,8 +41,6 @@ SpectatorCamera::SpectatorCamera(Camera* target,
 void SpectatorCamera::update(float deltaTime) {
     InputSystem& input = InputSystem::Get();
 
-    m_camera->setProjection(m_fov, m_nearPlane, m_farPlane);
-
     glm::vec3 movement(0.0f);
     if (input.isKeyPressed(Key::W)) movement += m_camera->forward();
     if (input.isKeyPressed(Key::S)) movement -= m_camera->forward();
@@ -108,4 +106,4 @@ void SpectatorCamera::syncCamera() {
     m_camera->setRotation(glm::vec3(m_pitch, m_yaw, 0.0f));
 }
 
-}
+} // namespace Karbon

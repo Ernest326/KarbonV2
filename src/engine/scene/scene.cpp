@@ -105,6 +105,7 @@ namespace Karbon {
         for (auto entity : view) {
             auto& component = view.get<CameraComponent>(entity);
             m_primaryCamera = entity;
+            component.primary = true; // sync flag with cached handle
             return &component.camera;
         }
 
