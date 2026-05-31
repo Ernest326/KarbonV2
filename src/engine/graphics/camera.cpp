@@ -2,6 +2,18 @@
 #include "../core/application.h"
 
 namespace Karbon {
+
+Camera::Camera(const glm::vec3& position, const glm::vec3& rotation, float fov, float nearPlane, float farPlane) {
+    this->position = position;
+    this->rotation = rotation;
+    m_fov = fov;
+    m_nearPlane = nearPlane;
+    m_farPlane = farPlane;
+    m_aspectRatio = Application::Get().getWindow().getAspectRatio(); 
+    setProjection(fov, nearPlane, farPlane);
+    updateViewMatrix();
+}
+
 void Camera::setPosition(const glm::vec3& position) {
     this->position = position;
     updateViewMatrix();
@@ -13,7 +25,16 @@ void Camera::setRotation(const glm::vec3& rotation) {
 }
 
 void Camera::setProjection(float fov, float nearPlane, float farPlane) {
-    projectionMatrix = glm::perspective(glm::radians(fov), Application::Get().getWindow().getAspectRatio(), nearPlane, farPlane);
+    projectionMatrix = glm::perspective(glm::radians(fov), m_aspectRatio, nearPlane, farPlane);
+}
+
+void Camera::setProjection(float fov, float nearPlane, float farPlane, float aspectRatio) {
+    projectionMatrix = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+}
+
+void Camera::setAspectRatio(float aspectRatio) {
+    m_aspectRatio = aspectRatio;
+    setProjection(m_fov, m_nearPlane, m_farPlane, aspectRatio);
 }
 
 const glm::vec3& Camera::getPosition() const {

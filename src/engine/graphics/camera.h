@@ -2,21 +2,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 namespace Karbon {
 class Camera {
 public:
-    Camera(const glm::vec3& position=glm::vec3(0.0f), const glm::vec3& rotation=glm::vec3(0.0f), float fov=45.0f, float nearPlane=0.1f, float farPlane=100.0f)
-        : position(position), rotation(rotation), m_fov(fov), m_nearPlane(nearPlane), m_farPlane(farPlane) {
-        setProjection(fov, nearPlane, farPlane);
-        updateViewMatrix();
-    }
+    Camera(const glm::vec3& position=glm::vec3(0.0f), const glm::vec3& rotation=glm::vec3(0.0f), float fov=45.0f, float nearPlane=0.1f, float farPlane=100.0f);
     ~Camera() {};
 
     void setPosition(const glm::vec3& position);
     void setRotation(const glm::vec3& rotation);
     void setProjection(float fov, float nearPlane, float farPlane);
     void setProjection(float fov, float nearPlane, float farPlane, float aspectRatio);
+    void setAspectRatio(float aspectRatio);
 
     glm::vec3 forward() const {
         float pitch = glm::radians(rotation.x);

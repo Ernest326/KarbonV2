@@ -45,6 +45,7 @@ private:
 
     CubeMesh m_cubeMesh;
     Entity m_testCube;
+
 };
 
 }

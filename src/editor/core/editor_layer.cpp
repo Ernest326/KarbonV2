@@ -239,6 +239,13 @@ void EditorLayer::drawViewport() {
                 static_cast<uint32_t>(viewportPanelSize.x),
                 static_cast<uint32_t>(viewportPanelSize.y));
         }
+        
+        //Update camera aspect ratio
+        entt::entity cameraEntity = m_scene->getPrimaryCameraEntity();
+        if (cameraEntity != entt::null) {
+            CameraComponent& cameraComponent = m_scene->getRegistry().get<CameraComponent>(cameraEntity);
+            cameraComponent.camera.setAspectRatio(viewportPanelSize.x / viewportPanelSize.y);
+        }
     }
 
     uint32_t textureID = m_viewportFramebuffer->getColorAttachment();
