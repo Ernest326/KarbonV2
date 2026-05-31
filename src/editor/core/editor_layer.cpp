@@ -1,7 +1,9 @@
 #include "editor_layer.h"
-
+#include <memory>
+#include "events/keycode.h"
 #include "karbon.h"
 #include <iostream>
+#include "core/base.h"
 #include <imgui.h>
 #include "scene/cube_mesh.h"
 #include "scene/components/meshrenderer_component.h"
@@ -23,10 +25,15 @@ void EditorLayer::onAttach() {
     m_viewportFramebuffer = std::make_unique<Framebuffer>(1280, 720);
     Application::Get().setViewportFramebuffer(m_viewportFramebuffer.get());
 
-    entt::entity camera = m_scene->createEntity("Editor Camera");
-    m_scene->getRegistry().emplace<CameraComponent>(camera);
-    m_scene->setPrimaryCamera(camera);
+    // --- Editor Camera ---
+    m_editorCamera = m_scene->createEntity("Editor Camera");
+    auto& cam_comp = m_scene->getRegistry().emplace<CameraComponent>(m_editorCamera);
+    cam_comp.camera.setPosition(glm::vec3(0, 0, 5));
+    m_scene->setPrimaryCamera(m_editorCamera);
 
+    m_cameraController = std::make_unique<EditorCameraController>(&cam_comp.camera, &Application::Get().getWindow());
+
+    // Test entities added in
     entt::entity directionalLight = m_scene->createEntity("Point Light");
     m_scene->getRegistry().get<TransformComponent>(directionalLight).position = glm::vec3(0.0f, 4.0f, 0.0f);
     m_scene->getRegistry().emplace<PointLightComponent>(directionalLight);
@@ -37,9 +44,30 @@ void EditorLayer::onAttach() {
     m_cubeMesh = CubeMesh();
     m_testCube.GetComponent<MeshRendererComponent>().mesh = &m_cubeMesh;
 
-    m_selectedEntity = camera;
-
+    m_selectedEntity = m_editorCamera;
     m_bootstrapped = true;
+}
+
+void EditorLayer::OnUpdate(float deltaTime) {
+    if (m_editorCamera!=entt::null && m_cameraController) {
+        m_cameraController->SetViewportActive(m_viewportHovered || m_viewportFocused);
+        m_cameraController->OnUpdate(deltaTime);
+    }
+}
+
+void EditorLayer::OnEvent(Event& e) {
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(EditorLayer::OnKeyPress));
+}
+
+bool EditorLayer::OnKeyPress(KeyPressEvent& e) {
+    if (e.getKeyCode() == Key::Escape) {
+        if (m_cameraController && m_cameraController->IsCapturingMouse()) {
+            m_cameraController->Release();
+            return true;
+        }
+    }
+    return false;
 }
 
 void EditorLayer::onImGuiRender() {

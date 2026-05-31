@@ -87,8 +87,11 @@ void Application::run() {
 
     KarbonImGUI::init();
 
+    // Create spectator camera if we're not in the editor
+    bool enableTestLayer = false;
+    bool enableSpectatorCamera = enableTestLayer;
     std::unique_ptr<SpectatorCamera> spectatorCamera;
-    if (m_enableSpectatorCamera) {
+    if (enableSpectatorCamera) {
         entt::entity runtimeCamera = m_activeScene->createEntity("Runtime Camera");
         auto& cameraComponent = m_activeScene->getRegistry().emplace<CameraComponent>(runtimeCamera);
         m_activeScene->setPrimaryCamera(runtimeCamera);
@@ -99,8 +102,7 @@ void Application::run() {
     Shader test_shader("resources/shaders/test_standard.vert",
                          "resources/shaders/test_standard.frag");
 
-    bool enableTestLayer = false;
-    if (enableTestLayer && spectatorCamera) {
+    if (enableTestLayer) {
         m_layerStack->pushLayer(new TestLayer(m_activeScene.get(), m_renderSystem.get(), m_physicsSystem.get(),
                                     m_lightingSystem.get(), m_materialSystem.get(), spectatorCamera.get()));
     }

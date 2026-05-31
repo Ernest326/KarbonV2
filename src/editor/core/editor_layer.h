@@ -7,6 +7,8 @@
 #include "graphics/framebuffer.h"
 #include "scene/cube_mesh.h"
 #include "scene/entity.h"
+#include "editor_camera_controller.h"
+#include "events/key_event.h"
 
 namespace Karbon {
 
@@ -14,10 +16,14 @@ class EditorLayer : public Layer {
 public:
     explicit EditorLayer(Scene* scene);
 
+    void OnUpdate(float deltaTime) override;
     void onAttach() override;
     void onImGuiRender() override;
+    void OnEvent(Event& e) override;
 
 private:
+
+    bool OnKeyPress(KeyPressEvent& e);
 
     void setupDockSpace();
     void drawMenuBar();
@@ -45,6 +51,9 @@ private:
 
     CubeMesh m_cubeMesh;
     Entity m_testCube;
+
+    entt::entity m_editorCamera;
+    std::unique_ptr<EditorCameraController> m_cameraController;
 
 };
 
