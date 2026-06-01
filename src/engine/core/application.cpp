@@ -131,18 +131,19 @@ void Application::run() {
                 spectatorCamera->update(deltaTime);
             }
 
-            m_layerStack->update(deltaTime);
 
             GLuint lights = glGetUniformBlockIndex(test_shader.getID(), "Lights");
             glUniformBlockBinding(test_shader.getID(), lights, 1);
             glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_lightingSystem->getUBO());
 
-            m_layerStack->imGuiRender();
-
             //Updates
             m_activeScene->onUpdate();
+            m_layerStack->update(deltaTime);
+            
             m_physicsSystem->Update(deltaTime);
             m_lightingSystem->Update();
+
+            m_layerStack->imGuiRender();
             Camera* activeCamera = m_activeScene->getPrimaryCamera();
             if (activeCamera) {
                 if(m_viewportFramebuffer) {

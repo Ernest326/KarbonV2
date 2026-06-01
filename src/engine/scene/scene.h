@@ -30,6 +30,8 @@ public:
 
     void onUpdate();
 
+    void markDirtyUpward(entt::entity entity);
+    void markDirtyDownward(entt::entity entity);
 
 private:
     entt::registry m_registry;
@@ -40,8 +42,6 @@ private:
 
     void updateHierarchy();
     void updateWorldTransform(entt::entity entity, const WorldTransformComponent& parentWorld);
-    void markDirtyUpward(entt::entity entity);
-    void markDirtyDownward(entt::entity entity);
 
     void serialize(const std::string& filepath); //TODO for future
     void deserialize(const std::string& filepath); //TODO for future

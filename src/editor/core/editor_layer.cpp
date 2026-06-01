@@ -5,6 +5,7 @@
 #include "core/application.h"
 #include "scene/components/meshrenderer_component.h"
 #include "scene/components/pointlight_component.h"
+#include "scene/components/hierarchy_component.h"
 
 namespace Karbon {
 
@@ -52,10 +53,19 @@ void EditorLayer::OnEvent(Event& e) {
     EventDispatcher dispatcher(e);
     dispatcher.Dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(EditorLayer::OnKeyPress));
     dispatcher.Dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(EditorLayer::GizmoControls));
+    dispatcher.Dispatch<KeyReleaseEvent>(KB_BIND_EVENT_FN(EditorLayer::OnKeyRelease));
 }
 
 bool EditorLayer::OnKeyPress(KeyPressEvent& e) {
     return m_editorCamera.OnKeyPress(e);
+}
+
+bool EditorLayer::OnKeyRelease(KeyReleaseEvent& e) {
+    if (e.getKeyCode() == Key::LeftControl) {
+        m_snapGizmo = false;
+        return true;
+    }
+    return false;
 }
 
 bool EditorLayer::GizmoControls(KeyPressEvent& e) {
@@ -76,7 +86,10 @@ bool EditorLayer::GizmoControls(KeyPressEvent& e) {
             m_gizmoSettings.gizmoType = GizmoSettings::GizmoType::None;
             return true;
         }
-        m_snapGizmo = (e.getKeyCode() == Key::LeftControl);
+        if (e.getKeyCode() == Key::LeftControl) {
+            m_snapGizmo = true;
+            return true;
+        }
     }
     return false;
 }
@@ -126,10 +139,12 @@ void EditorLayer::OnRender() {
 void EditorLayer::drawGizmos(Scene* scene) {
     if (!scene) return;
 
-    // Target the Viewport window's drawlist
+    // CRITICAL: refresh all world transforms before we read them.
+    // Otherwise parented children use stale worldTransform.matrix.
+    scene->onUpdate();
+
     ImGuizmo::SetDrawlist();
 
-    // Compute the exact screen-space content rectangle
     ImVec2 windowPos  = ImGui::GetWindowPos();
     ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
     ImVec2 contentMax = ImGui::GetWindowContentRegionMax();
@@ -143,23 +158,16 @@ void EditorLayer::drawGizmos(Scene* scene) {
     CameraComponent* cameraComponent = &scene->getRegistry().get<CameraComponent>(m_editorCamera.GetEntity());
     Camera& camera = cameraComponent->camera;
 
-    // Grid
-    /*
-    glm::mat4 identity = glm::mat4(1.0f);
-    ImGuizmo::DrawGrid(
-        glm::value_ptr(camera.getViewMatrix()),
-        glm::value_ptr(camera.getProjectionMatrix()),
-        glm::value_ptr(identity),
-        100.0f
-    );
-    */
-
     if (m_selectedEntity == entt::null || m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::None) {
         return;
     }
 
-    auto& transform = scene->getRegistry().get<TransformComponent>(m_selectedEntity);
-    glm::mat4 transformMatrix = transform.getLocalMatrix();
+    auto& transform      = scene->getRegistry().get<TransformComponent>(m_selectedEntity);
+    auto& worldTransform = scene->getRegistry().get<WorldTransformComponent>(m_selectedEntity);
+    auto& hierarchy      = scene->getRegistry().get<HierarchyComponent>(m_selectedEntity);
+
+    // Use WORLD matrix so the gizmo appears at the actual world position
+    glm::mat4 transformMatrix = worldTransform.matrix;
 
     bool manipulated = false;
     switch (m_gizmoSettings.gizmoType) {
@@ -193,34 +201,50 @@ void EditorLayer::drawGizmos(Scene* scene) {
     }
 
     if (manipulated) {
-        transform.position = glm::vec3(transformMatrix[3]);
+        auto& hierarchy = scene->getRegistry().get<HierarchyComponent>(m_selectedEntity);
+
+        // 1. Convert ImGuizmo's world matrix back to local space
+        glm::mat4 newLocalMatrix = transformMatrix;
+        if (hierarchy.parent != entt::null && scene->getRegistry().valid(hierarchy.parent)) {
+            auto& parentWorld = scene->getRegistry().get<WorldTransformComponent>(hierarchy.parent);
+            newLocalMatrix = glm::inverse(parentWorld.matrix) * transformMatrix;
+        }
+
+        transform.setLocalMatrix(newLocalMatrix);
+
+        // Decompose back into TransformComponent (local space)
+        transform.position = glm::vec3(newLocalMatrix[3]);
 
         glm::vec3 scale;
-        scale.x = glm::length(glm::vec3(transformMatrix[0]));
-        scale.y = glm::length(glm::vec3(transformMatrix[1]));
-        scale.z = glm::length(glm::vec3(transformMatrix[2]));
+        scale.x = glm::length(glm::vec3(newLocalMatrix[0]));
+        scale.y = glm::length(glm::vec3(newLocalMatrix[1]));
+        scale.z = glm::length(glm::vec3(newLocalMatrix[2]));
 
         if (scale.x > 0.0f && scale.y > 0.0f && scale.z > 0.0f) {
             glm::mat3 rotationMat(
-                glm::vec3(transformMatrix[0]) / scale.x,
-                glm::vec3(transformMatrix[1]) / scale.y,
-                glm::vec3(transformMatrix[2]) / scale.z
+                glm::vec3(newLocalMatrix[0]) / scale.x,
+                glm::vec3(newLocalMatrix[1]) / scale.y,
+                glm::vec3(newLocalMatrix[2]) / scale.z
             );
             transform.rotation = glm::quat_cast(rotationMat);
-            transform.scale = scale;
+            transform.scale    = scale;
         }
 
-        //Snapping
-        if(m_snapGizmo) {
-            if (m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Translate || m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Scale) {
+        // Snapping
+        if (m_snapGizmo) {
+            if (m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Translate ||
+                m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Scale) {
                 transform.position = glm::round(transform.position / m_gizmoSettings.snapValue) * m_gizmoSettings.snapValue;
-                transform.scale = glm::round(transform.scale / m_gizmoSettings.snapValue) * m_gizmoSettings.snapValue;
+                transform.scale    = glm::round(transform.scale    / m_gizmoSettings.snapValue) * m_gizmoSettings.snapValue;
             } else if (m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Rotate) {
                 glm::vec3 euler = glm::degrees(glm::eulerAngles(transform.rotation));
                 euler = glm::round(euler / m_gizmoSettings.snapAngle) * m_gizmoSettings.snapAngle;
                 transform.rotation = glm::quat(glm::radians(euler));
             }
         }
+
+        // Force children to rebuild their world transforms next frame
+        scene->markDirtyDownward(m_selectedEntity);
     }
 }
 

@@ -35,6 +35,7 @@ public:
 private:
 
     bool OnKeyPress(KeyPressEvent& e);
+    bool OnKeyRelease(KeyReleaseEvent& e);
     bool GizmoControls(KeyPressEvent& e);
 
     void setupDockSpace();
