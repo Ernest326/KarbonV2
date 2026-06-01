@@ -71,7 +71,7 @@ void EditorLayer::onImGuiRender() {
     drawMenuBar();
 
     m_hierarchyPanel.Draw(m_scene, &m_selectedEntity);
-    m_inspectorPanel.Draw(m_scene);
+    m_inspectorPanel.Draw(m_scene, &m_selectedEntity);
     m_contentBrowserPanel.Draw(m_scene);
     m_statsPanel.Draw(m_scene);
 
