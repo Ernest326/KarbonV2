@@ -36,6 +36,10 @@ void EditorLayer::onAttach() {
     entt::entity empty = m_scene->createEntity("Empty Entity");
     m_scene->setParent(empty, cube_id);
 
+    // -------
+
+    m_grid = std::make_unique<Grid>(100, 50.0f);
+
     m_selectedEntity = m_editorCamera.GetEntity();
     m_bootstrapped = true;
 }
@@ -72,6 +76,7 @@ bool EditorLayer::GizmoControls(KeyPressEvent& e) {
             m_gizmoSettings.gizmoType = GizmoSettings::GizmoType::None;
             return true;
         }
+        m_snapGizmo = (e.getKeyCode() == Key::LeftControl);
     }
     return false;
 }
@@ -105,6 +110,19 @@ void EditorLayer::onImGuiRender() {
     });
 }
 
+void EditorLayer::OnRender() {
+
+    if(!m_grid || !m_scene) { return; }
+
+    Camera* activeCamera = m_scene->getPrimaryCamera();
+    if (activeCamera) {
+        m_grid->Draw(activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix());
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+    }
+
+}
+
 void EditorLayer::drawGizmos(Scene* scene) {
     if (!scene) return;
 
@@ -126,6 +144,7 @@ void EditorLayer::drawGizmos(Scene* scene) {
     Camera& camera = cameraComponent->camera;
 
     // Grid
+    /*
     glm::mat4 identity = glm::mat4(1.0f);
     ImGuizmo::DrawGrid(
         glm::value_ptr(camera.getViewMatrix()),
@@ -133,6 +152,7 @@ void EditorLayer::drawGizmos(Scene* scene) {
         glm::value_ptr(identity),
         100.0f
     );
+    */
 
     if (m_selectedEntity == entt::null || m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::None) {
         return;
@@ -188,6 +208,18 @@ void EditorLayer::drawGizmos(Scene* scene) {
             );
             transform.rotation = glm::quat_cast(rotationMat);
             transform.scale = scale;
+        }
+
+        //Snapping
+        if(m_snapGizmo) {
+            if (m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Translate || m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Scale) {
+                transform.position = glm::round(transform.position / m_gizmoSettings.snapValue) * m_gizmoSettings.snapValue;
+                transform.scale = glm::round(transform.scale / m_gizmoSettings.snapValue) * m_gizmoSettings.snapValue;
+            } else if (m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Rotate) {
+                glm::vec3 euler = glm::degrees(glm::eulerAngles(transform.rotation));
+                euler = glm::round(euler / m_gizmoSettings.snapAngle) * m_gizmoSettings.snapAngle;
+                transform.rotation = glm::quat(glm::radians(euler));
+            }
         }
     }
 }

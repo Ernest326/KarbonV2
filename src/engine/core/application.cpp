@@ -150,6 +150,7 @@ void Application::run() {
                     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 }
                 m_renderSystem->Draw(&test_shader, activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix(), activeCamera->getPosition());
+                m_layerStack->render();
                 if(m_viewportFramebuffer) {
                     m_viewportFramebuffer->unbind();
                 }

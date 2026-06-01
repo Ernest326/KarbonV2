@@ -58,4 +58,10 @@ void LayerStack::imGuiRender() {
     }
 }
 
+void LayerStack::render() {
+    for (Layer* layer : m_layers) {
+        layer->OnRender();
+    }
+}
+
 }

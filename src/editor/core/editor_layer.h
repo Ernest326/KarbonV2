@@ -9,6 +9,8 @@
 #include "core/camera/editor_camera.h"
 #include "core/panels/editor_panels.h"
 #include "core/viewport/editor_viewport.h"
+#include "../graphics/grid.h"
+#include "graphics/shader.h"
 
 namespace Karbon {
 
@@ -28,6 +30,7 @@ public:
     void onAttach() override;
     void onImGuiRender() override;
     void OnEvent(Event& e) override;
+    void OnRender() override;
 
 private:
 
@@ -39,11 +42,14 @@ private:
 
     GizmoSettings m_gizmoSettings;
     void drawGizmos(Scene* scene);
+    bool m_snapGizmo = false;
 
     Scene* m_scene = nullptr;
     entt::entity m_selectedEntity = entt::null;
     bool m_bootstrapped = false;
     bool m_styleInitialized = false;
+
+    std::unique_ptr<Grid> m_grid; 
 
     EditorViewportPanel m_viewport;
     EditorCamera m_editorCamera;

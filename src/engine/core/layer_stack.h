@@ -21,6 +21,7 @@ public:
     void event(Event& e);
     void update(float deltaTime);
     void imGuiRender();
+    void render();
 
 private:
     std::vector<Layer*> m_layers;
