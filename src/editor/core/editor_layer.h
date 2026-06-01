@@ -12,6 +12,14 @@
 
 namespace Karbon {
 
+struct GizmoSettings {
+    bool snap = false;
+    float snapValue = 0.5f; // For translation and scale
+    float snapAngle = 15.0f; // For rotation
+    enum class Mode { Local, World } mode = Mode::Local;
+    enum class GizmoType { None, Translate, Rotate, Scale } gizmoType = GizmoType::Translate;
+};
+
 class EditorLayer : public Layer {
 public:
     explicit EditorLayer(Scene* scene);
@@ -27,6 +35,9 @@ private:
 
     void setupDockSpace();
     void drawMenuBar();
+
+    GizmoSettings m_gizmoSettings;
+    void drawGizmos(Scene* scene);
 
     Scene* m_scene = nullptr;
     entt::entity m_selectedEntity = entt::null;

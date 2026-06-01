@@ -9,7 +9,7 @@ void EditorViewportPanel::Initialize() {
     m_framebuffer = std::make_unique<Framebuffer>(1280, 720);
 }
 
-void EditorViewportPanel::Draw(Scene* scene) {
+void EditorViewportPanel::Draw(Scene* scene, const std::function<void()>& onDrawGizmos) {
     if (!m_framebuffer) {
         return;
     }
@@ -25,6 +25,10 @@ void EditorViewportPanel::Draw(Scene* scene) {
 
     uint32_t textureID = m_framebuffer->getColorAttachment();
     ImGui::Image((void*)(uintptr_t)textureID, viewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
+
+    if(onDrawGizmos) {
+        onDrawGizmos();
+    }
 
     ImGui::End();
     ImGui::PopStyleVar();

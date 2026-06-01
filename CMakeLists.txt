@@ -65,6 +65,11 @@ add_subdirectory(thirdparty/imgui)
 add_subdirectory(thirdparty/jolt)
 add_subdirectory(thirdparty/entt)
 
+set (IMGUIZMO_BUILD_EXAMPLE OFF CACHE BOOL "" FORCE)
+add_subdirectory(thirdparty/imguizmo)
+
+target_link_libraries(imguizmo PUBLIC imgui)
+
 # Disable assimp unit tests
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Disable assimp unit tests" FORCE)
 add_subdirectory(thirdparty/assimp)

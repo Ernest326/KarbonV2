@@ -1,5 +1,5 @@
 #pragma once
-
+#include <functional>
 #include <memory>
 #include <imgui.h>
 #include "graphics/framebuffer.h"
@@ -11,7 +11,7 @@ class Scene;
 class EditorViewportPanel {
 public:
     void Initialize();
-    void Draw(Scene* scene);
+    void Draw(Scene* scene, const std::function<void()>& onDrawGizmos=std::function<void()>());
 
     bool IsFocused() const { return m_focused; }
     bool IsHovered() const { return m_hovered; }

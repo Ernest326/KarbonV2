@@ -46,7 +46,7 @@ Extra gimmicks:
 
 EDITOR:
 
-- ImGUI integration/simple UI
+- ImGUI integration/simple UI [X]
 - Some way to compile game engine and allow editor to use the game engine
 - Asset system
 - Compiler system

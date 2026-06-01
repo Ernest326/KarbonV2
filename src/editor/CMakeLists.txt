@@ -14,7 +14,7 @@ target_include_directories(karbon_editor PRIVATE
     "${CMAKE_SOURCE_DIR}/src/engine"
 )
 
-target_link_libraries(karbon_editor PRIVATE karbon_engine)
+target_link_libraries(karbon_editor PRIVATE karbon_engine imguizmo)
 
 # Editor-specific: ensure resources path points to project root
 if(NOT PRODUCTION_BUILD)

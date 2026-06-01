@@ -1,6 +1,5 @@
 #pragma once
 #include <glm/glm.hpp>
-#include <Jolt/Physics/Body/BodyID.h>
 
 namespace Karbon {
 

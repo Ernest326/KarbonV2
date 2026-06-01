@@ -3,18 +3,11 @@
 #include <memory>
 #include <vector>
 #include <entt/entt.hpp>
+#include "../component/component_inspector.h"
 
 namespace Karbon {
 
 class Scene;
-
-class ComponentInspector {
-public:
-    virtual ~ComponentInspector() = default;
-    virtual const char* GetName() const = 0;
-    virtual bool CanInspect(entt::registry& registry, entt::entity entity) const = 0;
-    virtual void Inspect(entt::registry& registry, entt::entity entity) = 0;
-};
 
 class HierarchyPanel {
 public:
