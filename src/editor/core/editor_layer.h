@@ -32,6 +32,7 @@ public:
 private:
 
     bool OnKeyPress(KeyPressEvent& e);
+    bool GizmoControls(KeyPressEvent& e);
 
     void setupDockSpace();
     void drawMenuBar();

@@ -14,6 +14,7 @@ public:
     void Initialize(Scene* scene);
     void OnUpdate(float deltaTime, bool viewportActive);
     bool OnKeyPress(KeyPressEvent& e);
+    bool IsCapturingMouse() const { return m_controller ? m_controller->IsCapturingMouse() : false; }
 
     entt::entity GetEntity() const { return m_entity; }
 

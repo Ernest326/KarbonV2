@@ -188,8 +188,10 @@ bool Application::OnWindowResize(WindowResizeEvent &e) {
 }
 
 bool Application::OnKeyPress(KeyPressEvent &e) {
+    /*
     if (e.getKeyCode() == GLFW_KEY_Q)
         quit();
+    */
     if (e.getKeyCode() == GLFW_KEY_ESCAPE) {
         // Toggle mouse visible
         GLFWwindow *window = m_window->getGLWindow();

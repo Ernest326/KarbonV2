@@ -47,10 +47,33 @@ void EditorLayer::OnUpdate(float deltaTime) {
 void EditorLayer::OnEvent(Event& e) {
     EventDispatcher dispatcher(e);
     dispatcher.Dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(EditorLayer::OnKeyPress));
+    dispatcher.Dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(EditorLayer::GizmoControls));
 }
 
 bool EditorLayer::OnKeyPress(KeyPressEvent& e) {
     return m_editorCamera.OnKeyPress(e);
+}
+
+bool EditorLayer::GizmoControls(KeyPressEvent& e) {
+    if(!m_editorCamera.IsCapturingMouse()) {
+        if (e.getKeyCode() == Key::W) {
+            m_gizmoSettings.gizmoType = GizmoSettings::GizmoType::Translate;
+            return true;
+        }
+        if (e.getKeyCode() == Key::E) {
+            m_gizmoSettings.gizmoType = GizmoSettings::GizmoType::Rotate;
+            return true;
+        }
+        if (e.getKeyCode() == Key::R) {
+            m_gizmoSettings.gizmoType = GizmoSettings::GizmoType::Scale;
+            return true;
+        }
+        if (e.getKeyCode() == Key::Q) {
+            m_gizmoSettings.gizmoType = GizmoSettings::GizmoType::None;
+            return true;
+        }
+    }
+    return false;
 }
 
 void EditorLayer::onImGuiRender() {
@@ -68,6 +91,7 @@ void EditorLayer::onImGuiRender() {
         m_styleInitialized = true;
     }
 
+    ImGuizmo::BeginFrame();
     setupDockSpace();
     drawMenuBar();
 
