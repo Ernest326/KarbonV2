@@ -148,7 +148,7 @@ void Application::run() {
             if (activeCamera) {
                 if(m_viewportFramebuffer) {
                     m_viewportFramebuffer->bind();
-                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
                 }
                 m_renderSystem->Draw(&test_shader, activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix(), activeCamera->getPosition());
                 m_layerStack->render();

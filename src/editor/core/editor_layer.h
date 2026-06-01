@@ -38,6 +38,8 @@ private:
     bool OnKeyRelease(KeyReleaseEvent& e);
     bool GizmoControls(KeyPressEvent& e);
 
+    void DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera);
+
     void setupDockSpace();
     void drawMenuBar();
 

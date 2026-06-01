@@ -129,9 +129,21 @@ void EditorLayer::OnRender() {
 
     Camera* activeCamera = m_scene->getPrimaryCamera();
     if (activeCamera) {
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         m_grid->Draw(activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix());
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
+    }
+
+    if (m_selectedEntity != entt::null && activeCamera) {
+        auto* meshRenderer = m_scene->getRegistry().try_get<MeshRendererComponent>(m_selectedEntity);
+        auto* worldTransform = m_scene->getRegistry().try_get<WorldTransformComponent>(m_selectedEntity);
+        if (meshRenderer && meshRenderer->mesh && worldTransform) {
+            DrawOutline(meshRenderer->mesh, worldTransform->matrix, activeCamera);
+        }
     }
 
 }
@@ -246,6 +258,43 @@ void EditorLayer::drawGizmos(Scene* scene) {
         // Force children to rebuild their world transforms next frame
         scene->markDirtyDownward(m_selectedEntity);
     }
+}
+
+void EditorLayer::DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera) {
+    static Shader outlineShader("resources/shaders/outline.vert", "resources/shaders/outline.frag");
+    if (!mesh || !camera) return;
+
+    glm::mat4 mvp = camera->getProjectionMatrix() * camera->getViewMatrix() * worldMatrix;
+
+    glEnable(GL_STENCIL_TEST);
+
+    // ── Pass 1: Mark EVERY pixel of this mesh in stencil ──
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glDepthMask(GL_FALSE);        // don't touch depth
+    glDisable(GL_DEPTH_TEST);     // ignore depth entirely — write stencil for all pixels
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilMask(0xFF);
+
+    outlineShader.bind();
+    outlineShader.bindUniform(mvp, "u_MVP");
+    outlineShader.bindUniform(1.0f, "u_Scale");
+    mesh->draw();
+
+    // ── Pass 2: Draw inflated mesh only OUTSIDE the stencil mask ──
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glStencilMask(0x00);
+
+    outlineShader.bindUniform(1.01f, "u_Scale");
+    mesh->draw();
+
+    // Restore
+    glDisable(GL_STENCIL_TEST);
+    glEnable(GL_DEPTH_TEST);      // restore for next caller
+    glDepthMask(GL_TRUE);
+    glStencilMask(0xFF);
 }
 
 void EditorLayer::setupDockSpace() {
