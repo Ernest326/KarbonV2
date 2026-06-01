@@ -1,4 +1,4 @@
-#include "editor_camera_controller.h"
+#include "core/camera/editor_camera_controller.h"
 #include "graphics/camera.h"
 #include "core/window.h"
 #include "input/inputsystem.h"
@@ -30,7 +30,7 @@ void EditorCameraController::OnUpdate(float deltaTime) {
     bool rmbDown = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
     bool escDown = glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS;
 
-    // ESC always wins — release immediately
+    // ESC always wins -- release immediately
     if (escDown && m_capturing) {
         Release();
         return;
@@ -42,10 +42,9 @@ void EditorCameraController::OnUpdate(float deltaTime) {
         m_firstFrame = true;
         glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-        // CRITICAL: Consume any stale mouse delta that accumulated while
-        // the mouse was moving over UI panels. This prevents the jump.
+        // Consume any stale mouse delta accumulated while over UI panels.
         InputSystem::Get().getMouseDelta();
-        return; // Skip this frame entirely
+        return;
     }
 
     // Stop capturing
@@ -57,7 +56,6 @@ void EditorCameraController::OnUpdate(float deltaTime) {
     // Only process look/movement when actively capturing
     if (m_capturing) {
         if (m_firstFrame) {
-            // One extra safety consume in case InputSystem averages over polls
             InputSystem::Get().getMouseDelta();
             m_firstFrame = false;
             return;

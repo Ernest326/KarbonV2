@@ -1,14 +1,8 @@
 #include "editor_layer.h"
-#include <memory>
-#include "events/keycode.h"
-#include "karbon.h"
-#include <iostream>
 #include "core/base.h"
 #include <imgui.h>
-#include "scene/cube_mesh.h"
+#include "core/application.h"
 #include "scene/components/meshrenderer_component.h"
-#include "scene/components/id_component.h"
-#include "scene/components/camera_component.h"
 #include "scene/components/pointlight_component.h"
 
 namespace Karbon {
@@ -22,37 +16,31 @@ void EditorLayer::onAttach() {
         return;
     }
 
-    m_viewportFramebuffer = std::make_unique<Framebuffer>(1280, 720);
-    Application::Get().setViewportFramebuffer(m_viewportFramebuffer.get());
+    m_viewport.Initialize();
+    Application::Get().setViewportFramebuffer(m_viewport.GetFramebuffer());
 
-    // --- Editor Camera ---
-    m_editorCamera = m_scene->createEntity("Editor Camera");
-    auto& cam_comp = m_scene->getRegistry().emplace<CameraComponent>(m_editorCamera);
-    cam_comp.camera.setPosition(glm::vec3(0, 0, 5));
-    m_scene->setPrimaryCamera(m_editorCamera);
-
-    m_cameraController = std::make_unique<EditorCameraController>(&cam_comp.camera, &Application::Get().getWindow());
+    m_editorCamera.Initialize(m_scene);
 
     // Test entities added in
     entt::entity directionalLight = m_scene->createEntity("Point Light");
     m_scene->getRegistry().get<TransformComponent>(directionalLight).position = glm::vec3(0.0f, 4.0f, 0.0f);
     m_scene->getRegistry().emplace<PointLightComponent>(directionalLight);
-    
+
     entt::entity cube_id = m_scene->createEntity("Test Cube");
     m_testCube = Entity(cube_id, &m_scene->getRegistry());
     m_testCube.AddComponent<MeshRendererComponent>();
     m_cubeMesh = CubeMesh();
     m_testCube.GetComponent<MeshRendererComponent>().mesh = &m_cubeMesh;
+    
+    entt::entity empty = m_scene->createEntity("Empty Entity");
+    m_scene->setParent(empty, cube_id);
 
-    m_selectedEntity = m_editorCamera;
+    m_selectedEntity = m_editorCamera.GetEntity();
     m_bootstrapped = true;
 }
 
 void EditorLayer::OnUpdate(float deltaTime) {
-    if (m_editorCamera!=entt::null && m_cameraController) {
-        m_cameraController->SetViewportActive(m_viewportHovered || m_viewportFocused);
-        m_cameraController->OnUpdate(deltaTime);
-    }
+    m_editorCamera.OnUpdate(deltaTime, m_viewport.IsActive());
 }
 
 void EditorLayer::OnEvent(Event& e) {
@@ -61,13 +49,7 @@ void EditorLayer::OnEvent(Event& e) {
 }
 
 bool EditorLayer::OnKeyPress(KeyPressEvent& e) {
-    if (e.getKeyCode() == Key::Escape) {
-        if (m_cameraController && m_cameraController->IsCapturingMouse()) {
-            m_cameraController->Release();
-            return true;
-        }
-    }
-    return false;
+    return m_editorCamera.OnKeyPress(e);
 }
 
 void EditorLayer::onImGuiRender() {
@@ -88,12 +70,12 @@ void EditorLayer::onImGuiRender() {
     setupDockSpace();
     drawMenuBar();
 
-    if (m_showHierarchy) { drawHierarchy(); }
-    if (m_showInspector) { drawInspector(); }
-    if (m_showContentBrowser) { drawContentBrowser(); }
-    if (m_showStats) { drawStats(); }
+    m_hierarchyPanel.Draw(m_scene, &m_selectedEntity);
+    m_inspectorPanel.Draw(m_scene);
+    m_contentBrowserPanel.Draw(m_scene);
+    m_statsPanel.Draw(m_scene);
 
-    drawViewport();
+    m_viewport.Draw(m_scene);
 }
 
 void EditorLayer::setupDockSpace() {
@@ -146,10 +128,10 @@ void EditorLayer::drawMenuBar() {
         }
         
         if (ImGui::BeginMenu("View")) {
-            ImGui::MenuItem("Hierarchy", nullptr, &m_showHierarchy);
-            ImGui::MenuItem("Inspector", nullptr, &m_showInspector);
-            ImGui::MenuItem("Content Browser", nullptr, &m_showContentBrowser);
-            ImGui::MenuItem("Stats", nullptr, &m_showStats);
+            ImGui::MenuItem("Hierarchy", nullptr, m_hierarchyPanel.OpenFlag());
+            ImGui::MenuItem("Inspector", nullptr, m_inspectorPanel.OpenFlag());
+            ImGui::MenuItem("Content Browser", nullptr, m_contentBrowserPanel.OpenFlag());
+            ImGui::MenuItem("Stats", nullptr, m_statsPanel.OpenFlag());
             ImGui::EndMenu();
         }
         
@@ -172,115 +154,4 @@ void EditorLayer::drawMenuBar() {
         ImGui::EndMainMenuBar();
     }
 }
-
-void EditorLayer::drawInspector() {
-    ImGui::Begin("Inspector", &m_showInspector);
-    
-    if (ImGui::Button("Add Component")) {
-        ImGui::OpenPopup("AddComponentPopup");
-    }
-    
-    if (ImGui::BeginPopup("AddComponentPopup")) {
-        if (ImGui::MenuItem("Transform")) {}
-        if (ImGui::MenuItem("Mesh Renderer")) {}
-        if (ImGui::MenuItem("Rigidbody")) {}
-        if (ImGui::MenuItem("Point Light")) {}
-        ImGui::EndPopup();
-    }
-    
-    ImGui::Separator();
-    ImGui::End();
-}
-
-void EditorLayer::drawHierarchy() {
-    ImGui::Begin("Hierarchy", &m_showHierarchy);
-    
-    if (m_scene) {
-        ImGui::Text("Scene Entities");
-        ImGui::Separator();
-        
-        auto view = m_scene->getRegistry().view<IDComponent, TagComponent>();
-        for (auto entity : view) {
-            auto [id, tag] = view.get<IDComponent, TagComponent>(entity);
-            ImGui::Text("%s (ID: %d)", tag.tag.c_str(), id.id);
-        }
-    } else {
-        ImGui::Text("No scene loaded");
-    }
-    
-    ImGui::End();
-}
-
-void EditorLayer::drawContentBrowser() {
-    ImGui::Begin("Content Browser", &m_showContentBrowser);
-    
-    // Breadcrumb
-    ImGui::Text("assets > meshes");
-    ImGui::Separator();
-    
-    // Asset grid
-    float cellSize = 80.0f;
-    float panelWidth = ImGui::GetContentRegionAvail().x;
-    int columnCount = static_cast<int>(panelWidth / cellSize);
-    if (columnCount < 1) columnCount = 1;
-    
-    ImGui::Columns(columnCount, nullptr, false);
-    
-    // Placeholder items
-    for (int i = 0; i < 12; i++) {
-        ImGui::Button("file", ImVec2(cellSize - 10, cellSize - 10));
-        ImGui::Text("asset_%d.fbx", i);
-        ImGui::NextColumn();
-    }
-    
-    ImGui::Columns(1);
-    ImGui::End();
-}
-
-void EditorLayer::drawStats() {
-    ImGui::Begin("Stats", &m_showStats);
-    
-    ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-    ImGui::Text("Frame Time: %.3f ms", 1000.0f / ImGui::GetIO().Framerate);
-    ImGui::Separator();
-    ImGui::Text("Draw Calls: 0");
-    ImGui::Text("Triangles: 0");
-    ImGui::Text("Entities: 0");
-    ImGui::Separator();
-    //ImGui::Text("Viewport: %.0f x %.0f", m_viewportSize.x, m_viewportSize.y);
-    
-    ImGui::End();
-}
-
-void EditorLayer::drawViewport() {
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-    ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-
-    m_viewportFocused = ImGui::IsWindowFocused();
-    m_viewportHovered = ImGui::IsWindowHovered();
-
-    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-    if (viewportPanelSize.x != m_viewportSize.x || viewportPanelSize.y != m_viewportSize.y) {
-        m_viewportSize = viewportPanelSize;
-        if (m_viewportFramebuffer && viewportPanelSize.x > 0 && viewportPanelSize.y > 0) {
-            m_viewportFramebuffer->resize(
-                static_cast<uint32_t>(viewportPanelSize.x),
-                static_cast<uint32_t>(viewportPanelSize.y));
-        }
-        
-        //Update camera aspect ratio
-        entt::entity cameraEntity = m_scene->getPrimaryCameraEntity();
-        if (cameraEntity != entt::null) {
-            CameraComponent& cameraComponent = m_scene->getRegistry().get<CameraComponent>(cameraEntity);
-            cameraComponent.camera.setAspectRatio(viewportPanelSize.x / viewportPanelSize.y);
-        }
-    }
-
-    uint32_t textureID = m_viewportFramebuffer->getColorAttachment();
-    ImGui::Image((void*)(uintptr_t)textureID, viewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
-
-    ImGui::End();
-    ImGui::PopStyleVar();
-}
-
 }
