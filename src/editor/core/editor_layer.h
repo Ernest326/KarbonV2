@@ -39,6 +39,10 @@ private:
     bool GizmoControls(KeyPressEvent& e);
 
     void DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera);
+    
+    glm::vec4 EncodeEntityID(entt::entity e);
+    entt::entity DecodeEntity(const GLubyte* pixel);
+    void DoPickingPass(int x, int y);
 
     void setupDockSpace();
     void drawMenuBar();

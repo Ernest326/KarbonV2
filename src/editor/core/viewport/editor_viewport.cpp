@@ -24,7 +24,16 @@ void EditorViewportPanel::Draw(Scene* scene, const std::function<void()>& onDraw
     ResizeIfNeeded(viewportPanelSize, scene);
 
     uint32_t textureID = m_framebuffer->getColorAttachment();
+    ImVec2 imagePos = ImGui::GetCursorScreenPos();
     ImGui::Image((void*)(uintptr_t)textureID, viewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
+
+    //Click handling
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && m_hovered) {
+        ImVec2 mousePos = ImGui::GetMousePos();
+        m_clickX = static_cast<int>(mousePos.x - imagePos.x);
+        m_clickY = static_cast<int>(viewportPanelSize.y - (mousePos.y - imagePos.y));
+        m_clicked = true;
+    }
 
     if(onDrawGizmos) {
         onDrawGizmos();
@@ -32,6 +41,16 @@ void EditorViewportPanel::Draw(Scene* scene, const std::function<void()>& onDraw
 
     ImGui::End();
     ImGui::PopStyleVar();
+}
+
+bool EditorViewportPanel::ConsumeClick(int& outX, int& outY) {
+    if (m_clicked) {
+        outX = m_clickX;
+        outY = m_clickY;
+        m_clicked = false; // Reset click state after consuming
+        return true;
+    }
+    return false;
 }
 
 void EditorViewportPanel::ResizeIfNeeded(const ImVec2& size, Scene* scene) {

@@ -19,6 +19,11 @@ public:
     ImVec2 GetSize() const { return m_size; }
     Framebuffer* GetFramebuffer() const { return m_framebuffer.get(); }
 
+    bool ConsumeClick(int& outX, int& outY);
+    bool m_clicked = false;
+    int m_clickX = 0;
+    int m_clickY = 0;
+
 private:
     void ResizeIfNeeded(const ImVec2& size, Scene* scene);
     void UpdateCameraAspect(Scene* scene, const ImVec2& size);

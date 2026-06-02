@@ -45,6 +45,62 @@ void EditorLayer::onAttach() {
     m_bootstrapped = true;
 }
 
+glm::vec4 EditorLayer::EncodeEntityID(entt::entity e) {
+    uint32_t id = static_cast<uint32_t>(e);
+    return glm::vec4(
+        ((id >> 0)  & 0xFF) / 255.0f,
+        ((id >> 8)  & 0xFF) / 255.0f,
+        ((id >> 16) & 0xFF) / 255.0f,
+        ((id >> 24) & 0xFF) / 255.0f
+    );
+}
+
+entt::entity EditorLayer::DecodeEntity(const GLubyte* pixel) {
+    uint32_t id = pixel[0] + (pixel[1] << 8) + (pixel[2] << 16) + (pixel[3] << 24);
+    return static_cast<entt::entity>(id);
+}
+
+void EditorLayer::DoPickingPass(int x, int y) {
+    if(!m_scene || !m_viewport.GetFramebuffer()) { return; }
+    if (x < 0 || y < 0) return;
+
+    uint32_t fbWidth = m_viewport.GetSize().x;
+    uint32_t fbHeight = m_viewport.GetSize().y;
+
+    std::cout << fbWidth << "x" << fbHeight << " viewport, picking at (" << x << ", " << y << ")\n";
+    if (x >= fbWidth || y >= fbHeight) return;
+
+    static Shader pickingShader("resources/shaders/picker.vert", "resources/shaders/picker.frag");
+    Camera* cam = m_scene->getPrimaryCamera();
+    if(!cam) { return; }
+
+    m_viewport.GetFramebuffer()->bind();
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    auto view = m_scene->getRegistry().view<WorldTransformComponent, MeshRendererComponent>();
+    for (auto entity : view) {
+        auto [worldTransform, meshRenderer] = view.get(entity);
+        if (!meshRenderer.mesh) continue;
+
+        glm::mat4 mvp = cam->getProjectionMatrix() * cam->getViewMatrix() * worldTransform.matrix;
+        pickingShader.bind();
+        pickingShader.bindUniform(mvp, "u_MVP");
+        pickingShader.bindUniform(EncodeEntityID(entity), "u_ID");
+
+        meshRenderer.mesh->draw();
+    }
+
+    GLubyte pixel[4];
+    glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+
+    entt::entity picked = DecodeEntity(pixel);
+    if (picked != entt::null) {
+        m_selectedEntity = picked;
+    }
+
+}
+
 void EditorLayer::OnUpdate(float deltaTime) {
     m_editorCamera.OnUpdate(deltaTime, m_viewport.IsActive());
 }
@@ -86,6 +142,10 @@ bool EditorLayer::GizmoControls(KeyPressEvent& e) {
             m_gizmoSettings.gizmoType = GizmoSettings::GizmoType::None;
             return true;
         }
+        if (e.getKeyCode() == Key::G) {
+            m_gizmoSettings.mode = (m_gizmoSettings.mode == GizmoSettings::Mode::Local) ? GizmoSettings::Mode::World : GizmoSettings::Mode::Local;
+            return true;
+        }
         if (e.getKeyCode() == Key::LeftControl) {
             m_snapGizmo = true;
             return true;
@@ -121,6 +181,12 @@ void EditorLayer::onImGuiRender() {
     m_viewport.Draw(m_scene, [this]() {
         drawGizmos(m_scene);
     });
+
+    int pickX, pickY;
+    if (!m_editorCamera.IsCapturingMouse() && m_viewport.ConsumeClick(pickX, pickY)) {
+        DoPickingPass(pickX, pickY);
+        std::cout << "Clicked at (" << pickX << ", " << pickY << ")\n";
+    }
 }
 
 void EditorLayer::OnRender() {
