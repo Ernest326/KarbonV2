@@ -40,6 +40,7 @@ private:
 
     void DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera);
     
+    std::unique_ptr<Framebuffer> m_pickingFramebuffer;
     glm::vec4 EncodeEntityID(entt::entity e);
     entt::entity DecodeEntity(const GLubyte* pixel);
     void DoPickingPass(int x, int y);

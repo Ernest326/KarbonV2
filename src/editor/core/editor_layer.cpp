@@ -39,6 +39,7 @@ void EditorLayer::onAttach() {
 
     // -------
 
+    m_pickingFramebuffer = std::make_unique<Framebuffer>(m_viewport.GetSize().x, m_viewport.GetSize().y);
     m_grid = std::make_unique<Grid>(100, 50.0f);
 
     m_selectedEntity = m_editorCamera.GetEntity();
@@ -47,6 +48,7 @@ void EditorLayer::onAttach() {
 
 glm::vec4 EditorLayer::EncodeEntityID(entt::entity e) {
     uint32_t id = static_cast<uint32_t>(e);
+    id = id + 1; // Avoid black (0) which is reserved for "no entity"
     return glm::vec4(
         ((id >> 0)  & 0xFF) / 255.0f,
         ((id >> 8)  & 0xFF) / 255.0f,
@@ -56,7 +58,7 @@ glm::vec4 EditorLayer::EncodeEntityID(entt::entity e) {
 }
 
 entt::entity EditorLayer::DecodeEntity(const GLubyte* pixel) {
-    uint32_t id = pixel[0] + (pixel[1] << 8) + (pixel[2] << 16) + (pixel[3] << 24);
+    uint32_t id = pixel[0] + (pixel[1] << 8) + (pixel[2] << 16) + (pixel[3] << 24) - 1;
     return static_cast<entt::entity>(id);
 }
 
@@ -74,9 +76,15 @@ void EditorLayer::DoPickingPass(int x, int y) {
     Camera* cam = m_scene->getPrimaryCamera();
     if(!cam) { return; }
 
-    m_viewport.GetFramebuffer()->bind();
+    m_pickingFramebuffer->resize(fbWidth, fbHeight);
+    m_pickingFramebuffer->bind();
+    glViewport(0, 0, fbWidth, fbHeight);
+
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(x, y, 1, 1);
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_SCISSOR_TEST);
 
     auto view = m_scene->getRegistry().view<WorldTransformComponent, MeshRendererComponent>();
     for (auto entity : view) {
@@ -95,9 +103,7 @@ void EditorLayer::DoPickingPass(int x, int y) {
     glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
 
     entt::entity picked = DecodeEntity(pixel);
-    if (picked != entt::null) {
-        m_selectedEntity = picked;
-    }
+    m_selectedEntity = picked;
 
 }
 
@@ -183,7 +189,7 @@ void EditorLayer::onImGuiRender() {
     });
 
     int pickX, pickY;
-    if (!m_editorCamera.IsCapturingMouse() && m_viewport.ConsumeClick(pickX, pickY)) {
+    if (m_viewport.ConsumeClick(pickX, pickY) && !m_editorCamera.IsCapturingMouse() && !ImGuizmo::IsUsing()) {
         DoPickingPass(pickX, pickY);
         std::cout << "Clicked at (" << pickX << ", " << pickY << ")\n";
     }
