@@ -3,7 +3,8 @@
 ENGINE LAYER:
 
 Core:
-- Logging system i.e. logger.info(),warn(),debug() + save logs if needed, better observability + same formatting for messages etc.
+- Logging system i.e. logger.info(),warn(),debug() + save logs if needed, better observability + same formatting for messages etc. [X]
+- ^ Start using the logging system implementation
 - Audio system implementation
 
 - Assimp mesh loading system + animation system -> test to see if models load corretly
@@ -21,13 +22,15 @@ Rendering:
 - Anti-aliasing
 
 Shading/Lighting:
+- More lighting types e.g. Spot, Directional, Area etc.
+- Emission separate framebuffer pass HDR/Bloom/Lighting effects?
 - Skybox (cubemap + hdr skyboxes) [X]
 - Add a lighting system which grabs point lights and passes them as needed into shader [X]
 - PBR material system
 - Shadow maps maybe, or some sort of dynamic shadow system
 - Volumetric fog, fog effects
 - Bloom effect
-- Ambient Occlusion
+- Ambient Occlusion (SSAO + AO textures)
 
 Optimizations:
 - Backface culling
@@ -36,13 +39,10 @@ Optimizations:
 
 Extra gimmicks:
 - OpenVR implementation
-
-
--- Stuff to add in the future...
-- Navigation system, navmesh baking
+- Navmesh stuff + basic A* pathfinding
+- Vehicle system
 - Crossplatform compability
 - Networking
-
 
 
 EDITOR:
@@ -50,7 +50,9 @@ EDITOR:
 - ImGUI integration/simple UI [X]
 - Some way to compile game engine and allow editor to use the game engine
 - Asset system
+^ - Scene serialization
+  - Materialhandle serialization
 - Compiler system
 - Scene system [X]
-- Script compiling system of some sort?
+- Script compiling system of some sort? (Lua runtime or C/C++)
 - Action events + action clipboard for undo/redo
