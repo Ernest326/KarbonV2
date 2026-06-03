@@ -16,7 +16,8 @@ Physics:
 - Mesh collision system
 
 Rendering:
-- Framebuffer system
+- Framebuffer system [X]
+- Post-process effects templates/settings
 - Anti-aliasing
 
 Shading/Lighting:
@@ -52,3 +53,4 @@ EDITOR:
 - Compiler system
 - Scene system [X]
 - Script compiling system of some sort?
+- Action events + action clipboard for undo/redo

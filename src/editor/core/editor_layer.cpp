@@ -39,7 +39,7 @@ void EditorLayer::onAttach() {
 
     // -------
 
-    m_pickingFramebuffer = std::make_unique<Framebuffer>(m_viewport.GetSize().x, m_viewport.GetSize().y);
+    m_pickingFramebuffer = std::make_unique<Framebuffer>(1920, 1080);
     m_grid = std::make_unique<Grid>(100, 50.0f);
 
     m_selectedEntity = m_editorCamera.GetEntity();
@@ -63,23 +63,21 @@ entt::entity EditorLayer::DecodeEntity(const GLubyte* pixel) {
 }
 
 void EditorLayer::DoPickingPass(int x, int y) {
-    if(!m_scene || !m_viewport.GetFramebuffer()) { return; }
+    if (!m_scene || !m_viewport.GetFramebuffer()) return;
     if (x < 0 || y < 0) return;
 
-    uint32_t fbWidth = m_viewport.GetSize().x;
-    uint32_t fbHeight = m_viewport.GetSize().y;
-
-    std::cout << fbWidth << "x" << fbHeight << " viewport, picking at (" << x << ", " << y << ")\n";
-    if (x >= fbWidth || y >= fbHeight) return;
+    uint32_t fbW = m_viewport.GetFramebuffer()->getWidth();
+    uint32_t fbH = m_viewport.GetFramebuffer()->getHeight();
+    if (x >= (int)fbW || y >= (int)fbH) return;
 
     static Shader pickingShader("resources/shaders/picker.vert", "resources/shaders/picker.frag");
     Camera* cam = m_scene->getPrimaryCamera();
-    if(!cam) { return; }
+    if (!cam) return;
 
-    m_pickingFramebuffer->resize(fbWidth, fbHeight);
     m_pickingFramebuffer->bind();
-    glViewport(0, 0, fbWidth, fbHeight);
-
+    // Use viewport to restrict rendering to the picked pixel's area
+    // But the FBO is 1920x1080, so we use scissor to only clear the relevant pixel
+    glViewport(0, 0, fbW, fbH);  // match viewport size for correct projection
     glEnable(GL_SCISSOR_TEST);
     glScissor(x, y, 1, 1);
     glClearColor(0, 0, 0, 0);
@@ -105,6 +103,8 @@ void EditorLayer::DoPickingPass(int x, int y) {
     entt::entity picked = DecodeEntity(pixel);
     m_selectedEntity = picked;
 
+    // Unbind picking FBO, but DON'T bind viewport FBO here
+    // Let Application::run() handle it
 }
 
 void EditorLayer::OnUpdate(float deltaTime) {
@@ -151,6 +151,15 @@ bool EditorLayer::GizmoControls(KeyPressEvent& e) {
         if (e.getKeyCode() == Key::G) {
             m_gizmoSettings.mode = (m_gizmoSettings.mode == GizmoSettings::Mode::Local) ? GizmoSettings::Mode::World : GizmoSettings::Mode::Local;
             return true;
+        }
+        if (e.getKeyCode() == Key::F) {
+            // Focus selected entity
+            if (m_selectedEntity != entt::null) {
+                auto& worldTransform = m_scene->getRegistry().get<WorldTransformComponent>(m_selectedEntity);
+                auto& cameraTransform = m_scene->getRegistry().get<WorldTransformComponent>(m_editorCamera.GetEntity());
+                cameraTransform.worldPosition = (worldTransform.worldPosition - cameraTransform.worldPosition)*0.1f + cameraTransform.worldPosition; // Lerp to target for smoothness
+                return true;
+            }
         }
         if (e.getKeyCode() == Key::LeftControl) {
             m_snapGizmo = true;
@@ -315,6 +324,8 @@ void EditorLayer::drawGizmos(Scene* scene) {
         }
 
         // Snapping
+
+        //TOOD: Fix snapping with transform hierarchy updates
         if (m_snapGizmo) {
             if (m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Translate ||
                 m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::Scale) {

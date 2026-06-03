@@ -122,7 +122,10 @@ void Application::run() {
         InputSystem::Get().BeginFrame();
         glfwPollEvents();
 
-        m_window->clear();
+        if (!m_viewportFramebuffer) {
+            m_window->clear();
+        }
+
         KarbonImGUI::begin();
 
         if (!m_minimised) {
@@ -148,6 +151,7 @@ void Application::run() {
             if (activeCamera) {
                 if(m_viewportFramebuffer) {
                     m_viewportFramebuffer->bind();
+                    glClearColor(0.16f, 0.16f, 0.18f, 1.0f);
                     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
                 }
                 m_renderSystem->Draw(&test_shader, activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix(), activeCamera->getPosition());

@@ -2737,6 +2737,12 @@
 },
 {
   "directory": "C:/Users/Ernest/Documents/KarbonV2/src/editor",
+  "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_editor.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_editor.dir\\graphics\\grid.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\editor\\graphics\\grid.cpp",
+  "file": "C:/Users/Ernest/Documents/KarbonV2/src/editor/graphics/grid.cpp",
+  "output": "src/editor/CMakeFiles/karbon_editor.dir/graphics/grid.cpp.obj"
+},
+{
+  "directory": "C:/Users/Ernest/Documents/KarbonV2/src/editor",
   "command": "C:\\msys64\\ucrt64\\bin\\c++.exe -DDEVELOPMENT_BUILD=1 -DGLFW_INCLUDE_NONE=1 -DJPH_OBJECT_STREAM -DJPH_USE_AVX -DJPH_USE_AVX2 -DJPH_USE_DX12 -DJPH_USE_F16C -DJPH_USE_FMADD -DJPH_USE_LZCNT -DJPH_USE_SSE4_1 -DJPH_USE_SSE4_2 -DJPH_USE_TZCNT -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"C:/Users/Ernest/Documents/KarbonV2/resources\\\" @CMakeFiles/karbon_editor.dir/includes_CXX.rsp -std=gnu++20 -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c -mfma -mfpmath=sse -o CMakeFiles\\karbon_editor.dir\\main.cpp.obj -c C:\\Users\\Ernest\\Documents\\KarbonV2\\src\\editor\\main.cpp",
   "file": "C:/Users/Ernest/Documents/KarbonV2/src/editor/main.cpp",
   "output": "src/editor/CMakeFiles/karbon_editor.dir/main.cpp.obj"
