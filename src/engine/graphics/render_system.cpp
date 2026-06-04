@@ -60,11 +60,8 @@ void RenderSystem::Draw(Shader* shader, const glm::mat4& view, const glm::mat4& 
         
         shader->bindUniform(transform.matrix, "model");
         shader->bindUniform(static_cast<int>(renderer.material), "materialIndex");
-        m_materials->bindAlbedoMap(renderer.material, 2);
-        shader->bindUniform(2, "albedoMap");
-        m_materials->bindNormalMap(renderer.material, 3);
-        shader->bindUniform(3, "normalMap");
-        renderer.mesh->draw();
+        m_materials->bindMaterialTextures(renderer.material);
+        renderer.mesh->draw(); 
     }
     shader->unbind();
     

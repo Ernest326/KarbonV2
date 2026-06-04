@@ -99,8 +99,8 @@ void Application::run() {
                                                             glm::vec3(0.0f, 0.0f, 5.0f),
                                                             glm::vec3(0.0f, 0.0f, 0.0f));
     }
-    Shader test_shader("resources/shaders/test_standard.vert",
-                         "resources/shaders/test_standard.frag");
+    Shader test_shader("resources/shaders/pbr.vert",
+                         "resources/shaders/pbr.frag");
 
     if (enableTestLayer) {
         m_layerStack->pushLayer(new TestLayer(m_activeScene.get(), m_renderSystem.get(), m_physicsSystem.get(),
@@ -134,14 +134,9 @@ void Application::run() {
                 spectatorCamera->update(deltaTime);
             }
 
-
-            GLuint lights = glGetUniformBlockIndex(test_shader.getID(), "Lights");
-            glUniformBlockBinding(test_shader.getID(), lights, 1);
-            glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_lightingSystem->getUBO());
-
             //Updates
-            m_activeScene->onUpdate();
-            m_layerStack->update(deltaTime);
+            m_layerStack->update(deltaTime);  // onAttach() creates entities here
+            m_activeScene->onUpdate();         // propagate world transforms (includes newly created entities)
             
             m_physicsSystem->Update(deltaTime);
             m_lightingSystem->Update();
@@ -154,6 +149,11 @@ void Application::run() {
                     glClearColor(0.16f, 0.16f, 0.18f, 1.0f);
                     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
                 }
+
+                GLuint lights = glGetUniformBlockIndex(test_shader.getID(), "Lights");
+                glUniformBlockBinding(test_shader.getID(), lights, 1);
+                glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_lightingSystem->getUBO());
+
                 m_renderSystem->Draw(&test_shader, activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix(), activeCamera->getPosition());
                 m_layerStack->render();
                 if(m_viewportFramebuffer) {

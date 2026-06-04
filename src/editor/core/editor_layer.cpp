@@ -5,6 +5,8 @@
 #include "core/application.h"
 #include "scene/components/meshrenderer_component.h"
 #include "scene/components/pointlight_component.h"
+#include "scene/components/directional_light_component.h"
+#include "scene/components/spotlight_component.h"
 #include "scene/components/hierarchy_component.h"
 
 namespace Karbon {
@@ -24,15 +26,26 @@ void EditorLayer::onAttach() {
     m_editorCamera.Initialize(m_scene);
 
     // Test entities added in
-    entt::entity directionalLight = m_scene->createEntity("Point Light");
+    entt::entity directionalLight = m_scene->createEntity("Directional Light");
     m_scene->getRegistry().get<TransformComponent>(directionalLight).position = glm::vec3(0.0f, 4.0f, 0.0f);
-    m_scene->getRegistry().emplace<PointLightComponent>(directionalLight);
+    m_scene->getRegistry().emplace<DirectionalLightComponent>(directionalLight);
+
+    entt::entity pointLight = m_scene->createEntity("Point Light");
+    m_scene->getRegistry().get<TransformComponent>(pointLight).position = glm::vec3(0.0f, 4.0f, 0.0f);
+    m_scene->getRegistry().emplace<PointLightComponent>(pointLight);
+
+    entt::entity spotlight = m_scene->createEntity("Spot Light");
+    m_scene->getRegistry().get<TransformComponent>(spotlight).position = glm::vec3(5.0f, 4.0f, 0.0f);
+    m_scene->getRegistry().emplace<SpotLightComponent>(spotlight);
 
     entt::entity cube_id = m_scene->createEntity("Test Cube");
     m_testCube = Entity(cube_id, &m_scene->getRegistry());
     m_testCube.AddComponent<MeshRendererComponent>();
     m_cubeMesh = CubeMesh();
     m_testCube.GetComponent<MeshRendererComponent>().mesh = &m_cubeMesh;
+
+    MaterialHandle matHandle = Application::Get().getMaterialSystem().create({1.0f, 0.5f, 0.31f, 1.0f}, 0.5f, 0.5f);
+    m_testCube.GetComponent<MeshRendererComponent>().material = matHandle;
     
     entt::entity empty = m_scene->createEntity("Empty Entity");
     m_scene->setParent(empty, cube_id);

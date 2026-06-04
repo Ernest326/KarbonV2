@@ -7,6 +7,8 @@
 #include "../component/rigidbody_component.h"
 #include "../component/collider_component.h"
 #include "../component/meshrenderer_component.h"
+#include "../component/directional_light_component.h"
+#include "../component/spotlight_component.h"
 #include <glm/gtc/quaternion.hpp>
 #include "scene/components/hierarchy_component.h"
 #include "scene/components/id_component.h"
@@ -60,6 +62,8 @@ InspectorPanel::InspectorPanel() {
     m_componentInspectors.push_back(std::make_unique<RigidbodyComponentInspector>());
     m_componentInspectors.push_back(std::make_unique<ColliderComponentInspector>());
     m_componentInspectors.push_back(std::make_unique<MeshRendererComponentInspector>());
+    m_componentInspectors.push_back(std::make_unique<DirectionalLightComponentInspector>());
+    m_componentInspectors.push_back(std::make_unique<SpotLightComponentInspector>());
 }
 
 void HierarchyPanel::Draw(Scene* scene, entt::entity* selectedEntity) {

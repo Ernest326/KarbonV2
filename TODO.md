@@ -48,11 +48,18 @@ Extra gimmicks:
 EDITOR:
 
 - ImGUI integration/simple UI [X]
+- Drag and drop parent system, right click functionality(currently goes into camera look-around no matter what)
+- Allow object to be set as active/inactive
+- Adding/Deleting Components, Adding material modifiers in meshRenderer material
+- Meshrenderer to handle a model with multiple material slots (treat multiple material-separate meshes as a single mesh)
 - Some way to compile game engine and allow editor to use the game engine
 - Asset system
 ^ - Scene serialization
   - Materialhandle serialization
+  - Serialise a material file which uses texture paths, create/update materialHandler and keep reference of texture paths
 - Compiler system
 - Scene system [X]
+^ - Further develop scene system to save/load a scene, allow play-test and return back to original state once done
 - Script compiling system of some sort? (Lua runtime or C/C++)
 - Action events + action clipboard for undo/redo
+- keybind mapping from a settings file, Keybind -> Action

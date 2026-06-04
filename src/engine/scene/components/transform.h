@@ -25,6 +25,10 @@ struct TransformComponent {
             return localMatrix;
         }
         return glm::translate(glm::mat4(1.0f), position) * glm::mat4_cast(rotation) * glm::scale(glm::mat4(1.0f), scale);
+    }   
+    
+    glm::vec3 forward() const {
+        return rotation * glm::vec3(0.0f, 0.0f, -1.0f);
     }
 };
 
@@ -33,6 +37,9 @@ struct WorldTransformComponent {
     glm::vec3 worldPosition{0.0f};
     glm::quat worldRotation{1.0f, 0.0f, 0.0f, 0.0f};
     glm::vec3 worldScale{1.0f};
+    glm::vec3 forward() const {
+        return worldRotation * glm::vec3(0.0f, 0.0f, -1.0f);
+    }
 };
 
 }
