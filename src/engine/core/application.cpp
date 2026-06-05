@@ -153,7 +153,9 @@ void Application::run() {
                 GLuint lights = glGetUniformBlockIndex(test_shader.getID(), "Lights");
                 glUniformBlockBinding(test_shader.getID(), lights, 1);
                 glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_lightingSystem->getUBO());
-
+                
+                auto& env = m_activeScene->getEnvironment();
+                env.bindIBL(test_shader);
                 m_renderSystem->Draw(&test_shader, activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix(), activeCamera->getPosition());
                 m_layerStack->render();
                 if(m_viewportFramebuffer) {

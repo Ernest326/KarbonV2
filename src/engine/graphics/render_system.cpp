@@ -2,6 +2,7 @@
 #include "../scene/components/meshrenderer_component.h"
 #include "../scene/components/transform.h"
 #include "texture.h"
+#include "../core/application.h"
 
 namespace Karbon {
 
@@ -16,22 +17,8 @@ void RenderSystem::Draw(Shader* shader, const glm::mat4& view, const glm::mat4& 
     m_lights->Update();
 
     //Draw skybox first
-    if(m_skybox) {
-        glDepthFunc(GL_LEQUAL);  // Change depth function so depth test passes when values are equal to depth buffer's content
-        glDepthMask(GL_FALSE);
-        m_skyboxShader->bind();
-        // Remove translation from the view matrix so the skybox stays centered on the camera
-        glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(view));
-        m_skyboxShader->bindUniform(viewNoTranslation, "view");
-        m_skyboxShader->bindUniform(projection, "projection");
-        m_skyboxShader->bindUniform(0, "skybox");
-        m_skybox->bind(0);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-        m_skybox->unbind();
-        m_skyboxShader->unbind();
-        glDepthMask(GL_TRUE);
-        glDepthFunc(GL_LESS); // Set depth function back to default
-    }
+    auto& activeScene = Application::Get().getActiveScene();
+    activeScene.renderSkybox(*m_skyboxShader);
 
     //Draw rest of scene
     shader->bind();

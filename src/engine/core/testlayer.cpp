@@ -44,8 +44,8 @@ void TestLayer::onAttach() {
         return e;
     };
 
-    // Skybox (heap-allocated so it lives as long as the layer)
-    m_skybox = std::make_unique<Cubemap>(std::vector<std::string>{
+    auto& env = m_scene->getEnvironment();
+    env.setCubemap(std::vector<std::string>{
         "resources/textures/skybox/right.jpg",
         "resources/textures/skybox/left.jpg",
         "resources/textures/skybox/top.jpg",
@@ -53,7 +53,6 @@ void TestLayer::onAttach() {
         "resources/textures/skybox/front.jpg",
         "resources/textures/skybox/back.jpg"
     });
-    m_renderSystem->setSkybox(m_skybox.get());
 
     // Textures
     m_testTexture  = std::make_unique<Texture>("resources/textures/texture.png");
@@ -150,8 +149,6 @@ void TestLayer::onAttach() {
 }
 
 void TestLayer::onDetach() {
-    if (m_renderSystem)
-        m_renderSystem->setSkybox(nullptr);
     m_sphereEntities.clear();
 }
 

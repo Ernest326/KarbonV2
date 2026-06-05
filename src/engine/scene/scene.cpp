@@ -41,6 +41,109 @@ static void decomposeNoShear(const glm::mat4& matrix, glm::vec3& position, glm::
 }
 
 namespace Karbon {
+    // Scene environment implementation
+    void SceneEnvironment::setCubemap(const std::vector<std::string>& faces) {
+        clear();
+        m_cubemap = std::make_unique<Cubemap>(faces);
+        if (m_cubemap->getID() != 0) {
+            m_type = Type::Cubemap;
+            m_cubemapFaces = faces;
+            m_hdrPath.clear();
+        } else {
+            m_cubemap.reset();
+        }
+    }
+
+    void SceneEnvironment::setHDR(const std::string& hdrPath) {
+        clear();
+        m_environmentMap = std::make_unique<EnvironmentMap>(hdrPath);
+        if (m_environmentMap->getID() != 0) {
+            m_type = Type::HDR;
+            m_hdrPath = hdrPath;
+            m_cubemapFaces.clear();
+        } else {
+            m_environmentMap.reset();
+        }
+    }
+
+    void SceneEnvironment::clear() {
+        m_cubemap.reset();
+        m_environmentMap.reset();
+        m_type = Type::None;
+        m_cubemapFaces.clear();
+        m_hdrPath.clear();
+    }
+
+    unsigned int SceneEnvironment::getSkyboxCubemap() const {
+        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->getID();
+        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->getCubemap();
+        return 0;
+    }
+
+    bool SceneEnvironment::hasIBL() const {
+        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->hasIBL();
+        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->hasIBL();
+        return false;
+    }
+
+    void SceneEnvironment::generateIBL() {
+        if (m_type == Type::Cubemap && m_cubemap) m_cubemap->generateIBL();
+        if (m_type == Type::HDR && m_environmentMap) m_environmentMap->generateIBL();
+    }
+
+    unsigned int SceneEnvironment::getIrradianceMap() const {
+        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->getIrradianceMap();
+        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->getIrradianceMap();
+        return 0;
+    }
+
+    unsigned int SceneEnvironment::getPrefilterMap() const {
+        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->getPrefilterMap();
+        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->getPrefilterMap();
+        return 0;
+    }
+
+    unsigned int SceneEnvironment::getBRDFLUT() const {
+        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->getBRDFLUT();
+        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->getBRDFLUT();
+        return 0;
+    }
+
+    void SceneEnvironment::bind() {
+        if (m_type == Type::Cubemap && m_cubemap) m_cubemap->bind();
+        if (m_type == Type::HDR && m_environmentMap) m_environmentMap->bind();
+    }
+
+    void SceneEnvironment::unbind() {
+        if (m_type == Type::Cubemap && m_cubemap) m_cubemap->unbind();
+        if (m_type == Type::HDR && m_environmentMap) m_environmentMap->unbind();
+    }
+
+    void SceneEnvironment::bindIBL(Shader& shader) {
+        shader.bind();
+        if (this->hasIBL()) {
+            const int IRR_SLOT = 8;
+            const int PREF_SLOT = 9;
+            const int BRDF_SLOT = 10;
+
+            glActiveTexture(GL_TEXTURE0 + IRR_SLOT);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, getIrradianceMap());
+            shader.bindUniform(IRR_SLOT, "irradianceMap");
+
+            glActiveTexture(GL_TEXTURE0 + PREF_SLOT);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, getPrefilterMap());
+            shader.bindUniform(PREF_SLOT, "prefilterMap");
+
+            glActiveTexture(GL_TEXTURE0 + BRDF_SLOT);
+            glBindTexture(GL_TEXTURE_2D, getBRDFLUT());
+            shader.bindUniform(BRDF_SLOT, "brdfLUT");
+            shader.bindUniform(1, "u_HasIBL");
+        } else {
+            shader.bindUniform(0, "u_HasIBL");
+        }
+    }
+
+    // -----------------------------------------------------
 
     entt::entity Scene::createEntity(const std::string& tag) {
         auto entity = m_registry.create();
@@ -110,6 +213,37 @@ namespace Karbon {
         }
 
         return nullptr;
+    }
+
+    void Scene::renderSkybox(Shader& skyboxShader) {
+        Camera* camera = getPrimaryCamera();
+
+        if (!camera || m_sceneEnvironment.getSkyboxCubemap() == 0)
+            return;
+
+        if (m_sceneEnvironment.getSkyboxCubemap() != 0) {
+            GLboolean depthMask;
+            glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMask);
+
+            glDepthFunc(GL_LEQUAL);
+            glDepthMask(GL_FALSE);
+
+            m_sceneEnvironment.bind();
+
+            skyboxShader.bind();
+            skyboxShader.bindUniform(camera->getProjectionMatrix(), "projection");
+
+            glm::mat4 viewRot = glm::mat4(glm::mat3(camera->getViewMatrix()));
+            skyboxShader.bindUniform(viewRot, "view");
+            skyboxShader.bindUniform(0, "skybox");
+
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+            m_sceneEnvironment.unbind();
+
+            glDepthMask(depthMask);
+            glDepthFunc(GL_LESS);
+        }
     }
 
     entt::entity Scene::findByTag(const std::string& tag) {

@@ -70,6 +70,12 @@ void EditorLayer::onAttach() {
 
     // -------
 
+    auto& env = m_scene->getEnvironment();
+    env.setHDR("resources/rosendal_plains_2_1k.hdr");
+    env.generateIBL();
+
+    // -------
+
     m_pickingFramebuffer = std::make_unique<Framebuffer>(1920, 1080);
     m_grid = std::make_unique<Grid>(100, 50.0f);
 
