@@ -4,6 +4,7 @@
 #include <ImGuizmo.h>
 #include "core/application.h"
 #include "scene/components/meshrenderer_component.h"
+#include "scene/components/transform.h"
 #include "scene/components/pointlight_component.h"
 #include "scene/components/directional_light_component.h"
 #include "scene/components/spotlight_component.h"
@@ -43,10 +44,27 @@ void EditorLayer::onAttach() {
     m_testCube.AddComponent<MeshRendererComponent>();
     m_cubeMesh = CubeMesh();
     m_testCube.GetComponent<MeshRendererComponent>().mesh = &m_cubeMesh;
-
     MaterialHandle matHandle = Application::Get().getMaterialSystem().create({1.0f, 0.5f, 0.31f, 1.0f}, 0.5f, 0.5f);
     m_testCube.GetComponent<MeshRendererComponent>().material = matHandle;
     
+    entt::entity sphere_id = m_scene->createEntity("Test Sphere");
+    m_scene->getRegistry().emplace<MeshRendererComponent>(sphere_id);
+    m_sphereMesh = SphereMesh();
+    m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).mesh = &m_sphereMesh;
+    m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).material = matHandle;
+    MaterialHandle matHandle2 = Application::Get().getMaterialSystem().create({0.1f, 0.5f, 0.89f, 1.0f}, 0.1f, 0.9f);
+    m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).material = matHandle2;
+    m_scene->getRegistry().get<TransformComponent>(sphere_id).position = glm::vec3(5.0f, 0.0f, 0.0f);
+
+    entt::entity monke = m_scene->createEntity("Monke");
+    m_scene->getRegistry().emplace<MeshRendererComponent>(monke);
+    m_monkeModel = std::make_unique<Model>("resources/models/monke.fbx", &Application::Get().getMaterialSystem());
+    m_scene->getRegistry().get<MeshRendererComponent>(monke).mesh = &m_monkeModel->getMesh(0);
+
+    MaterialHandle matHandle3 = Application::Get().getMaterialSystem().create({0.8f, 0.2f, 0.5f, 1.0f}, 0.7f, 0.9f);
+    m_scene->getRegistry().get<MeshRendererComponent>(monke).material = matHandle3;
+    m_scene->getRegistry().get<TransformComponent>(monke).position = glm::vec3(-5.0f, 0.0f, 0.0f);
+
     entt::entity empty = m_scene->createEntity("Empty Entity");
     m_scene->setParent(empty, cube_id);
 

@@ -34,6 +34,12 @@ uniform sampler2D roughnessMap;
 uniform sampler2D aoMap;
 uniform sampler2D emissiveMap;
 
+//IBL stuff
+uniform samplerCube irradianceMap;
+uniform samplerCube prefilterMap;
+uniform sampler2D brdfLUT;
+uniform int u_HasIBL;  // 0 = no cubemap, 1 = IBL active
+
 struct PointLight {
     vec3  position;    // bytes  0-11
     float radius;      // bytes 12-15
@@ -106,6 +112,10 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float k) {
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
 //Helper functions -----------------------
@@ -265,6 +275,30 @@ vec3 computeSpotLight(SpotLight light, vec3 N, vec3 fragPos, vec3 V,
     return (kD * albedo / PI + specular) * radiance * NdotL * ao;
 }
 
+vec3 computeIBL(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao) {
+    if (u_HasIBL == 0) return vec3(0.03) * albedo * ao;  // flat fallback
+    
+    float NdotV = max(dot(N, V), 0.0);
+    vec3 R = reflect(-V, N);
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+    
+    // Diffuse
+    vec3 irradiance = texture(irradianceMap, N).rgb;
+    vec3 diffuse = irradiance * albedo;
+    
+    // Specular
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
+    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+    
+    return (kD * diffuse + specular) * ao;
+}
+
 // Extra functions
 
 vec3 ACESFilm(vec3 x) {
@@ -314,7 +348,7 @@ void main() {
     }
 
     // --- Ambient (IBL placeholder or flat fallback) ---
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 ambient = computeIBL(N, V, albedo, metallic, roughness, ao);
 
     // --- Compose ---
     vec3 color = ambient + Lo + emissive;
