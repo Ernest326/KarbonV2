@@ -56,6 +56,19 @@ public:
   GetBroadPhaseLayer(JPH::ObjectLayer objectLayer) const override {
     return mObjectToBroadPhaseLayer[objectLayer];
   }
+#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
+  virtual const char *
+  GetBroadPhaseLayerName(JPH::BroadPhaseLayer layer) const override {
+    switch ((JPH::BroadPhaseLayer::Type)layer) {
+    case (JPH::BroadPhaseLayer::Type)0:
+      return "NON_MOVING";
+    case (JPH::BroadPhaseLayer::Type)1:
+      return "MOVING";
+    default:
+      return "UNKNOWN";
+    }
+  }
+#endif
 };
 
 class ObjectVsBroadPhaseLayerFilterImpl

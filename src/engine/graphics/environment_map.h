@@ -1,6 +1,7 @@
 #pragma once
 #include "../graphics/buffers/buffers.h"
 #include "../graphics/shader.h" 
+#include "../graphics/primitives/cube.h"
 #include <string>
 
 namespace Karbon {
@@ -35,6 +36,7 @@ private:
     GLuint m_prefilterMap = 0;
     GLuint m_brdfLUT = 0;
     bool m_hasIBL = false;
+    static Cube* m_envCube;
 };
 
 }

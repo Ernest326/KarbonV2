@@ -121,22 +121,31 @@ namespace Karbon {
 
     void SceneEnvironment::bindIBL(Shader& shader) {
         shader.bind();
-        if (this->hasIBL()) {
-            const int IRR_SLOT = 8;
-            const int PREF_SLOT = 9;
-            const int BRDF_SLOT = 10;
 
+        const int IRR_SLOT = 8;
+        const int PREF_SLOT = 9;
+        const int BRDF_SLOT = 10;
+
+        // FIX: Assign the sampler units UNCONDITIONALLY. When these were only
+        // set inside the hasIBL() branch, the samplers defaulted to unit 0
+        // whenever IBL was absent — putting samplerCube irradianceMap/
+        // prefilterMap on the same unit as the sampler2D material maps.
+        // A samplerCube and sampler2D sharing a unit in one program raises
+        // GL_INVALID_OPERATION at draw time and the draw is silently dropped.
+        shader.bindUniform(IRR_SLOT, "irradianceMap");
+        shader.bindUniform(PREF_SLOT, "prefilterMap");
+        shader.bindUniform(BRDF_SLOT, "brdfLUT");
+
+        if (this->hasIBL()) {
             glActiveTexture(GL_TEXTURE0 + IRR_SLOT);
             glBindTexture(GL_TEXTURE_CUBE_MAP, getIrradianceMap());
-            shader.bindUniform(IRR_SLOT, "irradianceMap");
 
             glActiveTexture(GL_TEXTURE0 + PREF_SLOT);
             glBindTexture(GL_TEXTURE_CUBE_MAP, getPrefilterMap());
-            shader.bindUniform(PREF_SLOT, "prefilterMap");
 
             glActiveTexture(GL_TEXTURE0 + BRDF_SLOT);
             glBindTexture(GL_TEXTURE_2D, getBRDFLUT());
-            shader.bindUniform(BRDF_SLOT, "brdfLUT");
+
             shader.bindUniform(1, "u_HasIBL");
         } else {
             shader.bindUniform(0, "u_HasIBL");

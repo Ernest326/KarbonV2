@@ -111,11 +111,11 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float k) {
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 //Helper functions -----------------------
@@ -278,7 +278,10 @@ vec3 computeSpotLight(SpotLight light, vec3 N, vec3 fragPos, vec3 V,
 vec3 computeIBL(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, float ao) {
     if (u_HasIBL == 0) return vec3(0.03) * albedo * ao;  // flat fallback
     
-    float NdotV = max(dot(N, V), 0.0);
+    // Clamp NdotV to a small positive value to avoid the degenerate grazing-angle
+    // case where Fresnel→1 kills diffuse while BRDF LUT returns near-zero, producing
+    // black artifacts at silhouette edges (top of objects).
+    float NdotV = max(dot(N, V), 0.001);
     vec3 R = reflect(-V, N);
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
     vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
@@ -329,7 +332,7 @@ void main() {
     // --- Normal ---
     vec3 N = getNormal(materialIndex);
     vec3 V = normalize(viewPos - FragPos);
-    float NdotV = max(dot(N, V), 0.0);
+    float NdotV = max(dot(N, V), 0.001);
 
     // --- Fresnel base ---
     vec3 F0 = mix(vec3(0.04), albedo, metallic);

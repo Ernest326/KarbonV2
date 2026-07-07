@@ -66,7 +66,10 @@ vec2 IntegrateBRDF(float NdotV, float roughness) {
         float VdotH = max(dot(V, H), 0.0);
         if(NdotL > 0.0) {
             float G = GeometrySmith(N, V, L, roughness);
-            float G_Vis = (G * VdotH) / (NdotH * NdotV);
+            // FIX: guard the denominator. NdotH or NdotV hitting ~0 writes
+            // inf/NaN texels into the LUT; pbr.frag samples near NdotV=0.001 at
+            // grazing angles and those texels show up as black silhouette fringes.
+            float G_Vis = (G * VdotH) / max(NdotH * NdotV, 1e-4);
             float Fc = pow(1.0 - VdotH, 5.0);
             A += (1.0 - Fc) * G_Vis;
             B += Fc * G_Vis;

@@ -25,6 +25,11 @@ void RenderSystem::Draw(Shader* shader, const glm::mat4& view, const glm::mat4& 
     shader->bindUniform(view, "view");
     shader->bindUniform(projection, "projection");
     shader->bindUniform(viewPos, "viewPos");
+
+    // FIX: bind IBL maps + assign their sampler units via the scene environment.
+    // (Scene exposes getEnvironment(), not getEnvironmentMap().)
+    activeScene.getEnvironment().bindIBL(*shader);
+    glActiveTexture(GL_TEXTURE0); // leave unit 0 active for material binds
     
     GLuint lightsBlock = glGetUniformBlockIndex(shader->getID(), "Lights");
     if(lightsBlock != GL_INVALID_INDEX) {

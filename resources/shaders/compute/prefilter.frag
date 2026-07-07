@@ -3,7 +3,19 @@ in vec3 localPos;
 out vec4 FragColor;
 uniform samplerCube environmentMap;
 uniform float roughness;
+// FIX: face resolution of the source cubemap, set from C++ (defaults to 512).
+// Needed for PDF-based mip selection below.
+uniform float sourceResolution = 512.0;
 const float PI = 3.14159265359;
+
+float DistributionGGX(vec3 N, vec3 H, float roughness) {
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float denom = (NdotH * NdotH * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+    return a2 / denom;
+}
 
 float RadicalInverse_VdC(uint bits) {
     bits = (bits << 16u) | (bits >> 16u);
@@ -47,10 +59,28 @@ void main() {
         vec3 L = normalize(2.0 * dot(V, H) * H - V);
         float NdotL = max(dot(N, L), 0.0);
         if(NdotL > 0.0) {
-            prefilteredColor += texture(environmentMap, L).rgb * NdotL;
+            // FIX: was textureLod(environmentMap, L, 0.0) — forcing every sample
+            // to mip 0 undersamples the 512^2 source with only 1024 samples and
+            // produces bright/dark speckle artifacts at higher roughness mips.
+            // Select the mip from the GGX sample PDF (Chetan Jags / Epic method):
+            // low-probability directions cover a large solid angle, so read a
+            // higher (pre-averaged) mip for them.
+            float D     = DistributionGGX(N, H, roughness);
+            float NdotH = max(dot(N, H), 0.0);
+            float HdotV = max(dot(H, V), 0.0);
+            float pdf   = D * NdotH / (4.0 * HdotV) + 0.0001;
+
+            float saTexel  = 4.0 * PI / (6.0 * sourceResolution * sourceResolution);
+            float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
+            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
+
+            prefilteredColor += textureLod(environmentMap, L, mipLevel).rgb * NdotL;
             totalWeight += NdotL;
         }
     }
-    prefilteredColor = prefilteredColor / totalWeight;
+    // FIX: guard restored — this version had the unguarded divide again.
+    // If totalWeight ever lands at 0, the NaN survives ACES/clamp in pbr.frag
+    // and renders as a black texel.
+    prefilteredColor = prefilteredColor / max(totalWeight, 0.001);
     FragColor = vec4(prefilteredColor, 1.0);
 }

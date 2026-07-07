@@ -7,3 +7,5 @@ cmake_install.cmake
 *.o
 *.a
 Build
+node_modules
+.claude
