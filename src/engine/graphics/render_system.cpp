@@ -13,6 +13,16 @@ constexpr GLuint MATERIALS_BLOCK_BINDING = 3;
 RenderSystem::RenderSystem(entt::registry *registry, MaterialSystem *materials, LightingSystem* lights) : m_registry(registry), m_materials(materials), m_lights(lights) {
     m_pbrShader = std::make_unique<Shader>("resources/shaders/pbr.vert", "resources/shaders/pbr.frag");
     m_skyboxShader = std::make_unique<Shader>("resources/shaders/skybox.vert", "resources/shaders/skybox.frag");
+
+    // Uniform block bindings are program state — assign once at link time
+    GLuint lightsBlock = glGetUniformBlockIndex(m_pbrShader->getID(), "Lights");
+    if (lightsBlock != GL_INVALID_INDEX) {
+        glUniformBlockBinding(m_pbrShader->getID(), lightsBlock, LIGHTS_BLOCK_BINDING);
+    }
+    GLuint materialsBlock = glGetUniformBlockIndex(m_pbrShader->getID(), "Materials");
+    if (materialsBlock != GL_INVALID_INDEX) {
+        glUniformBlockBinding(m_pbrShader->getID(), materialsBlock, MATERIALS_BLOCK_BINDING);
+    }
 }
 RenderSystem::~RenderSystem() { }
 
@@ -35,17 +45,9 @@ void RenderSystem::draw(Scene& scene, const Camera& camera) {
     scene.getEnvironment().bindIBL(*shader);
     glActiveTexture(GL_TEXTURE0); // leave unit 0 active for material binds
 
-    GLuint lightsBlock = glGetUniformBlockIndex(shader->getID(), "Lights");
-    if(lightsBlock != GL_INVALID_INDEX) {
-        glUniformBlockBinding(shader->getID(), lightsBlock, LIGHTS_BLOCK_BINDING);
-        glBindBufferBase(GL_UNIFORM_BUFFER, LIGHTS_BLOCK_BINDING, m_lights->getUBO());
-    }
-
-    GLuint materialsBlock = glGetUniformBlockIndex(shader->getID(), "Materials");
-    if(materialsBlock != GL_INVALID_INDEX) {
-        glUniformBlockBinding(shader->getID(), materialsBlock, MATERIALS_BLOCK_BINDING);
-        glBindBufferBase(GL_UNIFORM_BUFFER, MATERIALS_BLOCK_BINDING, m_materials->getUBO());
-    }
+    // UBO binding points are context state that other passes may touch — rebind per frame
+    glBindBufferBase(GL_UNIFORM_BUFFER, LIGHTS_BLOCK_BINDING, m_lights->getUBO());
+    glBindBufferBase(GL_UNIFORM_BUFFER, MATERIALS_BLOCK_BINDING, m_materials->getUBO());
 
     auto entt_view = m_registry->view<MeshRendererComponent, WorldTransformComponent>();
     for (auto entity : entt_view) {

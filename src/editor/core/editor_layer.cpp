@@ -427,7 +427,7 @@ void EditorLayer::drawMenuBar() {
             if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {}
             ImGui::Separator();
             if (ImGui::MenuItem("Build", "Ctrl+B")) {}
-            if (ImGui::MenuItem("Exit")) {}
+            if (ImGui::MenuItem("Exit")) { Application::get().quit(); }
             ImGui::EndMenu();
         }
         

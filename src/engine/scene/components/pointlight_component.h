@@ -8,7 +8,6 @@ struct PointLightComponent {
     float radius = 10.0f;
     float falloff = 2.0f;
     bool castShadows = false;
-    bool dirty = true;
 };
 
 } // namespace Karbon

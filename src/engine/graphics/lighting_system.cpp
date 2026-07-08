@@ -52,7 +52,6 @@ void LightingSystem::update() {
         gpuLight.padding[2] = 0.0f;
 
         m_pointLights.push_back(gpuLight);
-        light.dirty = false;
     }
 
     // Gather directional lights
@@ -71,7 +70,6 @@ void LightingSystem::update() {
         directionalLight.padding   = 0.0f;
 
         m_directionalLights.push_back(directionalLight);
-        light.dirty = false;
     }
 
     // Gather spot lights
@@ -96,7 +94,6 @@ void LightingSystem::update() {
         spotLight.padding[2] = 0.0f;
 
         m_spotLights.push_back(spotLight);
-        light.dirty = false;
     }
 
     glBindBuffer(GL_UNIFORM_BUFFER, m_lightsUBO);

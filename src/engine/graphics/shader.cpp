@@ -87,19 +87,29 @@ void Shader::unbind() const {
     glUseProgram(0);
 }
 
+GLint Shader::getUniformLocation(const char* name) {
+    auto it = m_uniformCache.find(name);
+    if (it != m_uniformCache.end()) {
+        return it->second;
+    }
+    GLint location = glGetUniformLocation(m_shaderID, name);
+    m_uniformCache.emplace(name, location);
+    return location;
+}
+
 //bindUniform(value, name) - Detect type and bind it to correct uniform function
 template<typename T>
 void Shader::bindUniform(const T& value, const char* name) {
     if constexpr (std::is_same_v<T, int>) {
-        glUniform1i(glGetUniformLocation(m_shaderID, name), value);
+        glUniform1i(getUniformLocation(name), value);
     } else if constexpr (std::is_same_v<T, float>) {
-        glUniform1f(glGetUniformLocation(m_shaderID, name), value);
+        glUniform1f(getUniformLocation(name), value);
     } else if constexpr (std::is_same_v<T, glm::vec3>) {
-        glUniform3fv(glGetUniformLocation(m_shaderID, name), 1, &value[0]);
+        glUniform3fv(getUniformLocation(name), 1, &value[0]);
     } else if constexpr (std::is_same_v<T, glm::vec4>) {
-        glUniform4fv(glGetUniformLocation(m_shaderID, name), 1, &value[0]);
+        glUniform4fv(getUniformLocation(name), 1, &value[0]);
     } else if constexpr (std::is_same_v<T, glm::mat4>) {
-        glUniformMatrix4fv(glGetUniformLocation(m_shaderID, name), 1, GL_FALSE, &value[0][0]);
+        glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &value[0][0]);
     } else {
         static_assert(!std::is_same_v<T, T>, "ERROR: UNSUPPORTED UNIFORM TYPE");
     }

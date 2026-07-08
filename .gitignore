@@ -9,3 +9,4 @@ cmake_install.cmake
 Build
 node_modules
 .claude
+compile_commands.json
