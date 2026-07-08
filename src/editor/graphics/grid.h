@@ -11,7 +11,7 @@ public:
     Grid(float size = 1.0f, int divisions = 10);
     ~Grid() {};
 
-    void Draw(glm::mat4 view, glm::mat4 projection);
+    void draw(glm::mat4 view, glm::mat4 projection);
 
 private:
     static GLuint gridVAO, gridVBO;

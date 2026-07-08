@@ -5,13 +5,13 @@
 namespace Karbon {
 class RigidbodyComponentInspector : public ComponentInspector {
 public:
-    const char* GetName() const override { return "Rigidbody 3D"; }
+    const char* getName() const override { return "Rigidbody 3D"; }
 
-    bool CanInspect(entt::registry& registry, entt::entity entity) const override {
+    bool canInspect(entt::registry& registry, entt::entity entity) const override {
         return registry.all_of<RigidbodyComponent>(entity);
     }
 
-    void Inspect(entt::registry& registry, entt::entity entity) override {
+    void inspect(entt::registry& registry, entt::entity entity) override {
         auto& rigidbody = registry.get<RigidbodyComponent>(entity);
 
         if (ImGui::Combo("Type", reinterpret_cast<int*>(&rigidbody.type), "Static\0Kinematic\0Dynamic\0")) {

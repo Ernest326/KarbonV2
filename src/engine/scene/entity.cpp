@@ -3,7 +3,7 @@
 namespace Karbon {
 
 Entity::Entity(entt::entity handle, entt::registry* registry)
-    : m_EntityHandle(handle), m_Registry(registry) {
+    : m_entityHandle(handle), m_registry(registry) {
 }
 
 } // namespace Karbon

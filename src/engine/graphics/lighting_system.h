@@ -53,12 +53,14 @@ public:
     static constexpr size_t MAX_DIRECTIONAL_LIGHTS = 8;
     static constexpr size_t MAX_SPOT_LIGHTS = 16;
 
+    // RAII: the constructor creates the light UBO, the destructor deletes it
     LightingSystem(entt::registry *registry);
     ~LightingSystem();
 
-    void Initialize();
-    void Update();
-    void Shutdown();
+    LightingSystem(const LightingSystem&) = delete;
+    LightingSystem& operator=(const LightingSystem&) = delete;
+
+    void update();
 
     GLuint getUBO() const { return m_lightsUBO; }
 

@@ -5,13 +5,13 @@
 namespace Karbon {
 class PointLightComponentInspector : public ComponentInspector {
 public:
-    const char* GetName() const override { return "Point Light"; }
+    const char* getName() const override { return "Point Light"; }
 
-    bool CanInspect(entt::registry& registry, entt::entity entity) const override {
+    bool canInspect(entt::registry& registry, entt::entity entity) const override {
         return registry.all_of<PointLightComponent>(entity);
     }
 
-    void Inspect(entt::registry& registry, entt::entity entity) override {
+    void inspect(entt::registry& registry, entt::entity entity) override {
         auto& pointLight = registry.get<PointLightComponent>(entity);
        
         if (ImGui::ColorEdit3("Color", &pointLight.color.x)) {

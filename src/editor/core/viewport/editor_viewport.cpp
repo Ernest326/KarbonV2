@@ -5,11 +5,11 @@
 
 namespace Karbon {
 
-void EditorViewportPanel::Initialize() {
+void EditorViewportPanel::initialize() {
     m_framebuffer = std::make_unique<Framebuffer>(1280, 720);
 }
 
-void EditorViewportPanel::Draw(Scene* scene, const std::function<void()>& onDrawGizmos) {
+void EditorViewportPanel::draw(Scene* scene, const std::function<void()>& onDrawGizmos) {
     if (!m_framebuffer) {
         return;
     }
@@ -21,7 +21,7 @@ void EditorViewportPanel::Draw(Scene* scene, const std::function<void()>& onDraw
     m_hovered = ImGui::IsWindowHovered();
 
     ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-    ResizeIfNeeded(viewportPanelSize, scene);
+    resizeIfNeeded(viewportPanelSize, scene);
 
     uint32_t textureID = m_framebuffer->getColorAttachment();
     ImVec2 imagePos = ImGui::GetCursorScreenPos();
@@ -43,7 +43,7 @@ void EditorViewportPanel::Draw(Scene* scene, const std::function<void()>& onDraw
     ImGui::PopStyleVar();
 }
 
-bool EditorViewportPanel::ConsumeClick(int& outX, int& outY) {
+bool EditorViewportPanel::consumeClick(int& outX, int& outY) {
     if (m_clicked) {
         outX = m_clickX;
         outY = m_clickY;
@@ -53,7 +53,7 @@ bool EditorViewportPanel::ConsumeClick(int& outX, int& outY) {
     return false;
 }
 
-void EditorViewportPanel::ResizeIfNeeded(const ImVec2& size, Scene* scene) {
+void EditorViewportPanel::resizeIfNeeded(const ImVec2& size, Scene* scene) {
     if (size.x <= 0.0f || size.y <= 0.0f) {
         return;
     }
@@ -64,10 +64,10 @@ void EditorViewportPanel::ResizeIfNeeded(const ImVec2& size, Scene* scene) {
 
     m_size = size;
     m_framebuffer->resize(static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y));
-    UpdateCameraAspect(scene, size);
+    updateCameraAspect(scene, size);
 }
 
-void EditorViewportPanel::UpdateCameraAspect(Scene* scene, const ImVec2& size) {
+void EditorViewportPanel::updateCameraAspect(Scene* scene, const ImVec2& size) {
     if (!scene || size.y <= 0.0f) {
         return;
     }

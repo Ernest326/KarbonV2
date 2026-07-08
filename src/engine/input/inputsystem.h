@@ -5,22 +5,22 @@
 
 #include <array>
 #include <utility>
-#include "../events/keycode.h"
-#include "../events/mousecode.h"
-#include "../events/key_event.h"
-#include "../events/mouse_event.h"
-#include "../events/event.h"
+#include "events/keycode.h"
+#include "events/mousecode.h"
+#include "events/key_event.h"
+#include "events/mouse_event.h"
+#include "events/event.h"
 
 namespace Karbon {
     class InputSystem {
     public:
-        static InputSystem& Get();
+        static InputSystem& get();
 
         InputSystem() = default;
         ~InputSystem() = default;
 
-        void BeginFrame();
-        void OnEvent(Event& e);
+        void beginFrame();
+        void onEvent(Event& e);
 
         //Keyboard input
         bool isKeyPressed(int keycode);

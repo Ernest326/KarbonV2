@@ -5,13 +5,13 @@
 namespace Karbon {
 class SpotLightComponentInspector : public ComponentInspector {
 public:
-    const char* GetName() const override { return "Spotlight"; }
+    const char* getName() const override { return "Spotlight"; }
 
-    bool CanInspect(entt::registry& registry, entt::entity entity) const override {
+    bool canInspect(entt::registry& registry, entt::entity entity) const override {
         return registry.all_of<SpotLightComponent>(entity);
     }
 
-    void Inspect(entt::registry& registry, entt::entity entity) override {
+    void inspect(entt::registry& registry, entt::entity entity) override {
         auto& spotlight = registry.get<SpotLightComponent>(entity); 
 
         if(ImGui::ColorEdit3("Color", &spotlight.color.x)) {

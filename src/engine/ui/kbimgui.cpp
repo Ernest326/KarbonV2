@@ -1,5 +1,5 @@
 #include "kbimgui.h"
-#include "../core/application.h"
+#include "core/application.h"
 
 namespace Karbon {
 
@@ -9,7 +9,7 @@ void KarbonImGUI::init() {
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(Application::Get().getWindow().getGLWindow(), true);
+    ImGui_ImplGlfw_InitForOpenGL(Application::get().getWindow().getGLWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 

@@ -13,41 +13,43 @@ public:
     PhysicsSystem(entt::registry* registry, JPH::JobSystem* jobSystem);
     ~PhysicsSystem();
 
-    void Initialize();
-    void Shutdown();
-    void Update(float deltaTime);
+    // Explicit lifecycle: Jolt global init/teardown (Factory, RegisterTypes)
+    // is owned by Application, so this system can't be pure RAII.
+    void initialize();
+    void shutdown();
+    void update(float deltaTime);
 
-    void SyncPhysicsToEntities();
-    void SyncEntitiesToPhysics();
-
-    entt::registry* m_Registry = nullptr;
-    JPH::JobSystem* m_JobSystem = nullptr;
-    JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
-    JPH::TempAllocatorImpl m_TempAllocator;
-
-    std::unique_ptr<JPH::ObjectLayerPairFilter> m_ObjectLayerPairFilter;
-    std::unique_ptr<JPH::BroadPhaseLayerInterface> m_BroadPhaseLayerInterface;
-    std::unique_ptr<JPH::ObjectVsBroadPhaseLayerFilter> m_ObjectVsBroadPhaseLayerFilter;
-
-    //EnTT hooks
-    void OnRigidbodyRemoved(entt::registry& registry, entt::entity entity);
-    void OnColliderRemoved(entt::registry& registry, entt::entity entity);
-    void OnTransformRemoved(entt::registry& registry, entt::entity entity);
-
-    // Helpers
-    void TryCreateBody(entt::registry& registry, entt::entity entity);
-    void RemoveBody(entt::entity entity);
-
-    std::unordered_map<entt::entity, JPH::BodyID> m_EntityToBodyMap;
-    std::unordered_map<JPH::BodyID, entt::entity> m_BodyToEntityMap;
-
-    float m_Accum = 0.0f;
-    const float m_FixedTimeStep = 1.0f / 60.0f; // 60 FPS
-
-    inline int getBodyCount() const { return bodyCounter; }
+    int getBodyCount() const { return m_bodyCounter; }
 
 private:
-    int bodyCounter = 0;
+    void syncPhysicsToEntities();
+    void syncEntitiesToPhysics();
+
+    //EnTT hooks
+    void onRigidbodyRemoved(entt::registry& registry, entt::entity entity);
+    void onColliderRemoved(entt::registry& registry, entt::entity entity);
+    void onTransformRemoved(entt::registry& registry, entt::entity entity);
+
+    // Helpers
+    void tryCreateBody(entt::registry& registry, entt::entity entity);
+    void removeBody(entt::entity entity);
+
+    entt::registry* m_registry = nullptr;
+    JPH::JobSystem* m_jobSystem = nullptr;
+    JPH::PhysicsSystem* m_physicsSystem = nullptr;
+    JPH::TempAllocatorImpl m_tempAllocator;
+
+    std::unique_ptr<JPH::ObjectLayerPairFilter> m_objectLayerPairFilter;
+    std::unique_ptr<JPH::BroadPhaseLayerInterface> m_broadPhaseLayerInterface;
+    std::unique_ptr<JPH::ObjectVsBroadPhaseLayerFilter> m_objectVsBroadPhaseLayerFilter;
+
+    std::unordered_map<entt::entity, JPH::BodyID> m_entityToBodyMap;
+    std::unordered_map<JPH::BodyID, entt::entity> m_bodyToEntityMap;
+
+    float m_accum = 0.0f;
+    const float m_fixedTimeStep = 1.0f / 60.0f; // 60 FPS
+
+    int m_bodyCounter = 0;
 };
 
 }

@@ -16,14 +16,14 @@ EditorCameraController::EditorCameraController(Camera* camera, Window* window)
     }
 }
 
-void EditorCameraController::Release() {
+void EditorCameraController::release() {
     if (!m_capturing) return;
     m_capturing = false;
     m_firstFrame = false;
     glfwSetInputMode(m_window->getGLWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
-void EditorCameraController::OnUpdate(float deltaTime) {
+void EditorCameraController::onUpdate(float deltaTime) {
     if (!m_camera || !m_window) return;
 
     GLFWwindow* win = m_window->getGLWindow();
@@ -32,7 +32,7 @@ void EditorCameraController::OnUpdate(float deltaTime) {
 
     // ESC always wins -- release immediately
     if (escDown && m_capturing) {
-        Release();
+        release();
         return;
     }
 
@@ -43,30 +43,30 @@ void EditorCameraController::OnUpdate(float deltaTime) {
         glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // Consume any stale mouse delta accumulated while over UI panels.
-        InputSystem::Get().getMouseDelta();
+        InputSystem::get().getMouseDelta();
         return;
     }
 
     // Stop capturing
     if (!rmbDown && m_capturing) {
-        Release();
+        release();
         return;
     }
 
     // Only process look/movement when actively capturing
     if (m_capturing) {
         if (m_firstFrame) {
-            InputSystem::Get().getMouseDelta();
+            InputSystem::get().getMouseDelta();
             m_firstFrame = false;
             return;
         }
-        UpdateMouseLook();
-        UpdateMovement(deltaTime);
+        updateMouseLook();
+        updateMovement(deltaTime);
     }
 }
 
-void EditorCameraController::UpdateMouseLook() {
-    auto [dx, dy] = InputSystem::Get().getMouseDelta();
+void EditorCameraController::updateMouseLook() {
+    auto [dx, dy] = InputSystem::get().getMouseDelta();
     m_yaw   += static_cast<float>(dx) * m_mouseSensitivity;
     m_pitch -= static_cast<float>(dy) * m_mouseSensitivity;
     m_pitch  = glm::clamp(m_pitch, -89.0f, 89.0f);
@@ -74,8 +74,8 @@ void EditorCameraController::UpdateMouseLook() {
     m_camera->setRotation(glm::vec3(m_pitch, m_yaw, 0.0f));
 }
 
-void EditorCameraController::UpdateMovement(float deltaTime) {
-    InputSystem& input = InputSystem::Get();
+void EditorCameraController::updateMovement(float deltaTime) {
+    InputSystem& input = InputSystem::get();
 
     float speed = input.isKeyPressed(Key::LeftShift) ? m_sprintSpeed : m_moveSpeed;
     float velocity = speed * deltaTime;

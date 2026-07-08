@@ -4,26 +4,26 @@
 
 namespace Karbon {
 
-InputSystem& InputSystem::Get() {
+InputSystem& InputSystem::get() {
     static InputSystem instance;
     return instance;
 }
 
-void InputSystem::BeginFrame() {
+void InputSystem::beginFrame() {
     m_mouseDeltaX = 0.0;
     m_mouseDeltaY = 0.0;
     m_scrollX = 0.0f;
     m_scrollY = 0.0f;
 }
 
-void InputSystem::OnEvent(Event& e) {
+void InputSystem::onEvent(Event& e) {
     EventDispatcher dispatcher(e);
-    dispatcher.Dispatch<KeyPressEvent>([this](KeyPressEvent& event) { return handleKeyPress(event); });
-    dispatcher.Dispatch<KeyReleaseEvent>([this](KeyReleaseEvent& event) { return handleKeyRelease(event); });
-    dispatcher.Dispatch<MouseButtonPressEvent>([this](MouseButtonPressEvent& event) { return handleMouseButtonPress(event); });
-    dispatcher.Dispatch<MouseButtonReleaseEvent>([this](MouseButtonReleaseEvent& event) { return handleMouseButtonRelease(event); });
-    dispatcher.Dispatch<MouseMoveEvent>([this](MouseMoveEvent& event) { return handleMouseMove(event); });
-    dispatcher.Dispatch<MouseScrollEvent>([this](MouseScrollEvent& event) { return handleMouseScroll(event); });
+    dispatcher.dispatch<KeyPressEvent>([this](KeyPressEvent& event) { return handleKeyPress(event); });
+    dispatcher.dispatch<KeyReleaseEvent>([this](KeyReleaseEvent& event) { return handleKeyRelease(event); });
+    dispatcher.dispatch<MouseButtonPressEvent>([this](MouseButtonPressEvent& event) { return handleMouseButtonPress(event); });
+    dispatcher.dispatch<MouseButtonReleaseEvent>([this](MouseButtonReleaseEvent& event) { return handleMouseButtonRelease(event); });
+    dispatcher.dispatch<MouseMoveEvent>([this](MouseMoveEvent& event) { return handleMouseMove(event); });
+    dispatcher.dispatch<MouseScrollEvent>([this](MouseScrollEvent& event) { return handleMouseScroll(event); });
 }
 
 bool InputSystem::isKeyPressed(int keycode) {

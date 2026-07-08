@@ -40,7 +40,7 @@ void LayerStack::popOverlay(Layer* overlay) {
 
 void LayerStack::event(Event& e) {
     for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it) {
-        (*it)->OnEvent(e);
+        (*it)->onEvent(e);
         if (e.handled)
             break;
     }
@@ -48,7 +48,7 @@ void LayerStack::event(Event& e) {
 
 void LayerStack::update(float deltaTime) {
     for (Layer* layer : m_layers) {
-        layer->OnUpdate(deltaTime);
+        layer->onUpdate(deltaTime);
     }
 }
 
@@ -60,7 +60,7 @@ void LayerStack::imGuiRender() {
 
 void LayerStack::render() {
     for (Layer* layer : m_layers) {
-        layer->OnRender();
+        layer->onRender();
     }
 }
 

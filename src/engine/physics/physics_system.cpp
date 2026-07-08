@@ -1,8 +1,8 @@
 #include "physics_system.h"
-#include "../scene/components/collider_component.h"
-#include "../scene/components/hierarchy_component.h"
-#include "../scene/components/rigidbody_component.h"
-#include "../scene/components/transform.h"
+#include "scene/components/collider_component.h"
+#include "scene/components/hierarchy_component.h"
+#include "scene/components/rigidbody_component.h"
+#include "scene/components/transform.h"
 #include <Jolt/Geometry/Plane.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
@@ -91,96 +91,96 @@ public:
 
 PhysicsSystem::PhysicsSystem(entt::registry *registry,
                              JPH::JobSystem *jobSystem)
-    : m_Registry(registry), m_JobSystem(jobSystem),
-      m_TempAllocator(10 * 1024 *
+    : m_registry(registry), m_jobSystem(jobSystem),
+      m_tempAllocator(10 * 1024 *
                       1024), // 10 MB temp allocator for physics updates
-      m_Accum(0.0f), m_FixedTimeStep(1.0f / 60.0f) {}
+      m_accum(0.0f), m_fixedTimeStep(1.0f / 60.0f) {}
 
-PhysicsSystem::~PhysicsSystem() { Shutdown(); }
+PhysicsSystem::~PhysicsSystem() { shutdown(); }
 
-void PhysicsSystem::Initialize() {
-  m_PhysicsSystem = new JPH::PhysicsSystem();
+void PhysicsSystem::initialize() {
+  m_physicsSystem = new JPH::PhysicsSystem();
 
-  m_BroadPhaseLayerInterface = std::make_unique<BroadPhaseLayerInterfaceImpl>();
-  m_ObjectVsBroadPhaseLayerFilter =
+  m_broadPhaseLayerInterface = std::make_unique<BroadPhaseLayerInterfaceImpl>();
+  m_objectVsBroadPhaseLayerFilter =
       std::make_unique<ObjectVsBroadPhaseLayerFilterImpl>();
-  m_ObjectLayerPairFilter = std::make_unique<ObjectLayerPairFilterImpl>();
+  m_objectLayerPairFilter = std::make_unique<ObjectLayerPairFilterImpl>();
 
   // Init(max_bodies, num_body_mutexes, max_body_pairs, max_contact_constraints,
   // ...)
-  m_PhysicsSystem->Init(65536, 0, 65536, 10240, *m_BroadPhaseLayerInterface,
-                        *m_ObjectVsBroadPhaseLayerFilter,
-                        *m_ObjectLayerPairFilter);
-  m_PhysicsSystem->SetGravity(JPH::Vec3(0.0f, -9.81f, 0.0f));
+  m_physicsSystem->Init(65536, 0, 65536, 10240, *m_broadPhaseLayerInterface,
+                        *m_objectVsBroadPhaseLayerFilter,
+                        *m_objectLayerPairFilter);
+  m_physicsSystem->SetGravity(JPH::Vec3(0.0f, -9.81f, 0.0f));
 
 
   // Register EnTT hooks
-  m_Registry->on_destroy<RigidbodyComponent>()
-      .connect<&PhysicsSystem::OnRigidbodyRemoved>(this);
-  m_Registry->on_destroy<ColliderComponent>()
-      .connect<&PhysicsSystem::OnColliderRemoved>(this);
-  m_Registry->on_destroy<TransformComponent>()
-      .connect<&PhysicsSystem::OnTransformRemoved>(this);
+  m_registry->on_destroy<RigidbodyComponent>()
+      .connect<&PhysicsSystem::onRigidbodyRemoved>(this);
+  m_registry->on_destroy<ColliderComponent>()
+      .connect<&PhysicsSystem::onColliderRemoved>(this);
+  m_registry->on_destroy<TransformComponent>()
+      .connect<&PhysicsSystem::onTransformRemoved>(this);
 }
 
-void PhysicsSystem::Update(float deltaTime) {
+void PhysicsSystem::update(float deltaTime) {
 
-  if (!m_PhysicsSystem || !m_JobSystem)
+  if (!m_physicsSystem || !m_jobSystem)
     return;
 
   // Create pending bodies
-  auto view = m_Registry->view<RigidbodyComponent, ColliderComponent, TransformComponent>(entt::exclude<PhysicsBodyTag>);
+  auto view = m_registry->view<RigidbodyComponent, ColliderComponent, TransformComponent>(entt::exclude<PhysicsBodyTag>);
   for (auto entity : view) {
-    TryCreateBody(*m_Registry, entity);
+    tryCreateBody(*m_registry, entity);
   }
 
-  m_Accum += deltaTime;
+  m_accum += deltaTime;
 
-  while (m_Accum >= m_FixedTimeStep) {
-    SyncEntitiesToPhysics();
-    m_PhysicsSystem->Update(m_FixedTimeStep, 1, &m_TempAllocator, m_JobSystem);
-    SyncPhysicsToEntities();
-    m_Accum -= m_FixedTimeStep;
+  while (m_accum >= m_fixedTimeStep) {
+    syncEntitiesToPhysics();
+    m_physicsSystem->Update(m_fixedTimeStep, 1, &m_tempAllocator, m_jobSystem);
+    syncPhysicsToEntities();
+    m_accum -= m_fixedTimeStep;
   }
 }
 
-void PhysicsSystem::Shutdown() {
-  if (!m_PhysicsSystem) {
+void PhysicsSystem::shutdown() {
+  if (!m_physicsSystem) {
     return;
   }
 
-  if (m_Registry) {
-    m_Registry->on_destroy<RigidbodyComponent>()
-        .disconnect<&PhysicsSystem::OnRigidbodyRemoved>(this);
-    m_Registry->on_destroy<ColliderComponent>()
-        .disconnect<&PhysicsSystem::OnColliderRemoved>(this);
-    m_Registry->on_destroy<TransformComponent>()
-        .disconnect<&PhysicsSystem::OnTransformRemoved>(this);
+  if (m_registry) {
+    m_registry->on_destroy<RigidbodyComponent>()
+        .disconnect<&PhysicsSystem::onRigidbodyRemoved>(this);
+    m_registry->on_destroy<ColliderComponent>()
+        .disconnect<&PhysicsSystem::onColliderRemoved>(this);
+    m_registry->on_destroy<TransformComponent>()
+        .disconnect<&PhysicsSystem::onTransformRemoved>(this);
   }
 
-  auto &bodyInterface = m_PhysicsSystem->GetBodyInterface();
-  for (const auto &pair : m_EntityToBodyMap) {
+  auto &bodyInterface = m_physicsSystem->GetBodyInterface();
+  for (const auto &pair : m_entityToBodyMap) {
     bodyInterface.RemoveBody(pair.second);
     bodyInterface.DestroyBody(pair.second);
   }
-  m_EntityToBodyMap.clear();
-  m_BodyToEntityMap.clear();
+  m_entityToBodyMap.clear();
+  m_bodyToEntityMap.clear();
 
-  delete m_PhysicsSystem;
-  m_PhysicsSystem = nullptr;
+  delete m_physicsSystem;
+  m_physicsSystem = nullptr;
 }
 
-void PhysicsSystem::OnColliderRemoved(entt::registry &registry,
+void PhysicsSystem::onColliderRemoved(entt::registry &registry,
                                       entt::entity entity) {
-  RemoveBody(entity);
+  removeBody(entity);
 }
 
-void PhysicsSystem::OnTransformRemoved(entt::registry &registry,
+void PhysicsSystem::onTransformRemoved(entt::registry &registry,
                                        entt::entity entity) {
-  RemoveBody(entity);
+  removeBody(entity);
 }
 
-void PhysicsSystem::TryCreateBody(entt::registry &registry,
+void PhysicsSystem::tryCreateBody(entt::registry &registry,
                                   entt::entity entity) {
   // Ensure entity has all required components
   if (!registry.all_of<RigidbodyComponent, ColliderComponent,
@@ -188,7 +188,7 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
     return;
 
   // If body already exists, do nothing
-  if (m_EntityToBodyMap.find(entity) != m_EntityToBodyMap.end())
+  if (m_entityToBodyMap.find(entity) != m_entityToBodyMap.end())
     return;
 
   auto &localTransform  = registry.get<TransformComponent>(entity);
@@ -291,7 +291,7 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
   }
 
   // Create body and store mapping
-  auto &bodyInterface = m_PhysicsSystem->GetBodyInterface();
+  auto &bodyInterface = m_physicsSystem->GetBodyInterface();
   JPH::Body *body = bodyInterface.CreateBody(settings);
   if (!body) {
     std::cerr << "Failed to create physics body for entity " << int(entity)
@@ -305,41 +305,41 @@ void PhysicsSystem::TryCreateBody(entt::registry &registry,
                                     : JPH::EActivation::DontActivate;
   bodyInterface.AddBody(bodyID, activation);
 
-  m_EntityToBodyMap[entity] = bodyID;
-  m_BodyToEntityMap[bodyID] = entity;
+  m_entityToBodyMap[entity] = bodyID;
+  m_bodyToEntityMap[bodyID] = entity;
   registry.emplace<PhysicsBodyTag>(entity);
-  bodyCounter++;
+  m_bodyCounter++;
 }
 
-void PhysicsSystem::RemoveBody(entt::entity entity) {
-  auto it = m_EntityToBodyMap.find(entity);
-  if (it != m_EntityToBodyMap.end()) {
-    auto &bodyInterface = m_PhysicsSystem->GetBodyInterface();
+void PhysicsSystem::removeBody(entt::entity entity) {
+  auto it = m_entityToBodyMap.find(entity);
+  if (it != m_entityToBodyMap.end()) {
+    auto &bodyInterface = m_physicsSystem->GetBodyInterface();
     bodyInterface.RemoveBody(it->second);
     bodyInterface.DestroyBody(it->second);
-    m_BodyToEntityMap.erase(it->second);
-    m_EntityToBodyMap.erase(it);
-    m_Registry->erase<PhysicsBodyTag>(entity);
-    bodyCounter--;
+    m_bodyToEntityMap.erase(it->second);
+    m_entityToBodyMap.erase(it);
+    m_registry->erase<PhysicsBodyTag>(entity);
+    m_bodyCounter--;
   }
 }
 
-void PhysicsSystem::OnRigidbodyRemoved(entt::registry &registry,
+void PhysicsSystem::onRigidbodyRemoved(entt::registry &registry,
                                        entt::entity entity) {
-  RemoveBody(entity);
+  removeBody(entity);
 }
 
-void PhysicsSystem::SyncPhysicsToEntities() {
-  for (const auto &pair : m_EntityToBodyMap) {
+void PhysicsSystem::syncPhysicsToEntities() {
+  for (const auto &pair : m_entityToBodyMap) {
     entt::entity entity = pair.first;
     JPH::BodyID bodyID = pair.second;
 
     JPH::RVec3 pos;
     JPH::Quat rot;
-    auto &bodyInterface = m_PhysicsSystem->GetBodyInterface();
+    auto &bodyInterface = m_physicsSystem->GetBodyInterface();
     bodyInterface.GetPositionAndRotation(bodyID, pos, rot);
 
-    auto& hierarchy = m_Registry->get<HierarchyComponent>(entity);
+    auto& hierarchy = m_registry->get<HierarchyComponent>(entity);
     glm::vec3 worldPos(
         static_cast<float>(pos.GetX()),
         static_cast<float>(pos.GetY()),
@@ -350,11 +350,11 @@ void PhysicsSystem::SyncPhysicsToEntities() {
         static_cast<float>(rot.GetY()),
         static_cast<float>(rot.GetZ()));
 
-    auto &transform = m_Registry->get<TransformComponent>(entity);
+    auto &transform = m_registry->get<TransformComponent>(entity);
 
     if (hierarchy.parent != entt::null) {
-        auto& parentWorld = m_Registry->get<WorldTransformComponent>(hierarchy.parent);
-        auto& worldTransform = m_Registry->get<WorldTransformComponent>(entity);
+        auto& parentWorld = m_registry->get<WorldTransformComponent>(hierarchy.parent);
+        auto& worldTransform = m_registry->get<WorldTransformComponent>(entity);
 
         glm::mat4 worldMatrix =
             glm::translate(glm::mat4(1.0f), worldPos) *
@@ -378,31 +378,31 @@ void PhysicsSystem::SyncPhysicsToEntities() {
     }
 
     entt::entity current = entity;
-    while(m_Registry->get<HierarchyComponent>(current).parent != entt::null) {
-        m_Registry->get<HierarchyComponent>(current).dirty = true;
-        current = m_Registry->get<HierarchyComponent>(current).parent;
+    while(m_registry->get<HierarchyComponent>(current).parent != entt::null) {
+        m_registry->get<HierarchyComponent>(current).dirty = true;
+        current = m_registry->get<HierarchyComponent>(current).parent;
     }
   }
 }
 
-void PhysicsSystem::SyncEntitiesToPhysics() {
-  for (const auto &pair : m_EntityToBodyMap) {
+void PhysicsSystem::syncEntitiesToPhysics() {
+  for (const auto &pair : m_entityToBodyMap) {
     entt::entity entity = pair.first;
     JPH::BodyID bodyID = pair.second;
 
-    auto &rb = m_Registry->get<RigidbodyComponent>(entity);
+    auto &rb = m_registry->get<RigidbodyComponent>(entity);
     if (rb.type != RigidbodyComponent::Type::Kinematic)
       continue;
 
     // Update physics body based on entity transform
-    auto &transform = m_Registry->get<WorldTransformComponent>(entity);
-    m_PhysicsSystem->GetBodyInterface().MoveKinematic(
+    auto &transform = m_registry->get<WorldTransformComponent>(entity);
+    m_physicsSystem->GetBodyInterface().MoveKinematic(
         bodyID,
         JPH::RVec3(transform.worldPosition.x, transform.worldPosition.y,
                    transform.worldPosition.z),
         JPH::Quat(transform.worldRotation.x, transform.worldRotation.y,
                   transform.worldRotation.z, transform.worldRotation.w),
-        m_FixedTimeStep);
+        m_fixedTimeStep);
   }
 }
 

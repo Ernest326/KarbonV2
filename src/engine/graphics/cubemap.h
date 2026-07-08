@@ -1,5 +1,5 @@
 #pragma once
-#include "../graphics/buffers/buffers.h"
+#include "graphics/buffers/buffers.h"
 #include <string>
 #include <vector>
 

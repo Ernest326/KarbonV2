@@ -8,9 +8,9 @@ namespace Karbon {
 class ComponentInspector {
 public:
     virtual ~ComponentInspector() = default;
-    virtual const char* GetName() const = 0;
-    virtual bool CanInspect(entt::registry& registry, entt::entity entity) const = 0;
-    virtual void Inspect(entt::registry& registry, entt::entity entity) = 0;
+    virtual const char* getName() const = 0;
+    virtual bool canInspect(entt::registry& registry, entt::entity entity) const = 0;
+    virtual void inspect(entt::registry& registry, entt::entity entity) = 0;
     virtual void renderGizmo(entt::registry& registry, entt::entity entity) {} // Optional override for rendering gizmos in the viewport
 };
 }

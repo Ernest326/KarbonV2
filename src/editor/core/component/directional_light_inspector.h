@@ -5,13 +5,13 @@
 namespace Karbon {
 class DirectionalLightComponentInspector : public ComponentInspector {
 public:
-    const char* GetName() const override { return "Directional Light"; }
+    const char* getName() const override { return "Directional Light"; }
 
-    bool CanInspect(entt::registry& registry, entt::entity entity) const override {
+    bool canInspect(entt::registry& registry, entt::entity entity) const override {
         return registry.all_of<DirectionalLightComponent>(entity);
     }
 
-    void Inspect(entt::registry& registry, entt::entity entity) override {
+    void inspect(entt::registry& registry, entt::entity entity) override {
         auto& dirLight = registry.get<DirectionalLightComponent>(entity); 
 
         if(ImGui::ColorEdit3("Color", &dirLight.color.x)) {

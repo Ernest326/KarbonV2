@@ -5,11 +5,11 @@
 namespace Karbon {
 class ColliderComponentInspector : public ComponentInspector {
 public:
-    const char* GetName() const override { return "Collider 3D"; }
-    bool CanInspect(entt::registry& registry, entt::entity entity) const override {
+    const char* getName() const override { return "Collider 3D"; }
+    bool canInspect(entt::registry& registry, entt::entity entity) const override {
         return registry.all_of<ColliderComponent>(entity);
     }
-    void Inspect(entt::registry& registry, entt::entity entity) override {
+    void inspect(entt::registry& registry, entt::entity entity) override {
         auto& collider = registry.get<ColliderComponent>(entity);
         const char* colliderTypes[] = { "Box", "Sphere", "Capsule", "Mesh", "Plane" };
         if (ImGui::Combo("Type", reinterpret_cast<int*>(&collider.type), colliderTypes, IM_ARRAYSIZE(colliderTypes))) {

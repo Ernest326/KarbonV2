@@ -7,8 +7,8 @@
 #include <glm/glm.hpp>
 #include "components/id_component.h"
 #include "components/transform.h"
-#include "../graphics/cubemap.h"
-#include "../graphics/environment_map.h"
+#include "graphics/cubemap.h"
+#include "graphics/environment_map.h"
 
 namespace Karbon {
 

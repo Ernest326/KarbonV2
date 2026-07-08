@@ -5,9 +5,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <functional>
-#include "../events/application_event.h"
-#include "../events/key_event.h"
-#include "../events/mouse_event.h"
+#include "events/application_event.h"
+#include "events/key_event.h"
+#include "events/mouse_event.h"
 
 namespace Karbon {
 

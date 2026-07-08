@@ -9,14 +9,14 @@ class EditorCameraController {
 public:
     EditorCameraController(Camera* camera, Window* window);
 
-    void OnUpdate(float deltaTime);
-    void SetViewportActive(bool active) { m_viewportActive = active; }
-    bool IsCapturingMouse() const { return m_capturing; }
-    void Release(); // force release (ESC, focus loss, etc.)
+    void onUpdate(float deltaTime);
+    void setViewportActive(bool active) { m_viewportActive = active; }
+    bool isCapturingMouse() const { return m_capturing; }
+    void release(); // force release (ESC, focus loss, etc.)
 
 private:
-    void UpdateMouseLook();
-    void UpdateMovement(float deltaTime);
+    void updateMouseLook();
+    void updateMovement(float deltaTime);
 
     Camera* m_camera = nullptr;
     Window* m_window = nullptr;

@@ -1,34 +1,34 @@
 #include "application.h"
-#include "../events/application_event.h"
-#include "../input/inputsystem.h"
+#include "events/application_event.h"
+#include "input/inputsystem.h"
 #include "base.h"
 #include <iostream>
 
-#include "../ui/kbimgui.h"
+#include "ui/kbimgui.h"
 
 // Physics includes
-#include "../physics/physics_system.h"
+#include "physics/physics_system.h"
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/RegisterTypes.h>
 
 // Systems
-#include "../graphics/lighting_system.h"
-#include "../graphics/render_system.h"
-#include "../graphics/material_system.h"
+#include "graphics/lighting_system.h"
+#include "graphics/render_system.h"
+#include "graphics/material_system.h"
 
 namespace Karbon {
 
 float deltaTime = 0.0f;
 Application *Application::s_instance = nullptr;
-Application &Application::Get() { return *Application::s_instance; }
+Application &Application::get() { return *Application::s_instance; }
 
 Application::Application(const char *title) {
     //Window setup
     s_instance = this;
     WindowProperties specification(title);
     m_window = std::make_unique<Window>(specification);
-    m_window->setEventCallback(KB_BIND_EVENT_FN(Application::OnEvent));
+    m_window->setEventCallback(KB_BIND_EVENT_FN(Application::onEvent));
 
     // Jolt physics one-time global init
     JPH::RegisterDefaultAllocator();
@@ -42,9 +42,8 @@ Application::Application(const char *title) {
 
     //Startup systems
     m_physicsSystem = std::make_unique<PhysicsSystem>(&m_activeScene->getRegistry(), m_jobSystem.get());
-    m_physicsSystem->Initialize();
+    m_physicsSystem->initialize();
     m_lightingSystem = std::make_unique<LightingSystem>(&m_activeScene->getRegistry());
-    m_lightingSystem->Initialize();
     m_materialSystem = std::make_unique<MaterialSystem>();
     m_renderSystem = std::make_unique<RenderSystem>(&m_activeScene->getRegistry(), m_materialSystem.get(), m_lightingSystem.get());
 }
@@ -86,7 +85,7 @@ void Application::run() {
         deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
 
-        InputSystem::Get().BeginFrame();
+        InputSystem::get().beginFrame();
         glfwPollEvents();
 
         if (!m_viewportFramebuffer) {
@@ -101,7 +100,7 @@ void Application::run() {
             m_layerStack->update(deltaTime);  // onAttach() creates entities here
             m_activeScene->onUpdate();         // propagate world transforms (includes newly created entities)
 
-            m_physicsSystem->Update(deltaTime);
+            m_physicsSystem->update(deltaTime);
 
             m_layerStack->imGuiRender();
             Camera* activeCamera = m_activeScene->getPrimaryCamera();
@@ -112,7 +111,7 @@ void Application::run() {
                     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
                 }
 
-                m_renderSystem->Draw(*m_activeScene, *activeCamera);
+                m_renderSystem->draw(*m_activeScene, *activeCamera);
                 m_layerStack->render();
                 if(m_viewportFramebuffer) {
                     m_viewportFramebuffer->unbind();
@@ -125,8 +124,8 @@ void Application::run() {
         m_window->update();
     }
 
-    // Shutdown
-    m_physicsSystem->Shutdown();
+    // shutdown
+    m_physicsSystem->shutdown();
     JPH::UnregisterTypes();
     delete JPH::Factory::sInstance;
     JPH::Factory::sInstance = nullptr;
@@ -137,12 +136,12 @@ void Application::run() {
 
 void Application::quit() { m_running = false; }
 
-bool Application::OnWindowClose(WindowCloseEvent &e) {
+bool Application::onWindowClose(WindowCloseEvent &e) {
     quit();
     return true;
 }
 
-bool Application::OnWindowResize(WindowResizeEvent &e) {
+bool Application::onWindowResize(WindowResizeEvent &e) {
     if (e.getWidth() == 0 || e.getHeight() == 0) {
         m_minimised = true;
         return false;
@@ -151,7 +150,7 @@ bool Application::OnWindowResize(WindowResizeEvent &e) {
     return false;
 }
 
-bool Application::OnKeyPress(KeyPressEvent &e) {
+bool Application::onKeyPress(KeyPressEvent &e) {
     /*
     if (e.getKeyCode() == GLFW_KEY_Q)
         quit();
@@ -169,15 +168,15 @@ bool Application::OnKeyPress(KeyPressEvent &e) {
     return true;
 }
 
-void Application::OnEvent(Event &e) {
-    InputSystem::Get().OnEvent(e);
+void Application::onEvent(Event &e) {
+    InputSystem::get().onEvent(e);
     EventDispatcher dispatcher(e);
     m_layerStack->event(e);
-    dispatcher.Dispatch<WindowCloseEvent>(
-        KB_BIND_EVENT_FN(Application::OnWindowClose));
-    dispatcher.Dispatch<WindowResizeEvent>(
-        KB_BIND_EVENT_FN(Application::OnWindowResize));
-    dispatcher.Dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(Application::OnKeyPress));
+    dispatcher.dispatch<WindowCloseEvent>(
+        KB_BIND_EVENT_FN(Application::onWindowClose));
+    dispatcher.dispatch<WindowResizeEvent>(
+        KB_BIND_EVENT_FN(Application::onWindowResize));
+    dispatcher.dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(Application::onKeyPress));
 }
 
 float Application::getTime() { return static_cast<float>(glfwGetTime()); }

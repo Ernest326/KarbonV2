@@ -1,12 +1,12 @@
 #pragma once
 
 #include <entt/entt.hpp>
-#include "../graphics/framebuffer.h"
-#include "../scene/scene.h"
-#include "../physics/physics_system.h"
-#include "../graphics/render_system.h"
-#include "../graphics/lighting_system.h"
-#include "../graphics/material_system.h"
+#include "graphics/framebuffer.h"
+#include "scene/scene.h"
+#include "physics/physics_system.h"
+#include "graphics/render_system.h"
+#include "graphics/lighting_system.h"
+#include "graphics/material_system.h"
 #include <memory>
 #include "window.h"
 #include "layer_stack.h"
@@ -28,9 +28,9 @@ public:
     virtual void run();
     void quit();
 
-    void OnEvent(Event& e);
+    void onEvent(Event& e);
 
-    static Application& Get();
+    static Application& get();
     inline Window& getWindow() { return *m_window; }
 
     void pushLayer(Layer* layer);
@@ -48,9 +48,9 @@ public:
     static float getDeltaTime();
 
 private:
-    bool OnWindowClose(WindowCloseEvent& e);
-    bool OnWindowResize(WindowResizeEvent& e);
-    bool OnKeyPress(KeyPressEvent& e);
+    bool onWindowClose(WindowCloseEvent& e);
+    bool onWindowResize(WindowResizeEvent& e);
+    bool onKeyPress(KeyPressEvent& e);
 
 private:
     std::unique_ptr<Window> m_window;

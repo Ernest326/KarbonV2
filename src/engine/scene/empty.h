@@ -8,7 +8,7 @@ public:
   Empty(entt::registry* registry, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &scale) 
       : Entity(registry->create(), registry) {
     m_id = registry->create();
-    auto &transform = AddComponent<TransformComponent>();
+    auto &transform = addComponent<TransformComponent>();
     transform.position = position;
     transform.rotation = rotation;
     transform.scale = scale;

@@ -1,7 +1,7 @@
 #pragma once
-#include "../graphics/buffers/buffers.h"
-#include "../graphics/shader.h" 
-#include "../graphics/primitives/cube.h"
+#include "graphics/buffers/buffers.h"
+#include "graphics/shader.h" 
+#include "graphics/primitives/cube.h"
 #include <string>
 
 namespace Karbon {

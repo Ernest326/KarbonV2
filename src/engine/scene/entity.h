@@ -9,26 +9,26 @@ public:
     Entity(entt::entity handle, entt::registry* registry);
     Entity(const Entity& other) = default;
 
-    operator entt::entity() const { return m_EntityHandle; }
+    operator entt::entity() const { return m_entityHandle; }
 
     template<typename T, typename... Args>
-    T& AddComponent(Args&&... args) {
-        return m_Registry->emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
+    T& addComponent(Args&&... args) {
+        return m_registry->emplace<T>(m_entityHandle, std::forward<Args>(args)...);
     }
 
     template<typename T>
-    T& GetComponent() {
-        return m_Registry->get<T>(m_EntityHandle);
+    T& getComponent() {
+        return m_registry->get<T>(m_entityHandle);
     }
 
     template<typename T>
-    bool HasComponent() {
-        return m_Registry->any_of<T>(m_EntityHandle);
+    bool hasComponent() {
+        return m_registry->any_of<T>(m_entityHandle);
     }
 
 private:
-    entt::entity m_EntityHandle{entt::null};
-    entt::registry* m_Registry{nullptr};
+    entt::entity m_entityHandle{entt::null};
+    entt::registry* m_registry{nullptr};
 };
 
 }

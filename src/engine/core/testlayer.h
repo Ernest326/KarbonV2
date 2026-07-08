@@ -1,16 +1,16 @@
 #pragma once
 #include "layer.h"
-#include "../scene/entity.h"
-#include "../graphics/material_system.h"
-#include "../graphics/render_system.h"
-#include "../scene/scene.h"
-#include "../graphics/lighting_system.h"
-#include "../physics/physics_system.h"
-#include "../graphics/spectator_camera.h"
-#include "../scene/cube_mesh.h"
-#include "../scene/plane_mesh.h"
-#include "../scene/sphere_mesh.h"
-#include "../scene/model.h"
+#include "scene/entity.h"
+#include "graphics/material_system.h"
+#include "graphics/render_system.h"
+#include "scene/scene.h"
+#include "graphics/lighting_system.h"
+#include "physics/physics_system.h"
+#include "graphics/spectator_camera.h"
+#include "scene/cube_mesh.h"
+#include "scene/plane_mesh.h"
+#include "scene/sphere_mesh.h"
+#include "scene/model.h"
 #include <memory>
 #include <vector>
 
@@ -25,7 +25,7 @@ public:
 
     void onAttach() override;
     void onDetach() override;
-    void OnUpdate(float deltaTime) override;
+    void onUpdate(float deltaTime) override;
     void onImGuiRender() override;
 
 private:

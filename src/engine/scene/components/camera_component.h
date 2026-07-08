@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../graphics/camera.h"
+#include "graphics/camera.h"
 
 namespace Karbon {
 

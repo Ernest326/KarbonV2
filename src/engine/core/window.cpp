@@ -130,7 +130,7 @@ void Window::update() {
 
 void Window::shutdown() {
     glfwDestroyWindow(m_window);
-    glfwTerminate(); //Shutdown the app after window is closed
+    glfwTerminate(); //shutdown the app after window is closed
 }
 
 void Window::setVSync(bool enabled) {

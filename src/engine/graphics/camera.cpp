@@ -1,5 +1,5 @@
 #include "camera.h"
-#include "../core/application.h"
+#include "core/application.h"
 
 namespace Karbon {
 
@@ -9,7 +9,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& rotation, float fov, 
     m_fov = fov;
     m_nearPlane = nearPlane;
     m_farPlane = farPlane;
-    m_aspectRatio = Application::Get().getWindow().getAspectRatio(); 
+    m_aspectRatio = Application::get().getWindow().getAspectRatio(); 
     setProjection(fov, nearPlane, farPlane);
     updateViewMatrix();
 }

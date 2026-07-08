@@ -2,8 +2,8 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
-#include "../graphics/buffers/buffers.h"
-#include "../graphics/material_system.h"
+#include "graphics/buffers/buffers.h"
+#include "graphics/material_system.h"
 
 namespace Karbon {
 

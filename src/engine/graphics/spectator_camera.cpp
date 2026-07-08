@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <GLFW/glfw3.h>
 #include <glm/common.hpp>
-#include "../core/application.h"
+#include "core/application.h"
 
 namespace Karbon {
 
@@ -35,11 +35,11 @@ SpectatorCamera::SpectatorCamera(Camera* target,
                 m_camera->setRotation(rotation);
                 m_camera->setProjection(fov, nearPlane, farPlane);
         }
-    glfwSetInputMode(Application::Get().getWindow().getGLWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(Application::get().getWindow().getGLWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void SpectatorCamera::update(float deltaTime) {
-    InputSystem& input = InputSystem::Get();
+    InputSystem& input = InputSystem::get();
 
     glm::vec3 movement(0.0f);
     if (input.isKeyPressed(Key::W)) movement += m_camera->forward();

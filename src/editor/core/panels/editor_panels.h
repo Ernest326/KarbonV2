@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 #include <entt/entt.hpp>
-#include "../component/component_inspector.h"
+#include "core/component/component_inspector.h"
 
 namespace Karbon {
 
@@ -11,9 +11,9 @@ class Scene;
 
 class HierarchyPanel {
 public:
-    void Draw(Scene* scene, entt::entity* selectedEntity);
-    bool* OpenFlag() { return &m_open; }
-    bool IsOpen() const { return m_open; }
+    void draw(Scene* scene, entt::entity* selectedEntity);
+    bool* openFlag() { return &m_open; }
+    bool isOpen() const { return m_open; }
 
 private:
     bool m_open = true;
@@ -22,9 +22,9 @@ private:
 class InspectorPanel {
 public:
     InspectorPanel();
-    void Draw(Scene* scene, entt::entity* selectedEntity);
-    bool* OpenFlag() { return &m_open; }
-    bool IsOpen() const { return m_open; }
+    void draw(Scene* scene, entt::entity* selectedEntity);
+    bool* openFlag() { return &m_open; }
+    bool isOpen() const { return m_open; }
 
 private:
     bool m_open = true;
@@ -33,9 +33,9 @@ private:
 
 class ContentBrowserPanel {
 public:
-    void Draw(Scene* scene);
-    bool* OpenFlag() { return &m_open; }
-    bool IsOpen() const { return m_open; }
+    void draw(Scene* scene);
+    bool* openFlag() { return &m_open; }
+    bool isOpen() const { return m_open; }
 
 private:
     bool m_open = true;
@@ -43,9 +43,9 @@ private:
 
 class StatsPanel {
 public:
-    void Draw(Scene* scene);
-    bool* OpenFlag() { return &m_open; }
-    bool IsOpen() const { return m_open; }
+    void draw(Scene* scene);
+    bool* openFlag() { return &m_open; }
+    bool isOpen() const { return m_open; }
 
 private:
     bool m_open = true;

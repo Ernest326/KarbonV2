@@ -1,6 +1,6 @@
 #pragma once
-#include "../../graphics/material_system.h"
-#include "../mesh.h"
+#include "graphics/material_system.h"
+#include "scene/mesh.h"
 
 namespace Karbon {
 

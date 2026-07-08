@@ -10,7 +10,7 @@ Grid::Grid(float size, int divisions) {
     this->m_divisions = divisions;
 }
 
-void Grid::Draw(glm::mat4 view, glm::mat4 projection) {
+void Grid::draw(glm::mat4 view, glm::mat4 projection) {
     if (gridVAO == 0) {
 
         gridShader = new Shader("resources/shaders/grid.vert", "resources/shaders/grid.frag");

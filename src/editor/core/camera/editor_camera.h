@@ -11,12 +11,12 @@ class Scene;
 
 class EditorCamera {
 public:
-    void Initialize(Scene* scene);
-    void OnUpdate(float deltaTime, bool viewportActive);
-    bool OnKeyPress(KeyPressEvent& e);
-    bool IsCapturingMouse() const { return m_controller ? m_controller->IsCapturingMouse() : false; }
+    void initialize(Scene* scene);
+    void onUpdate(float deltaTime, bool viewportActive);
+    bool onKeyPress(KeyPressEvent& e);
+    bool isCapturingMouse() const { return m_controller ? m_controller->isCapturingMouse() : false; }
 
-    entt::entity GetEntity() const { return m_entity; }
+    entt::entity getEntity() const { return m_entity; }
 
 private:
     Scene* m_scene = nullptr;

@@ -17,7 +17,7 @@ public:
     ~RenderSystem();
 
     // Renders the scene (skybox + PBR pass) from the given camera's view.
-    void Draw(Scene& scene, const Camera& camera);
+    void draw(Scene& scene, const Camera& camera);
 
     Shader& getPBRShader() { return *m_pbrShader; }
 

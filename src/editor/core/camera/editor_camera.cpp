@@ -7,7 +7,7 @@
 
 namespace Karbon {
 
-void EditorCamera::Initialize(Scene* scene) {
+void EditorCamera::initialize(Scene* scene) {
     m_scene = scene;
     if (!m_scene) {
         return;
@@ -18,25 +18,25 @@ void EditorCamera::Initialize(Scene* scene) {
     camComp.camera.setPosition(glm::vec3(0, 0, 5));
     m_scene->setPrimaryCamera(m_entity);
 
-    m_controller = std::make_unique<EditorCameraController>(&camComp.camera, &Application::Get().getWindow());
+    m_controller = std::make_unique<EditorCameraController>(&camComp.camera, &Application::get().getWindow());
 }
 
-void EditorCamera::OnUpdate(float deltaTime, bool viewportActive) {
+void EditorCamera::onUpdate(float deltaTime, bool viewportActive) {
     if (!m_controller) {
         return;
     }
 
-    m_controller->SetViewportActive(viewportActive);
-    m_controller->OnUpdate(deltaTime);
+    m_controller->setViewportActive(viewportActive);
+    m_controller->onUpdate(deltaTime);
 }
 
-bool EditorCamera::OnKeyPress(KeyPressEvent& e) {
+bool EditorCamera::onKeyPress(KeyPressEvent& e) {
     if (e.getKeyCode() != Key::Escape) {
         return false;
     }
 
-    if (m_controller && m_controller->IsCapturingMouse()) {
-        m_controller->Release();
+    if (m_controller && m_controller->isCapturingMouse()) {
+        m_controller->release();
         return true;
     }
 

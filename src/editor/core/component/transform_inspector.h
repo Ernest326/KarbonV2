@@ -16,13 +16,13 @@ inline glm::quat EulerDegreesToQuaternion(const glm::vec3& eulerDegrees) {
 
 class TransformComponentInspector : public ComponentInspector {
 public:
-    const char* GetName() const override { return "Transform"; }
+    const char* getName() const override { return "Transform"; }
 
-    bool CanInspect(entt::registry& registry, entt::entity entity) const override {
+    bool canInspect(entt::registry& registry, entt::entity entity) const override {
         return registry.all_of<TransformComponent>(entity);
     }
 
-    void Inspect(entt::registry& registry, entt::entity entity) override {
+    void inspect(entt::registry& registry, entt::entity entity) override {
         auto& transform = registry.get<TransformComponent>(entity);
 
         if (ImGui::DragFloat3("Position", &transform.position.x, 0.1f)) {

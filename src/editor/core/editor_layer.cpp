@@ -21,10 +21,10 @@ void EditorLayer::onAttach() {
         return;
     }
 
-    m_viewport.Initialize();
-    Application::Get().setViewportFramebuffer(m_viewport.GetFramebuffer());
+    m_viewport.initialize();
+    Application::get().setViewportFramebuffer(m_viewport.getFramebuffer());
 
-    m_editorCamera.Initialize(m_scene);
+    m_editorCamera.initialize(m_scene);
 
     // Test entities added in
     entt::entity directionalLight = m_scene->createEntity("Directional Light");
@@ -41,27 +41,27 @@ void EditorLayer::onAttach() {
 
     entt::entity cube_id = m_scene->createEntity("Test Cube");
     m_testCube = Entity(cube_id, &m_scene->getRegistry());
-    m_testCube.AddComponent<MeshRendererComponent>();
+    m_testCube.addComponent<MeshRendererComponent>();
     m_cubeMesh = CubeMesh();
-    m_testCube.GetComponent<MeshRendererComponent>().mesh = &m_cubeMesh;
-    MaterialHandle matHandle = Application::Get().getMaterialSystem().create({1.0f, 0.5f, 0.31f, 1.0f}, 0.5f, 0.5f);
-    m_testCube.GetComponent<MeshRendererComponent>().material = matHandle;
+    m_testCube.getComponent<MeshRendererComponent>().mesh = &m_cubeMesh;
+    MaterialHandle matHandle = Application::get().getMaterialSystem().create({1.0f, 0.5f, 0.31f, 1.0f}, 0.5f, 0.5f);
+    m_testCube.getComponent<MeshRendererComponent>().material = matHandle;
     
     entt::entity sphere_id = m_scene->createEntity("Test Sphere");
     m_scene->getRegistry().emplace<MeshRendererComponent>(sphere_id);
     m_sphereMesh = SphereMesh();
     m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).mesh = &m_sphereMesh;
     m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).material = matHandle;
-    MaterialHandle matHandle2 = Application::Get().getMaterialSystem().create({0.1f, 0.5f, 0.89f, 1.0f}, 0.1f, 0.9f);
+    MaterialHandle matHandle2 = Application::get().getMaterialSystem().create({0.1f, 0.5f, 0.89f, 1.0f}, 0.1f, 0.9f);
     m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).material = matHandle2;
     m_scene->getRegistry().get<TransformComponent>(sphere_id).position = glm::vec3(5.0f, 0.0f, 0.0f);
 
     entt::entity monke = m_scene->createEntity("Monke");
     m_scene->getRegistry().emplace<MeshRendererComponent>(monke);
-    m_monkeModel = std::make_unique<Model>("resources/models/monke.fbx", &Application::Get().getMaterialSystem());
+    m_monkeModel = std::make_unique<Model>("resources/models/monke.fbx", &Application::get().getMaterialSystem());
     m_scene->getRegistry().get<MeshRendererComponent>(monke).mesh = &m_monkeModel->getMesh(0);
 
-    MaterialHandle matHandle3 = Application::Get().getMaterialSystem().create({0.8f, 0.2f, 0.5f, 1.0f}, 0.7f, 0.9f);
+    MaterialHandle matHandle3 = Application::get().getMaterialSystem().create({0.8f, 0.2f, 0.5f, 1.0f}, 0.7f, 0.9f);
     m_scene->getRegistry().get<MeshRendererComponent>(monke).material = matHandle3;
     m_scene->getRegistry().get<TransformComponent>(monke).position = glm::vec3(-5.0f, 0.0f, 0.0f);
 
@@ -81,11 +81,11 @@ void EditorLayer::onAttach() {
     m_outlineShader = std::make_unique<Shader>("resources/shaders/outline.vert", "resources/shaders/outline.frag");
     m_grid = std::make_unique<Grid>(100, 50.0f);
 
-    m_selectedEntity = m_editorCamera.GetEntity();
+    m_selectedEntity = m_editorCamera.getEntity();
     m_bootstrapped = true;
 }
 
-glm::vec4 EditorLayer::EncodeEntityID(entt::entity e) {
+glm::vec4 EditorLayer::encodeEntityID(entt::entity e) {
     uint32_t id = static_cast<uint32_t>(e);
     id = id + 1; // Avoid black (0) which is reserved for "no entity"
     return glm::vec4(
@@ -96,17 +96,17 @@ glm::vec4 EditorLayer::EncodeEntityID(entt::entity e) {
     );
 }
 
-entt::entity EditorLayer::DecodeEntity(const GLubyte* pixel) {
+entt::entity EditorLayer::decodeEntity(const GLubyte* pixel) {
     uint32_t id = pixel[0] + (pixel[1] << 8) + (pixel[2] << 16) + (pixel[3] << 24) - 1;
     return static_cast<entt::entity>(id);
 }
 
-void EditorLayer::DoPickingPass(int x, int y) {
-    if (!m_scene || !m_viewport.GetFramebuffer()) return;
+void EditorLayer::doPickingPass(int x, int y) {
+    if (!m_scene || !m_viewport.getFramebuffer()) return;
     if (x < 0 || y < 0) return;
 
-    uint32_t fbW = m_viewport.GetFramebuffer()->getWidth();
-    uint32_t fbH = m_viewport.GetFramebuffer()->getHeight();
+    uint32_t fbW = m_viewport.getFramebuffer()->getWidth();
+    uint32_t fbH = m_viewport.getFramebuffer()->getHeight();
     if (x >= (int)fbW || y >= (int)fbH) return;
 
     if (!m_pickingShader) return;
@@ -131,7 +131,7 @@ void EditorLayer::DoPickingPass(int x, int y) {
         glm::mat4 mvp = cam->getProjectionMatrix() * cam->getViewMatrix() * worldTransform.matrix;
         m_pickingShader->bind();
         m_pickingShader->bindUniform(mvp, "u_MVP");
-        m_pickingShader->bindUniform(EncodeEntityID(entity), "u_ID");
+        m_pickingShader->bindUniform(encodeEntityID(entity), "u_ID");
 
         meshRenderer.mesh->draw();
     }
@@ -139,29 +139,29 @@ void EditorLayer::DoPickingPass(int x, int y) {
     GLubyte pixel[4];
     glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
 
-    entt::entity picked = DecodeEntity(pixel);
+    entt::entity picked = decodeEntity(pixel);
     m_selectedEntity = picked;
 
     // Unbind picking FBO, but DON'T bind viewport FBO here
     // Let Application::run() handle it
 }
 
-void EditorLayer::OnUpdate(float deltaTime) {
-    m_editorCamera.OnUpdate(deltaTime, m_viewport.IsActive());
+void EditorLayer::onUpdate(float deltaTime) {
+    m_editorCamera.onUpdate(deltaTime, m_viewport.isActive());
 }
 
-void EditorLayer::OnEvent(Event& e) {
+void EditorLayer::onEvent(Event& e) {
     EventDispatcher dispatcher(e);
-    dispatcher.Dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(EditorLayer::OnKeyPress));
-    dispatcher.Dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(EditorLayer::GizmoControls));
-    dispatcher.Dispatch<KeyReleaseEvent>(KB_BIND_EVENT_FN(EditorLayer::OnKeyRelease));
+    dispatcher.dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(EditorLayer::onKeyPress));
+    dispatcher.dispatch<KeyPressEvent>(KB_BIND_EVENT_FN(EditorLayer::gizmoControls));
+    dispatcher.dispatch<KeyReleaseEvent>(KB_BIND_EVENT_FN(EditorLayer::onKeyRelease));
 }
 
-bool EditorLayer::OnKeyPress(KeyPressEvent& e) {
-    return m_editorCamera.OnKeyPress(e);
+bool EditorLayer::onKeyPress(KeyPressEvent& e) {
+    return m_editorCamera.onKeyPress(e);
 }
 
-bool EditorLayer::OnKeyRelease(KeyReleaseEvent& e) {
+bool EditorLayer::onKeyRelease(KeyReleaseEvent& e) {
     if (e.getKeyCode() == Key::LeftControl) {
         m_snapGizmo = false;
         return true;
@@ -169,8 +169,8 @@ bool EditorLayer::OnKeyRelease(KeyReleaseEvent& e) {
     return false;
 }
 
-bool EditorLayer::GizmoControls(KeyPressEvent& e) {
-    if(!m_editorCamera.IsCapturingMouse()) {
+bool EditorLayer::gizmoControls(KeyPressEvent& e) {
+    if(!m_editorCamera.isCapturingMouse()) {
         if (e.getKeyCode() == Key::W) {
             m_gizmoSettings.gizmoType = GizmoSettings::GizmoType::Translate;
             return true;
@@ -195,7 +195,7 @@ bool EditorLayer::GizmoControls(KeyPressEvent& e) {
             // Focus selected entity
             if (m_selectedEntity != entt::null) {
                 auto& worldTransform = m_scene->getRegistry().get<WorldTransformComponent>(m_selectedEntity);
-                auto& cameraTransform = m_scene->getRegistry().get<WorldTransformComponent>(m_editorCamera.GetEntity());
+                auto& cameraTransform = m_scene->getRegistry().get<WorldTransformComponent>(m_editorCamera.getEntity());
                 cameraTransform.worldPosition = (worldTransform.worldPosition - cameraTransform.worldPosition)*0.1f + cameraTransform.worldPosition; // Lerp to target for smoothness
                 return true;
             }
@@ -227,23 +227,23 @@ void EditorLayer::onImGuiRender() {
     setupDockSpace();
     drawMenuBar();
 
-    m_hierarchyPanel.Draw(m_scene, &m_selectedEntity);
-    m_inspectorPanel.Draw(m_scene, &m_selectedEntity);
-    m_contentBrowserPanel.Draw(m_scene);
-    m_statsPanel.Draw(m_scene);
+    m_hierarchyPanel.draw(m_scene, &m_selectedEntity);
+    m_inspectorPanel.draw(m_scene, &m_selectedEntity);
+    m_contentBrowserPanel.draw(m_scene);
+    m_statsPanel.draw(m_scene);
 
-    m_viewport.Draw(m_scene, [this]() {
+    m_viewport.draw(m_scene, [this]() {
         drawGizmos(m_scene);
     });
 
     int pickX, pickY;
-    if (m_viewport.ConsumeClick(pickX, pickY) && !m_editorCamera.IsCapturingMouse() && !ImGuizmo::IsUsing()) {
-        DoPickingPass(pickX, pickY);
+    if (m_viewport.consumeClick(pickX, pickY) && !m_editorCamera.isCapturingMouse() && !ImGuizmo::IsUsing()) {
+        doPickingPass(pickX, pickY);
         std::cout << "Clicked at (" << pickX << ", " << pickY << ")\n";
     }
 }
 
-void EditorLayer::OnRender() {
+void EditorLayer::onRender() {
 
     if(!m_grid || !m_scene) { return; }
 
@@ -253,7 +253,7 @@ void EditorLayer::OnRender() {
         glDepthMask(GL_FALSE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        m_grid->Draw(activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix());
+        m_grid->draw(activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix());
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
     }
@@ -262,7 +262,7 @@ void EditorLayer::OnRender() {
         auto* meshRenderer = m_scene->getRegistry().try_get<MeshRendererComponent>(m_selectedEntity);
         auto* worldTransform = m_scene->getRegistry().try_get<WorldTransformComponent>(m_selectedEntity);
         if (meshRenderer && meshRenderer->mesh && worldTransform) {
-            DrawOutline(meshRenderer->mesh, worldTransform->matrix, activeCamera);
+            drawOutline(meshRenderer->mesh, worldTransform->matrix, activeCamera);
         }
     }
 
@@ -287,7 +287,7 @@ void EditorLayer::drawGizmos(Scene* scene) {
         contentMax.y - contentMin.y
     );
 
-    CameraComponent* cameraComponent = &scene->getRegistry().get<CameraComponent>(m_editorCamera.GetEntity());
+    CameraComponent* cameraComponent = &scene->getRegistry().get<CameraComponent>(m_editorCamera.getEntity());
     Camera& camera = cameraComponent->camera;
 
     if (m_selectedEntity == entt::null || m_gizmoSettings.gizmoType == GizmoSettings::GizmoType::None) {
@@ -382,7 +382,7 @@ void EditorLayer::drawGizmos(Scene* scene) {
     }
 }
 
-void EditorLayer::DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera) {
+void EditorLayer::drawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera) {
     if (!mesh || !camera || !m_outlineShader) return;
 
     glm::mat4 mvp = camera->getProjectionMatrix() * camera->getViewMatrix() * worldMatrix;
@@ -402,7 +402,7 @@ void EditorLayer::DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* 
     m_outlineShader->bindUniform(1.0f, "u_Scale");
     mesh->draw();
 
-    // ── Pass 2: Draw inflated mesh only OUTSIDE the stencil mask ──
+    // ── Pass 2: draw inflated mesh only OUTSIDE the stencil mask ──
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -468,10 +468,10 @@ void EditorLayer::drawMenuBar() {
         }
         
         if (ImGui::BeginMenu("View")) {
-            ImGui::MenuItem("Hierarchy", nullptr, m_hierarchyPanel.OpenFlag());
-            ImGui::MenuItem("Inspector", nullptr, m_inspectorPanel.OpenFlag());
-            ImGui::MenuItem("Content Browser", nullptr, m_contentBrowserPanel.OpenFlag());
-            ImGui::MenuItem("Stats", nullptr, m_statsPanel.OpenFlag());
+            ImGui::MenuItem("Hierarchy", nullptr, m_hierarchyPanel.openFlag());
+            ImGui::MenuItem("Inspector", nullptr, m_inspectorPanel.openFlag());
+            ImGui::MenuItem("Content Browser", nullptr, m_contentBrowserPanel.openFlag());
+            ImGui::MenuItem("Stats", nullptr, m_statsPanel.openFlag());
             ImGui::EndMenu();
         }
         

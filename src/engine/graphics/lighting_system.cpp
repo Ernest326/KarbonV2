@@ -1,21 +1,14 @@
 #include "lighting_system.h"
-#include "../scene/components/pointlight_component.h"
-#include "../scene/components/directional_light_component.h"
-#include "../scene/components/spotlight_component.h"
-#include "../scene/components/transform.h"
+#include "scene/components/pointlight_component.h"
+#include "scene/components/directional_light_component.h"
+#include "scene/components/spotlight_component.h"
+#include "scene/components/transform.h"
 #include <iostream>
 
 namespace Karbon {
 
 LightingSystem::LightingSystem(entt::registry *registry)
-    : m_registry(registry) {}
-
-LightingSystem::~LightingSystem() {
-    if (m_lightsUBO)
-        glDeleteBuffers(1, &m_lightsUBO);
-}
-
-void LightingSystem::Initialize() {
+    : m_registry(registry) {
 
     m_uboSize = sizeof(GPULightHeader) + sizeof(GPUPointLight) * MAX_POINT_LIGHTS +
                 sizeof(GPUDirectionalLight) * MAX_DIRECTIONAL_LIGHTS +
@@ -28,7 +21,12 @@ void LightingSystem::Initialize() {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void LightingSystem::Update() {
+LightingSystem::~LightingSystem() {
+    if (m_lightsUBO)
+        glDeleteBuffers(1, &m_lightsUBO);
+}
+
+void LightingSystem::update() {
 
     m_pointLights.clear();
     m_directionalLights.clear();
@@ -135,11 +133,5 @@ void LightingSystem::Update() {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void LightingSystem::Shutdown() {
-    if (m_lightsUBO) {
-        glDeleteBuffers(1, &m_lightsUBO);
-        m_lightsUBO = 0;
-    }
-}
 
 } // namespace Karbon

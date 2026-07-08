@@ -10,7 +10,7 @@
 #include "core/camera/editor_camera.h"
 #include "core/panels/editor_panels.h"
 #include "core/viewport/editor_viewport.h"
-#include "../graphics/grid.h"
+#include "graphics/grid.h"
 #include "graphics/shader.h"
 #include "scene/model.h"
 
@@ -28,26 +28,26 @@ class EditorLayer : public Layer {
 public:
     explicit EditorLayer(Scene* scene);
 
-    void OnUpdate(float deltaTime) override;
+    void onUpdate(float deltaTime) override;
     void onAttach() override;
     void onImGuiRender() override;
-    void OnEvent(Event& e) override;
-    void OnRender() override;
+    void onEvent(Event& e) override;
+    void onRender() override;
 
 private:
 
-    bool OnKeyPress(KeyPressEvent& e);
-    bool OnKeyRelease(KeyReleaseEvent& e);
-    bool GizmoControls(KeyPressEvent& e);
+    bool onKeyPress(KeyPressEvent& e);
+    bool onKeyRelease(KeyReleaseEvent& e);
+    bool gizmoControls(KeyPressEvent& e);
 
-    void DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera);
+    void drawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera);
     
     std::unique_ptr<Framebuffer> m_pickingFramebuffer;
     std::unique_ptr<Shader> m_pickingShader;
     std::unique_ptr<Shader> m_outlineShader;
-    glm::vec4 EncodeEntityID(entt::entity e);
-    entt::entity DecodeEntity(const GLubyte* pixel);
-    void DoPickingPass(int x, int y);
+    glm::vec4 encodeEntityID(entt::entity e);
+    entt::entity decodeEntity(const GLubyte* pixel);
+    void doPickingPass(int x, int y);
 
     void setupDockSpace();
     void drawMenuBar();

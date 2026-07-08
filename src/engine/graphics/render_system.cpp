@@ -1,7 +1,7 @@
 #include "render_system.h"
-#include "../scene/components/meshrenderer_component.h"
-#include "../scene/components/transform.h"
-#include "../scene/scene.h"
+#include "scene/components/meshrenderer_component.h"
+#include "scene/components/transform.h"
+#include "scene/scene.h"
 #include "texture.h"
 
 namespace Karbon {
@@ -16,15 +16,15 @@ RenderSystem::RenderSystem(entt::registry *registry, MaterialSystem *materials, 
 }
 RenderSystem::~RenderSystem() { }
 
-void RenderSystem::Draw(Scene& scene, const Camera& camera) {
+void RenderSystem::draw(Scene& scene, const Camera& camera) {
     // GPU upload phase: materials and lights are gathered/uploaded once per frame here
     m_materials->uploadToGPU();
-    m_lights->Update();
+    m_lights->update();
 
-    //Draw skybox first
+    //draw skybox first
     scene.renderSkybox(*m_skyboxShader);
 
-    //Draw rest of scene
+    //draw rest of scene
     Shader* shader = m_pbrShader.get();
     shader->bind();
     shader->bindUniform(camera.getViewMatrix(), "view");

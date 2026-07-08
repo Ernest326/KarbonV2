@@ -1,6 +1,6 @@
 #pragma once
 #include "mesh.h"
-#include "../graphics/material_system.h"
+#include "graphics/material_system.h"
 #include <string>
 #include <vector>
 #include <assimp/scene.h>

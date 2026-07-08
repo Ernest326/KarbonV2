@@ -1,7 +1,7 @@
 #pragma once
 
 #include "camera.h"
-#include "../input/inputsystem.h"
+#include "input/inputsystem.h"
 
 namespace Karbon {
 

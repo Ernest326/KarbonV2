@@ -2,13 +2,13 @@
 
 #include <imgui.h>
 #include <cmath>
-#include "../component/transform_component.h"
-#include "../component/pointlight_component.h"
-#include "../component/rigidbody_component.h"
-#include "../component/collider_component.h"
-#include "../component/meshrenderer_component.h"
-#include "../component/directional_light_component.h"
-#include "../component/spotlight_component.h"
+#include "core/component/transform_inspector.h"
+#include "core/component/pointlight_inspector.h"
+#include "core/component/rigidbody_inspector.h"
+#include "core/component/collider_inspector.h"
+#include "core/component/meshrenderer_inspector.h"
+#include "core/component/directional_light_inspector.h"
+#include "core/component/spotlight_inspector.h"
 #include <glm/gtc/quaternion.hpp>
 #include "scene/components/hierarchy_component.h"
 #include "scene/components/id_component.h"
@@ -66,7 +66,7 @@ InspectorPanel::InspectorPanel() {
     m_componentInspectors.push_back(std::make_unique<SpotLightComponentInspector>());
 }
 
-void HierarchyPanel::Draw(Scene* scene, entt::entity* selectedEntity) {
+void HierarchyPanel::draw(Scene* scene, entt::entity* selectedEntity) {
     if (!m_open) {
         return;
     }
@@ -91,7 +91,7 @@ void HierarchyPanel::Draw(Scene* scene, entt::entity* selectedEntity) {
     ImGui::End();
 }
 
-void InspectorPanel::Draw(Scene* scene, entt::entity* selectedEntity) {
+void InspectorPanel::draw(Scene* scene, entt::entity* selectedEntity) {
     if (!m_open) {
         return;
     }
@@ -119,12 +119,12 @@ void InspectorPanel::Draw(Scene* scene, entt::entity* selectedEntity) {
         }
 
         for (const auto& inspector : m_componentInspectors) {
-            if (!inspector->CanInspect(registry, entity)) {
+            if (!inspector->canInspect(registry, entity)) {
                 continue;
             }
 
-            if (ImGui::CollapsingHeader(inspector->GetName(), ImGuiTreeNodeFlags_DefaultOpen)) {
-                inspector->Inspect(registry, entity);
+            if (ImGui::CollapsingHeader(inspector->getName(), ImGuiTreeNodeFlags_DefaultOpen)) {
+                inspector->inspect(registry, entity);
             }
         }
     }
@@ -147,7 +147,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity* selectedEntity) {
     ImGui::End();
 }
 
-void ContentBrowserPanel::Draw(Scene* /*scene*/) {
+void ContentBrowserPanel::draw(Scene* /*scene*/) {
     if (!m_open) {
         return;
     }
@@ -176,7 +176,7 @@ void ContentBrowserPanel::Draw(Scene* /*scene*/) {
     ImGui::End();
 }
 
-void StatsPanel::Draw(Scene* /*scene*/) {
+void StatsPanel::draw(Scene* /*scene*/) {
     if (!m_open) {
         return;
     }
@@ -188,7 +188,7 @@ void StatsPanel::Draw(Scene* /*scene*/) {
     ImGui::Text("FPS: %.1f", frameRate);
     ImGui::Text("Frame Time: %.3f ms", frameTimeMs);
     ImGui::Separator();
-    ImGui::Text("Draw Calls: 0");
+    ImGui::Text("draw Calls: 0");
     ImGui::Text("Triangles: 0");
     ImGui::Text("Entities: 0");
     ImGui::Separator();
