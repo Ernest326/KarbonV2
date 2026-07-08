@@ -9,6 +9,7 @@
 #include "scene/components/directional_light_component.h"
 #include "scene/components/spotlight_component.h"
 #include "scene/components/hierarchy_component.h"
+#include "utils/math_utils.h"
 
 namespace Karbon {
 
@@ -301,36 +302,22 @@ void EditorLayer::drawGizmos(Scene* scene) {
     // Use WORLD matrix so the gizmo appears at the actual world position
     glm::mat4 transformMatrix = worldTransform.matrix;
 
-    bool manipulated = false;
+    ImGuizmo::OPERATION operation;
     switch (m_gizmoSettings.gizmoType) {
-        case GizmoSettings::GizmoType::Translate:
-            manipulated = ImGuizmo::Manipulate(
-                glm::value_ptr(camera.getViewMatrix()),
-                glm::value_ptr(camera.getProjectionMatrix()),
-                ImGuizmo::OPERATION::TRANSLATE,
-                m_gizmoSettings.mode == GizmoSettings::Mode::Local ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD,
-                glm::value_ptr(transformMatrix)
-            );
-            break;
-        case GizmoSettings::GizmoType::Rotate:
-            manipulated = ImGuizmo::Manipulate(
-                glm::value_ptr(camera.getViewMatrix()),
-                glm::value_ptr(camera.getProjectionMatrix()),
-                ImGuizmo::OPERATION::ROTATE,
-                m_gizmoSettings.mode == GizmoSettings::Mode::Local ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD,
-                glm::value_ptr(transformMatrix)
-            );
-            break;
-        case GizmoSettings::GizmoType::Scale:
-            manipulated = ImGuizmo::Manipulate(
-                glm::value_ptr(camera.getViewMatrix()),
-                glm::value_ptr(camera.getProjectionMatrix()),
-                ImGuizmo::OPERATION::SCALE,
-                m_gizmoSettings.mode == GizmoSettings::Mode::Local ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD,
-                glm::value_ptr(transformMatrix)
-            );
-            break;
+        case GizmoSettings::GizmoType::Translate: operation = ImGuizmo::OPERATION::TRANSLATE; break;
+        case GizmoSettings::GizmoType::Rotate:    operation = ImGuizmo::OPERATION::ROTATE;    break;
+        case GizmoSettings::GizmoType::Scale:     operation = ImGuizmo::OPERATION::SCALE;     break;
+        default: return;
     }
+    ImGuizmo::MODE mode = m_gizmoSettings.mode == GizmoSettings::Mode::Local ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
+
+    bool manipulated = ImGuizmo::Manipulate(
+        glm::value_ptr(camera.getViewMatrix()),
+        glm::value_ptr(camera.getProjectionMatrix()),
+        operation,
+        mode,
+        glm::value_ptr(transformMatrix)
+    );
 
     if (manipulated) {
         auto& hierarchy = scene->getRegistry().get<HierarchyComponent>(m_selectedEntity);
@@ -345,22 +332,7 @@ void EditorLayer::drawGizmos(Scene* scene) {
         transform.setLocalMatrix(newLocalMatrix);
 
         // Decompose back into TransformComponent (local space)
-        transform.position = glm::vec3(newLocalMatrix[3]);
-
-        glm::vec3 scale;
-        scale.x = glm::length(glm::vec3(newLocalMatrix[0]));
-        scale.y = glm::length(glm::vec3(newLocalMatrix[1]));
-        scale.z = glm::length(glm::vec3(newLocalMatrix[2]));
-
-        if (scale.x > 0.0f && scale.y > 0.0f && scale.z > 0.0f) {
-            glm::mat3 rotationMat(
-                glm::vec3(newLocalMatrix[0]) / scale.x,
-                glm::vec3(newLocalMatrix[1]) / scale.y,
-                glm::vec3(newLocalMatrix[2]) / scale.z
-            );
-            transform.rotation = glm::quat_cast(rotationMat);
-            transform.scale    = scale;
-        }
+        decomposeNoShear(newLocalMatrix, transform.position, transform.rotation, transform.scale);
 
         // Snapping
 

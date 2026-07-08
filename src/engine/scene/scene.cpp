@@ -2,121 +2,41 @@
 #include "components/transform.h"
 #include "components/hierarchy_component.h"
 #include "components/camera_component.h"
+#include "graphics/cubemap.h"
+#include "graphics/environment_map.h"
+#include "graphics/shader.h"
+#include "utils/math_utils.h"
 
 #include <algorithm>
 #include <cmath>
-
-static void decomposeNoShear(const glm::mat4& matrix, glm::vec3& position, glm::quat& rotation, glm::vec3& scale) {
-    position = glm::vec3(matrix[3]);
-
-    glm::vec3 col0 = glm::vec3(matrix[0]);
-    glm::vec3 col1 = glm::vec3(matrix[1]);
-    glm::vec3 col2 = glm::vec3(matrix[2]);
-
-    scale.x = glm::length(col0);
-    if (scale.x > 0.000001f) {
-        col0 /= scale.x;
-    } else {
-        col0 = glm::vec3(1.0f, 0.0f, 0.0f);
-    }
-
-    col1 -= col0 * glm::dot(col1, col0);
-    scale.y = glm::length(col1);
-    if (scale.y > 0.000001f) {
-        col1 /= scale.y;
-    } else {
-        col1 = glm::vec3(0.0f, 1.0f, 0.0f);
-    }
-
-    col2 -= col0 * glm::dot(col2, col0) + col1 * glm::dot(col2, col1);
-    scale.z = glm::length(col2);
-    if (scale.z > 0.000001f) {
-        col2 /= scale.z;
-    } else {
-        col2 = glm::vec3(0.0f, 0.0f, 1.0f);
-    }
-
-    glm::mat3 rotMat(col0, col1, col2);
-    rotation = glm::normalize(glm::quat_cast(rotMat));
-}
 
 namespace Karbon {
     // Scene environment implementation
     void SceneEnvironment::setCubemap(const std::vector<std::string>& faces) {
         clear();
-        m_cubemap = std::make_unique<Cubemap>(faces);
-        if (m_cubemap->getID() != 0) {
+        auto cubemap = std::make_unique<Cubemap>(faces);
+        if (cubemap->getID() != 0) {
+            m_source = std::move(cubemap);
             m_type = Type::Cubemap;
             m_cubemapFaces = faces;
-            m_hdrPath.clear();
-        } else {
-            m_cubemap.reset();
         }
     }
 
     void SceneEnvironment::setHDR(const std::string& hdrPath) {
         clear();
-        m_environmentMap = std::make_unique<EnvironmentMap>(hdrPath);
-        if (m_environmentMap->getID() != 0) {
+        auto environmentMap = std::make_unique<EnvironmentMap>(hdrPath);
+        if (environmentMap->getID() != 0) {
+            m_source = std::move(environmentMap);
             m_type = Type::HDR;
             m_hdrPath = hdrPath;
-            m_cubemapFaces.clear();
-        } else {
-            m_environmentMap.reset();
         }
     }
 
     void SceneEnvironment::clear() {
-        m_cubemap.reset();
-        m_environmentMap.reset();
+        m_source.reset();
         m_type = Type::None;
         m_cubemapFaces.clear();
         m_hdrPath.clear();
-    }
-
-    unsigned int SceneEnvironment::getSkyboxCubemap() const {
-        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->getID();
-        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->getCubemap();
-        return 0;
-    }
-
-    bool SceneEnvironment::hasIBL() const {
-        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->hasIBL();
-        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->hasIBL();
-        return false;
-    }
-
-    void SceneEnvironment::generateIBL() {
-        if (m_type == Type::Cubemap && m_cubemap) m_cubemap->generateIBL();
-        if (m_type == Type::HDR && m_environmentMap) m_environmentMap->generateIBL();
-    }
-
-    unsigned int SceneEnvironment::getIrradianceMap() const {
-        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->getIrradianceMap();
-        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->getIrradianceMap();
-        return 0;
-    }
-
-    unsigned int SceneEnvironment::getPrefilterMap() const {
-        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->getPrefilterMap();
-        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->getPrefilterMap();
-        return 0;
-    }
-
-    unsigned int SceneEnvironment::getBRDFLUT() const {
-        if (m_type == Type::Cubemap && m_cubemap) return m_cubemap->getBRDFLUT();
-        if (m_type == Type::HDR && m_environmentMap) return m_environmentMap->getBRDFLUT();
-        return 0;
-    }
-
-    void SceneEnvironment::bind() {
-        if (m_type == Type::Cubemap && m_cubemap) m_cubemap->bind();
-        if (m_type == Type::HDR && m_environmentMap) m_environmentMap->bind();
-    }
-
-    void SceneEnvironment::unbind() {
-        if (m_type == Type::Cubemap && m_cubemap) m_cubemap->unbind();
-        if (m_type == Type::HDR && m_environmentMap) m_environmentMap->unbind();
     }
 
     void SceneEnvironment::bindIBL(Shader& shader) {

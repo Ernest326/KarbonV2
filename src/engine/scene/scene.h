@@ -7,10 +7,11 @@
 #include <glm/glm.hpp>
 #include "components/id_component.h"
 #include "components/transform.h"
-#include "graphics/cubemap.h"
-#include "graphics/environment_map.h"
+#include "graphics/environment_source.h"
 
 namespace Karbon {
+
+class Shader;
 
 class SceneEnvironment {
 public:
@@ -22,15 +23,15 @@ public:
 
     Type getType() const { return m_type; }
 
-    unsigned int getSkyboxCubemap() const;
+    unsigned int getSkyboxCubemap() const { return m_source ? m_source->getSkyboxCubemap() : 0; }
 
-    bool hasIBL() const;
-    void generateIBL();
-    unsigned int getIrradianceMap() const;
-    unsigned int getPrefilterMap() const;
-    unsigned int getBRDFLUT() const;
-    void bind();
-    void unbind();
+    bool hasIBL() const { return m_source && m_source->hasIBL(); }
+    void generateIBL() { if (m_source) m_source->generateIBL(); }
+    unsigned int getIrradianceMap() const { return m_source ? m_source->getIrradianceMap() : 0; }
+    unsigned int getPrefilterMap() const { return m_source ? m_source->getPrefilterMap() : 0; }
+    unsigned int getBRDFLUT() const { return m_source ? m_source->getBRDFLUT() : 0; }
+    void bind() { if (m_source) m_source->bind(); }
+    void unbind() { if (m_source) m_source->unbind(); }
     void bindIBL(Shader& shader);
 
     const std::vector<std::string>& getCubemapFaces() const { return m_cubemapFaces; }
@@ -38,8 +39,7 @@ public:
 
 private:
     Type m_type = Type::None;
-    std::unique_ptr<Cubemap> m_cubemap;
-    std::unique_ptr<EnvironmentMap> m_environmentMap;
+    std::unique_ptr<EnvironmentSource> m_source;
 
     std::vector<std::string> m_cubemapFaces;
     std::string m_hdrPath;
