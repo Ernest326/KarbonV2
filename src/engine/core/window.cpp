@@ -27,7 +27,7 @@ bool Window::init(const WindowProperties& properties) {
         s_GLFWInit = true;
     }
 
-    m_window = glfwCreateWindow(properties.width, properties.height, properties.title, nullptr, nullptr);
+    m_window = glfwCreateWindow(properties.width, properties.height, properties.title.c_str(), nullptr, nullptr);
     if (!m_window) {
         std::cout << "ERROR::Failed to create Window!!!" << std::endl;
         return false;

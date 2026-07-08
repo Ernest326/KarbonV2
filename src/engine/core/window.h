@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <functional>
@@ -11,9 +12,9 @@
 namespace Karbon {
 
 struct WindowProperties {
-    const char* title;
+    std::string title;
     unsigned int width, height;
-    WindowProperties(const char* title="Karbon", unsigned int width=800, unsigned int height=600) : title(title), width(width), height(height) {};
+    WindowProperties(const std::string& title="Karbon", unsigned int width=800, unsigned int height=600) : title(title), width(width), height(height) {};
 };
 
 class Window {
@@ -45,7 +46,7 @@ private:
 private:
     GLFWwindow* m_window;
     struct WindowData {
-        const char* title;
+        std::string title;
         unsigned int width, height;
         bool VSync;
         EventCallbackFn EventCallback;

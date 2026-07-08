@@ -175,8 +175,10 @@ namespace Karbon {
 
         unparent(entity);
 
-        auto& hierarchy = m_registry.get<HierarchyComponent>(entity);
-        for(auto child : hierarchy.children) {
+        // Copy the children: unparent()/destroyEntity() erase from the live
+        // vector and can reallocate registry storage, invalidating iterators.
+        auto children = m_registry.get<HierarchyComponent>(entity).children;
+        for(auto child : children) {
             unparent(child);
             destroyEntity(child);
         }

@@ -12,6 +12,12 @@ public:
     explicit EnvironmentMap(const std::string& hdrPath);
     ~EnvironmentMap();
 
+    // Owns GL texture handles; held via unique_ptr, so copying/moving is disabled
+    EnvironmentMap(const EnvironmentMap&) = delete;
+    EnvironmentMap& operator=(const EnvironmentMap&) = delete;
+    EnvironmentMap(EnvironmentMap&&) = delete;
+    EnvironmentMap& operator=(EnvironmentMap&&) = delete;
+
     void bind(unsigned int slot = 0) const;
     void unbind() const;
 

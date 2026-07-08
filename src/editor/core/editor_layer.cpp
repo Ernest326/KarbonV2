@@ -77,6 +77,8 @@ void EditorLayer::onAttach() {
     // -------
 
     m_pickingFramebuffer = std::make_unique<Framebuffer>(1920, 1080);
+    m_pickingShader = std::make_unique<Shader>("resources/shaders/picker.vert", "resources/shaders/picker.frag");
+    m_outlineShader = std::make_unique<Shader>("resources/shaders/outline.vert", "resources/shaders/outline.frag");
     m_grid = std::make_unique<Grid>(100, 50.0f);
 
     m_selectedEntity = m_editorCamera.GetEntity();
@@ -107,7 +109,7 @@ void EditorLayer::DoPickingPass(int x, int y) {
     uint32_t fbH = m_viewport.GetFramebuffer()->getHeight();
     if (x >= (int)fbW || y >= (int)fbH) return;
 
-    static Shader pickingShader("resources/shaders/picker.vert", "resources/shaders/picker.frag");
+    if (!m_pickingShader) return;
     Camera* cam = m_scene->getPrimaryCamera();
     if (!cam) return;
 
@@ -127,9 +129,9 @@ void EditorLayer::DoPickingPass(int x, int y) {
         if (!meshRenderer.mesh) continue;
 
         glm::mat4 mvp = cam->getProjectionMatrix() * cam->getViewMatrix() * worldTransform.matrix;
-        pickingShader.bind();
-        pickingShader.bindUniform(mvp, "u_MVP");
-        pickingShader.bindUniform(EncodeEntityID(entity), "u_ID");
+        m_pickingShader->bind();
+        m_pickingShader->bindUniform(mvp, "u_MVP");
+        m_pickingShader->bindUniform(EncodeEntityID(entity), "u_ID");
 
         meshRenderer.mesh->draw();
     }
@@ -381,8 +383,7 @@ void EditorLayer::drawGizmos(Scene* scene) {
 }
 
 void EditorLayer::DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera) {
-    static Shader outlineShader("resources/shaders/outline.vert", "resources/shaders/outline.frag");
-    if (!mesh || !camera) return;
+    if (!mesh || !camera || !m_outlineShader) return;
 
     glm::mat4 mvp = camera->getProjectionMatrix() * camera->getViewMatrix() * worldMatrix;
 
@@ -396,9 +397,9 @@ void EditorLayer::DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* 
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glStencilMask(0xFF);
 
-    outlineShader.bind();
-    outlineShader.bindUniform(mvp, "u_MVP");
-    outlineShader.bindUniform(1.0f, "u_Scale");
+    m_outlineShader->bind();
+    m_outlineShader->bindUniform(mvp, "u_MVP");
+    m_outlineShader->bindUniform(1.0f, "u_Scale");
     mesh->draw();
 
     // ── Pass 2: Draw inflated mesh only OUTSIDE the stencil mask ──
@@ -407,7 +408,7 @@ void EditorLayer::DrawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     glStencilMask(0x00);
 
-    outlineShader.bindUniform(1.01f, "u_Scale");
+    m_outlineShader->bindUniform(1.01f, "u_Scale");
     mesh->draw();
 
     // Restore

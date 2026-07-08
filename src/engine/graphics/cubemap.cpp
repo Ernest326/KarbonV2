@@ -52,7 +52,19 @@ Cubemap::Cubemap(const std::vector<std::string> &faces) {
 }
 
 Cubemap::~Cubemap() {
-    glDeleteTextures(1, &m_id);
+    release();
+}
+
+void Cubemap::release() {
+    if (m_id) glDeleteTextures(1, &m_id);
+    if (m_irradianceMap) glDeleteTextures(1, &m_irradianceMap);
+    if (m_prefilterMap) glDeleteTextures(1, &m_prefilterMap);
+    if (m_brdfLUT) glDeleteTextures(1, &m_brdfLUT);
+    m_id = 0;
+    m_irradianceMap = 0;
+    m_prefilterMap = 0;
+    m_brdfLUT = 0;
+    m_hasIBL = false;
 }
 
 void Cubemap::bind(unsigned int slot) const {

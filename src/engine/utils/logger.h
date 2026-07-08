@@ -4,14 +4,14 @@
 #include <string>
 #include <chrono>
 #include <sstream>
-#include <time>
+#include <iomanip>
+#include <ctime>
 
 namespace Karbon {
 
 class Logger {
 
 public:
-    Logger() = default;
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;
     static Logger& Get() {
@@ -19,9 +19,16 @@ public:
         return instance;
     }
 
-    const char* messageTemplate = "[%s] %s::%s"; // [TIME] TYPE::MESSAGE
+    // Different log levels
+    void info(const std::string& message)  { log("INFO", message); }
+    void warn(const std::string& message)  { log("WARN", message); }
+    void error(const std::string& message) { log("ERROR", message); }
+    void debug(const std::string& message) { log("DEBUG", message); }
 
-    std::string getCurrentTime() {
+private:
+    Logger() : m_logFile("log.txt", std::ios::app) {}
+
+    static std::string getCurrentTime() {
         auto now = std::chrono::system_clock::now();
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
         std::stringstream ss;
@@ -29,63 +36,16 @@ public:
         return ss.str();
     }
 
-    struct LogTemplate {
-        std::string time;
-        std::string type;
-        std::string message;
-    }
-
-    // Log the message using the provided template
-    void log(LogTemplate logTemplate) {
-        std::string formattedMessage = std::string(messageTemplate)
-            .replace(logTemplate.time, "%s")
-            .replace(logTemplate.type, "%s")
-            .replace(logTemplate.message, "%s");
+    // [TIME] TYPE::MESSAGE
+    void log(const char* type, const std::string& message) {
+        std::string formattedMessage = "[" + getCurrentTime() + "] " + type + "::" + message;
         std::cout << formattedMessage << std::endl;
-        writeToFile(formattedMessage);
-    }
-
-    // Different log levels
-    void info(const std::string& message) {
-        LogTemplate template;
-        template.time = getCurrentTime();
-        template.type = "INFO";
-        template.message = message;
-        log(template);
-    }
-
-    void warn(const std::string& message) {
-        LogTemplate template;
-        template.time = getCurrentTime();
-        template.type = "WARN";
-        template.message = message;
-        log(template);
-    }
-
-    void error(const std::string& message) {
-        LogTemplate template;
-        template.time = getCurrentTime();
-        template.type = "ERROR";
-        template.message = message;
-        log(template);
-    }
-
-    void debug(const std::string& message) {
-        LogTemplate template;
-        template.time = getCurrentTime();
-        template.type = "DEBUG";
-        template.message = message;
-        log(template);
-    }
-
-    // Write log to file
-    void writeToFile(const std::string& message) {
-        std::fstream logFile("log.txt", std::ios::app);
-        if (logFile.is_open()) {
-            logFile << message << std::endl;
-            logFile.close();
+        if (m_logFile.is_open()) {
+            m_logFile << formattedMessage << std::endl;
         }
     }
+
+    std::ofstream m_logFile;
 };
 
 }
