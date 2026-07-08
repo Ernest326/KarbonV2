@@ -34,6 +34,7 @@
 
 // Scene & ECS
 #include "scene/scene.h"
+#include "scene/scene_serializer.h"
 #include "scene/entity.h"
 #include "scene/mesh.h"
 #include "scene/model.h"

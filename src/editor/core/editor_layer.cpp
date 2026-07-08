@@ -9,9 +9,14 @@
 #include "scene/components/directional_light_component.h"
 #include "scene/components/spotlight_component.h"
 #include "scene/components/hierarchy_component.h"
+#include "scene/scene_serializer.h"
 #include "utils/math_utils.h"
+#include <iostream>
 
 namespace Karbon {
+
+// Basic serialization: one fixed scene slot for now — no save/open dialog yet.
+static const char* kDefaultScenePath = "resources/scenes/scene.kscene";
 
 EditorLayer::EditorLayer(Scene* scene) : m_scene(scene) {
 }
@@ -426,9 +431,20 @@ void EditorLayer::setupDockSpace() {
 void EditorLayer::drawMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("New Scene", "Ctrl+N")) {}
-            if (ImGui::MenuItem("Open Scene", "Ctrl+O")) {}
-            if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {}
+            if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
+                m_scene->clear();
+                // clear() destroys the editor's own utility camera entity too — recreate it
+                m_editorCamera.initialize(m_scene);
+                m_selectedEntity = entt::null;
+            }
+            if (ImGui::MenuItem("Open Scene", "Ctrl+O")) {
+                loadScene(*m_scene, Application::get().getAssetManager(), kDefaultScenePath);
+                m_editorCamera.initialize(m_scene);
+                m_selectedEntity = entt::null;
+            }
+            if (ImGui::MenuItem("Save Scene", "Ctrl+S")) {
+                saveScene(*m_scene, Application::get().getAssetManager(), kDefaultScenePath);
+            }
             ImGui::Separator();
             if (ImGui::MenuItem("Build", "Ctrl+B")) {}
             if (ImGui::MenuItem("Exit")) { Application::get().quit(); }

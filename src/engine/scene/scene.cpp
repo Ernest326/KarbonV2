@@ -75,15 +75,31 @@ namespace Karbon {
     // -----------------------------------------------------
 
     entt::entity Scene::createEntity(const std::string& tag) {
+        return createEntityWithID(m_nextUUID++, tag);
+    }
+
+    entt::entity Scene::createEntityWithID(UUID id, const std::string& tag) {
         auto entity = m_registry.create();
-        m_registry.emplace<IDComponent>(entity, m_nextUUID++);
+        m_registry.emplace<IDComponent>(entity, id);
         m_registry.emplace<TagComponent>(entity, tag);
         m_registry.emplace<TransformComponent>(entity);
         m_registry.emplace<WorldTransformComponent>(entity);
         m_registry.emplace<HierarchyComponent>(entity);
-        m_entityMap[m_registry.get<IDComponent>(entity).id] = entity;
+        m_entityMap[id] = entity;
+
+        // Keep future auto-generated IDs from colliding with an explicitly-assigned one
+        if (id >= m_nextUUID) m_nextUUID = id + 1;
 
         return entity;
+    }
+
+    void Scene::clear() {
+        m_registry.clear();
+        m_entityMap.clear();
+        m_tagMap.clear();
+        m_nextUUID = 1;
+        m_primaryCamera = entt::null;
+        m_sceneEnvironment.clear();
     }
 
     void Scene::destroyEntity(entt::entity entity) {

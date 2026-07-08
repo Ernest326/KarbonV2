@@ -152,4 +152,11 @@ bool AssetManager::saveMaterial(const std::string& path, MaterialHandle handle) 
     return saveMaterialAsset(path, asset);
 }
 
+std::string AssetManager::getMaterialPath(MaterialHandle handle) const {
+    for (const auto& [path, cachedHandle] : m_materialCache) {
+        if (cachedHandle == handle) return path;
+    }
+    return "";
+}
+
 }

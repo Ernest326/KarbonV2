@@ -51,9 +51,15 @@ public:
     ~Scene() = default;
 
     entt::entity createEntity(const std::string& tag="Entity");
+    // Used by scene deserialization to recreate an entity with its original UUID
+    // (preserves hierarchy/primary-camera references from the saved file).
+    entt::entity createEntityWithID(UUID id, const std::string& tag="Entity");
     void destroyEntity(entt::entity entity);
     entt::entity findByTag(const std::string& tag);
     entt::entity findByUUID(UUID id);
+
+    // Destroys all entities and resets the environment — used before loading a new scene
+    void clear();
 
     void unparent(entt::entity child);
     void setParent(entt::entity child, entt::entity parent);
@@ -85,9 +91,6 @@ private:
 
     void updateHierarchy();
     void updateWorldTransform(entt::entity entity, const WorldTransformComponent& parentWorld);
-
-    void serialize(const std::string& filepath); //TODO for future
-    void deserialize(const std::string& filepath); //TODO for future
 
 };
 

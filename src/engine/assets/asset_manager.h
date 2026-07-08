@@ -54,6 +54,11 @@ public:
     // not loaded through this AssetManager are written as empty slots).
     bool saveMaterial(const std::string& path, MaterialHandle handle);
 
+    // Reverse lookup: the path a material was loaded from, if it was loaded
+    // via loadMaterial(). Empty for materials created directly through
+    // MaterialSystem::create()/createTextured() with no backing file.
+    std::string getMaterialPath(MaterialHandle handle) const;
+
     MaterialSystem* getMaterialSystem() { return m_materials; }
 
 private:
