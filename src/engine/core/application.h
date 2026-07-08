@@ -37,8 +37,6 @@ public:
     void pushOverlay(Layer* overlay);
 
     void setViewportFramebuffer(Framebuffer* framebuffer) { m_viewportFramebuffer = framebuffer; }
-    void setSpectatorCameraEnabled(bool enabled) { m_enableSpectatorCamera = enabled; }
-    bool isSpectatorCameraEnabled() const { return m_enableSpectatorCamera; }
 
     Scene& getActiveScene();
     RenderSystem& getRenderSystem();
@@ -70,8 +68,6 @@ private:
 
     std::unique_ptr<LayerStack> m_layerStack;
     Framebuffer* m_viewportFramebuffer = nullptr;
-
-    bool m_enableSpectatorCamera = true;
 
 };
 

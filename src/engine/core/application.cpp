@@ -3,31 +3,19 @@
 #include "../input/inputsystem.h"
 #include "base.h"
 #include <iostream>
-#include "../graphics/shader.h"
-#include "../graphics/texture.h"
 
 #include "../ui/kbimgui.h"
 
-#include "../graphics/spectator_camera.h"
-
-// Physics incldues
+// Physics includes
 #include "../physics/physics_system.h"
-#include "../scene/components/collider_component.h"
-#include "../scene/components/rigidbody_component.h"
-#include "../scene/components/transform.h"
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/RegisterTypes.h>
 
-//Lighting
+// Systems
 #include "../graphics/lighting_system.h"
-
-//Rendering
 #include "../graphics/render_system.h"
 #include "../graphics/material_system.h"
-
-#include "testlayer.h"
-#include "../scene/components/camera_component.h"
 
 namespace Karbon {
 
@@ -87,27 +75,6 @@ void Application::run() {
 
     KarbonImGUI::init();
 
-    // Create spectator camera if we're not in the editor
-    bool enableTestLayer = false;
-    bool enableSpectatorCamera = enableTestLayer;
-    std::unique_ptr<SpectatorCamera> spectatorCamera;
-    if (enableSpectatorCamera) {
-        entt::entity runtimeCamera = m_activeScene->createEntity("Runtime Camera");
-        auto& cameraComponent = m_activeScene->getRegistry().emplace<CameraComponent>(runtimeCamera);
-        m_activeScene->setPrimaryCamera(runtimeCamera);
-        spectatorCamera = std::make_unique<SpectatorCamera>(&cameraComponent.camera,
-                                                            glm::vec3(0.0f, 0.0f, 5.0f),
-                                                            glm::vec3(0.0f, 0.0f, 0.0f));
-    }
-    Shader test_shader("resources/shaders/pbr.vert",
-                         "resources/shaders/pbr.frag");
-
-    if (enableTestLayer) {
-        m_layerStack->pushLayer(new TestLayer(m_activeScene.get(), m_renderSystem.get(), m_physicsSystem.get(),
-                                    m_lightingSystem.get(), m_materialSystem.get(), spectatorCamera.get()));
-    }
-
-    // Some defaults
     float lastFrameTime = getTime();
 
     // GL defaults
@@ -130,16 +97,11 @@ void Application::run() {
 
         if (!m_minimised) {
 
-            if (spectatorCamera) {
-                spectatorCamera->update(deltaTime);
-            }
-
             //Updates
             m_layerStack->update(deltaTime);  // onAttach() creates entities here
             m_activeScene->onUpdate();         // propagate world transforms (includes newly created entities)
-            
+
             m_physicsSystem->Update(deltaTime);
-            m_lightingSystem->Update();
 
             m_layerStack->imGuiRender();
             Camera* activeCamera = m_activeScene->getPrimaryCamera();
@@ -150,13 +112,7 @@ void Application::run() {
                     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
                 }
 
-                GLuint lights = glGetUniformBlockIndex(test_shader.getID(), "Lights");
-                glUniformBlockBinding(test_shader.getID(), lights, 1);
-                glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_lightingSystem->getUBO());
-                
-                auto& env = m_activeScene->getEnvironment();
-                env.bindIBL(test_shader);
-                m_renderSystem->Draw(&test_shader, activeCamera->getViewMatrix(), activeCamera->getProjectionMatrix(), activeCamera->getPosition());
+                m_renderSystem->Draw(*m_activeScene, *activeCamera);
                 m_layerStack->render();
                 if(m_viewportFramebuffer) {
                     m_viewportFramebuffer->unbind();
