@@ -29,6 +29,9 @@
 #include "graphics/material_system.h"
 #include "graphics/lighting_system.h"
 
+// Assets
+#include "assets/asset_manager.h"
+
 // Scene & ECS
 #include "scene/scene.h"
 #include "scene/entity.h"

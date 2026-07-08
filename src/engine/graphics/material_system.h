@@ -46,6 +46,10 @@ public:
     enum class MaterialMap { Albedo, Normal, Metallic, Roughness, Emissive, AO };
     void updateTexture(MaterialHandle handle, MaterialMap mapType, Texture* texture);
 
+    // Read back a material's current data/textures (e.g. to save it as an asset file)
+    const GPUMaterial& getMaterialData(MaterialHandle handle) const;
+    Texture* getTexture(MaterialHandle handle, MaterialMap mapType) const;
+
     void uploadToGPU();
     GLuint getUBO() const { return m_materialUBO; }
 

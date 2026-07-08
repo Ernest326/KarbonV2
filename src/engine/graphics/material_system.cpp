@@ -120,6 +120,27 @@ void MaterialSystem::updateTexture(MaterialHandle handle, MaterialMap mapType, T
     m_dirty = true;
 }
 
+const GPUMaterial& MaterialSystem::getMaterialData(MaterialHandle handle) const
+{
+    static const GPUMaterial fallback{};
+    if (handle >= m_count) return fallback;
+    return m_materials[handle];
+}
+
+Texture* MaterialSystem::getTexture(MaterialHandle handle, MaterialMap mapType) const
+{
+    if (handle >= m_count) return nullptr;
+    switch (mapType) {
+        case MaterialMap::Albedo:    return m_albedoMaps[handle];
+        case MaterialMap::Normal:    return m_normalMaps[handle];
+        case MaterialMap::Metallic:  return m_metallicMaps[handle];
+        case MaterialMap::Roughness: return m_roughnessMaps[handle];
+        case MaterialMap::Emissive:  return m_emissiveMaps[handle];
+        case MaterialMap::AO:        return m_aoMaps[handle];
+    }
+    return nullptr;
+}
+
 void MaterialSystem::uploadToGPU()
 {
     if (!m_dirty) return;

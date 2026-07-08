@@ -3,16 +3,14 @@
 #include <entt/entt.hpp>
 #include "core/layer.h"
 #include "events/key_event.h"
-#include "scene/cube_mesh.h"
-#include "scene/sphere_mesh.h"
 #include "scene/entity.h"
+#include "scene/mesh.h"
 #include "scene/scene.h"
 #include "core/camera/editor_camera.h"
 #include "core/panels/editor_panels.h"
 #include "core/viewport/editor_viewport.h"
 #include "graphics/grid.h"
 #include "graphics/shader.h"
-#include "scene/model.h"
 
 namespace Karbon {
 
@@ -71,9 +69,6 @@ private:
     ContentBrowserPanel m_contentBrowserPanel;
     StatsPanel m_statsPanel;
 
-    CubeMesh m_cubeMesh;
-    SphereMesh m_sphereMesh;
-    std::unique_ptr<Model> m_monkeModel;
     Entity m_testCube;
 
 };

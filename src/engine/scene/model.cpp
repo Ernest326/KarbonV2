@@ -1,4 +1,5 @@
 #include "model.h"
+#include "assets/asset_manager.h"
 #include "assimp/material.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -32,7 +33,10 @@ glm::mat4 removeScale(const glm::mat4& matrix) {
 }
 }
 
-Model::Model(const char* filepath, MaterialSystem* materialSystem) { loadModel(filepath, materialSystem); }
+Model::Model(const char* filepath, MaterialSystem* materialSystem, AssetManager* assets)
+    : m_assets(assets) {
+    loadModel(filepath, materialSystem);
+}
 
 void Model::draw() const {
     for (const auto& mesh : m_meshes) {
@@ -114,34 +118,21 @@ MaterialHandle Model::processAiMaterial(aiMaterial* aiMaterial, const aiScene* s
 
     glm::vec4 albedo = glm::vec4(color.r, color.g, color.b, 1.0f);
 
-    Texture* albedoMap = nullptr;
-    Texture* normalMap = nullptr;
-    Texture* metallicMap = nullptr;
-    Texture* roughnessMap = nullptr;
+    // Textures are loaded and owned by the AssetManager (deduplicated by path)
+    auto loadTexture = [this, aiMaterial](aiTextureType type) -> Texture* {
+        if (!m_assets || aiMaterial->GetTextureCount(type) == 0) return nullptr;
+        aiString path;
+        aiMaterial->GetTexture(type, 0, &path);
+        return m_assets->getTexture(m_assets->loadTexture(path.C_Str()));
+    };
 
-    if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-        aiString path;
-        aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path);
-        albedoMap = new Texture(path.C_Str());
-    }
-    if (aiMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
-        aiString path;
-        aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &path);
-        normalMap = new Texture(path.C_Str());
-    }
-    if (aiMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-        aiString path;
-        aiMaterial->GetTexture(aiTextureType_SPECULAR, 0, &path);
-        metallicMap = new Texture(path.C_Str());
-    }
-    if (aiMaterial->GetTextureCount(aiTextureType_SHININESS) > 0) {
-        aiString path;
-        aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &path);
-        roughnessMap = new Texture(path.C_Str());
-    }
+    Texture* albedoMap    = loadTexture(aiTextureType_DIFFUSE);
+    Texture* normalMap    = loadTexture(aiTextureType_NORMALS);
+    Texture* metallicMap  = loadTexture(aiTextureType_SPECULAR);
+    Texture* roughnessMap = loadTexture(aiTextureType_SHININESS);
 
-    return materialSystem->createTextured(albedo, metallic, roughness, albedoMap, normalMap, metallicMap, roughnessMap);
-    
+    // createTextured takes (albedo, roughness, metallic, albedoMap, normalMap, roughnessMap, metallicMap)
+    return materialSystem->createTextured(albedo, roughness, metallic, albedoMap, normalMap, roughnessMap, metallicMap);
 }
 
 }

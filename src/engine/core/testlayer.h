@@ -38,12 +38,6 @@ private:
 
     // Resources owned by this layer so they outlive the attach/update calls
     std::unique_ptr<Cubemap> m_skybox;
-    std::unique_ptr<Texture> m_testTexture;
-    std::unique_ptr<Texture> m_testTexture2;
-    std::unique_ptr<PlaneMesh> m_floorMesh;
-    std::unique_ptr<CubeMesh> m_cubeMesh;
-    std::unique_ptr<SphereMesh> m_sphereMesh;
-    std::unique_ptr<Model> m_monkeyModel;
 
     // Entities
     Entity m_floorEntity;

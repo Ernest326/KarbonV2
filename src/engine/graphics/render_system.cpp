@@ -1,4 +1,5 @@
 #include "render_system.h"
+#include "assets/asset_manager.h"
 #include "scene/components/meshrenderer_component.h"
 #include "scene/components/transform.h"
 #include "scene/scene.h"
@@ -10,7 +11,7 @@ namespace Karbon {
 constexpr GLuint LIGHTS_BLOCK_BINDING = 1;
 constexpr GLuint MATERIALS_BLOCK_BINDING = 3;
 
-RenderSystem::RenderSystem(entt::registry *registry, MaterialSystem *materials, LightingSystem* lights) : m_registry(registry), m_materials(materials), m_lights(lights) {
+RenderSystem::RenderSystem(entt::registry *registry, MaterialSystem *materials, LightingSystem* lights, AssetManager* assets) : m_registry(registry), m_materials(materials), m_lights(lights), m_assets(assets) {
     m_pbrShader = std::make_unique<Shader>("resources/shaders/pbr.vert", "resources/shaders/pbr.frag");
     m_skyboxShader = std::make_unique<Shader>("resources/shaders/skybox.vert", "resources/shaders/skybox.frag");
 
@@ -54,12 +55,13 @@ void RenderSystem::draw(Scene& scene, const Camera& camera) {
         const auto& transform = entt_view.get<WorldTransformComponent>(entity);
         const auto& renderer = entt_view.get<MeshRendererComponent>(entity);
 
-        if (!renderer.visible || !renderer.mesh) continue;
+        Mesh* mesh = m_assets->getMesh(renderer.mesh);
+        if (!renderer.visible || !mesh) continue;
 
         shader->bindUniform(transform.matrix, "model");
         shader->bindUniform(static_cast<int>(renderer.material), "materialIndex");
         m_materials->bindMaterialTextures(renderer.material);
-        renderer.mesh->draw();
+        mesh->draw();
     }
     shader->unbind();
 }

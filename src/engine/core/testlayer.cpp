@@ -1,4 +1,6 @@
 #include "testlayer.h"
+#include "core/application.h"
+#include "assets/asset_manager.h"
 #include <glfw/glfw3.h>
 #include "scene/components/transform.h"
 #include "scene/components/meshrenderer_component.h"
@@ -54,17 +56,17 @@ void TestLayer::onAttach() {
         "resources/textures/skybox/back.jpg"
     });
 
+    auto& assets = Application::get().getAssetManager();
+
     // Textures
-    m_testTexture  = std::make_unique<Texture>("resources/textures/texture.png");
-    m_testTexture2 = std::make_unique<Texture>("resources/textures/texture2.jpg");
+    Texture* floorTexture = assets.getTexture(assets.loadTexture("resources/textures/texture.png"));
 
     // Materials
-    m_floorMaterial  = m_materialSystem->createTextured(glm::vec4(1.0f), 0.0f, 1.0f, m_testTexture.get());
+    m_floorMaterial  = m_materialSystem->createTextured(glm::vec4(1.0f), 0.0f, 1.0f, floorTexture);
     m_sphereMaterial = m_materialSystem->create(glm::vec4(0.8f, 0.2f, 0.2f, 1.0f), 0.0f, 0.2f);
     m_monkeyMaterial = m_materialSystem->create(glm::vec4(0.2f, 0.2f, 0.8f, 1.0f), 0.5f, 0.1f);
 
     // Floor
-    m_floorMesh = std::make_unique<PlaneMesh>();
     m_floorEntity = createEntity("Floor", glm::vec3(0.0f, -1.0f, 0.0f),
                                  glm::vec3(0.0f), glm::vec3(20.0f, 0.1f, 20.0f));
     m_floorEntity.addComponent<RigidbodyComponent>();
@@ -75,15 +77,14 @@ void TestLayer::onAttach() {
     m_floorEntity.getComponent<ColliderComponent>().type = ColliderComponent::Type::Plane;
     m_floorEntity.getComponent<ColliderComponent>().halfExtents = glm::vec3(10.0f, 1.0f, 10.0f);
     m_floorEntity.addComponent<MeshRendererComponent>();
-    m_floorEntity.getComponent<MeshRendererComponent>().mesh = m_floorMesh.get();
+    m_floorEntity.getComponent<MeshRendererComponent>().mesh = assets.getPlaneMesh();
     m_floorEntity.getComponent<MeshRendererComponent>().material = m_floorMaterial;
 
     // Cube
-    m_cubeMesh = std::make_unique<CubeMesh>();
     m_cubeEntity = createEntity("Cube", glm::vec3(0.0f, 10.0f, 0.0f),
                                 glm::vec3(45.0f, 45.0f, 60.0f), glm::vec3(1.5f, 0.1f, 2.5f));
     m_cubeEntity.addComponent<MeshRendererComponent>();
-    m_cubeEntity.getComponent<MeshRendererComponent>().mesh = m_cubeMesh.get();
+    m_cubeEntity.getComponent<MeshRendererComponent>().mesh = assets.getCubeMesh();
     m_cubeEntity.getComponent<MeshRendererComponent>().material = m_floorMaterial;
     m_cubeEntity.addComponent<RigidbodyComponent>();
     m_cubeEntity.getComponent<RigidbodyComponent>().type = RigidbodyComponent::Type::Kinematic;
@@ -99,7 +100,6 @@ void TestLayer::onAttach() {
     m_scene->setParent(m_cubeEntity, m_floorEntity);
 
     // Spheres
-    m_sphereMesh = std::make_unique<SphereMesh>();
     for (int i = 0; i < 1000; i++) {
         int x = rand() % 10 - 5;
         int z = rand() % 10 - 5;
@@ -116,18 +116,18 @@ void TestLayer::onAttach() {
         sphere.getComponent<ColliderComponent>().radius = 0.5f;
 
         sphere.addComponent<MeshRendererComponent>();
-        sphere.getComponent<MeshRendererComponent>().mesh = m_sphereMesh.get();
+        sphere.getComponent<MeshRendererComponent>().mesh = assets.getSphereMesh();
         sphere.getComponent<MeshRendererComponent>().material = m_sphereMaterial;
 
         m_sphereEntities.push_back(sphere);
     }
 
     // Monkey model
-    m_monkeyModel = std::make_unique<Model>("resources/models/monke.fbx", m_materialSystem);
+    auto monkeyMeshes = assets.loadModel("resources/models/monke.fbx");
     m_monkeyEntity = createEntity("Monkey", glm::vec3(0.0f, 3.0f, 0.0f));
     m_monkeyEntity.addComponent<MeshRendererComponent>();
-    if (!m_monkeyModel->getMeshes().empty()) {
-        m_monkeyEntity.getComponent<MeshRendererComponent>().mesh = &m_monkeyModel->getMesh(0);
+    if (!monkeyMeshes.empty()) {
+        m_monkeyEntity.getComponent<MeshRendererComponent>().mesh = monkeyMeshes[0];
         m_monkeyEntity.getComponent<MeshRendererComponent>().material = m_monkeyMaterial;
     }
 

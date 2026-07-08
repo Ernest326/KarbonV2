@@ -1,11 +1,11 @@
 #pragma once
+#include "assets/asset_handles.h"
 #include "graphics/material_system.h"
-#include "scene/mesh.h"
 
 namespace Karbon {
 
 struct MeshRendererComponent {
-    Mesh* mesh = nullptr;
+    MeshHandle mesh = INVALID_MESH;
     MaterialHandle material = 0;
     bool visible = true;
     bool castShadows = true;

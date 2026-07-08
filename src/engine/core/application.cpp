@@ -45,7 +45,8 @@ Application::Application(const char *title) {
     m_physicsSystem->initialize();
     m_lightingSystem = std::make_unique<LightingSystem>(&m_activeScene->getRegistry());
     m_materialSystem = std::make_unique<MaterialSystem>();
-    m_renderSystem = std::make_unique<RenderSystem>(&m_activeScene->getRegistry(), m_materialSystem.get(), m_lightingSystem.get());
+    m_assetManager = std::make_unique<AssetManager>(m_materialSystem.get());
+    m_renderSystem = std::make_unique<RenderSystem>(&m_activeScene->getRegistry(), m_materialSystem.get(), m_lightingSystem.get(), m_assetManager.get());
 }
 
 Application::~Application() {}
@@ -67,6 +68,7 @@ RenderSystem& Application::getRenderSystem() { return *m_renderSystem; }
 PhysicsSystem& Application::getPhysicsSystem() { return *m_physicsSystem; }
 LightingSystem& Application::getLightingSystem() { return *m_lightingSystem; }
 MaterialSystem& Application::getMaterialSystem() { return *m_materialSystem; }
+AssetManager& Application::getAssetManager() { return *m_assetManager; }
 
 void Application::run() {
 

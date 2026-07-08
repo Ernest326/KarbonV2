@@ -7,6 +7,7 @@
 #include "graphics/render_system.h"
 #include "graphics/lighting_system.h"
 #include "graphics/material_system.h"
+#include "assets/asset_manager.h"
 #include <memory>
 #include "window.h"
 #include "layer_stack.h"
@@ -43,6 +44,7 @@ public:
     PhysicsSystem& getPhysicsSystem();
     LightingSystem& getLightingSystem();
     MaterialSystem& getMaterialSystem();
+    AssetManager& getAssetManager();
 
     static float getTime();
     static float getDeltaTime();
@@ -61,6 +63,7 @@ private:
     std::unique_ptr<JPH::JobSystemThreadPool> m_jobSystem;
     std::unique_ptr<LightingSystem> m_lightingSystem;
     std::unique_ptr<MaterialSystem> m_materialSystem;
+    std::unique_ptr<AssetManager> m_assetManager;
 
     bool m_running = true;
     bool m_minimised = false;

@@ -40,27 +40,28 @@ void EditorLayer::onAttach() {
     m_scene->getRegistry().get<TransformComponent>(spotlight).position = glm::vec3(5.0f, 4.0f, 0.0f);
     m_scene->getRegistry().emplace<SpotLightComponent>(spotlight);
 
+    auto& assets = Application::get().getAssetManager();
+
     entt::entity cube_id = m_scene->createEntity("Test Cube");
     m_testCube = Entity(cube_id, &m_scene->getRegistry());
     m_testCube.addComponent<MeshRendererComponent>();
-    m_cubeMesh = CubeMesh();
-    m_testCube.getComponent<MeshRendererComponent>().mesh = &m_cubeMesh;
-    MaterialHandle matHandle = Application::get().getMaterialSystem().create({1.0f, 0.5f, 0.31f, 1.0f}, 0.5f, 0.5f);
+    m_testCube.getComponent<MeshRendererComponent>().mesh = assets.getCubeMesh();
+    MaterialHandle matHandle = assets.loadMaterial("resources/materials/default.kmat");
     m_testCube.getComponent<MeshRendererComponent>().material = matHandle;
-    
+
     entt::entity sphere_id = m_scene->createEntity("Test Sphere");
     m_scene->getRegistry().emplace<MeshRendererComponent>(sphere_id);
-    m_sphereMesh = SphereMesh();
-    m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).mesh = &m_sphereMesh;
-    m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).material = matHandle;
+    m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).mesh = assets.getSphereMesh();
     MaterialHandle matHandle2 = Application::get().getMaterialSystem().create({0.1f, 0.5f, 0.89f, 1.0f}, 0.1f, 0.9f);
     m_scene->getRegistry().get<MeshRendererComponent>(sphere_id).material = matHandle2;
     m_scene->getRegistry().get<TransformComponent>(sphere_id).position = glm::vec3(5.0f, 0.0f, 0.0f);
 
     entt::entity monke = m_scene->createEntity("Monke");
     m_scene->getRegistry().emplace<MeshRendererComponent>(monke);
-    m_monkeModel = std::make_unique<Model>("resources/models/monke.fbx", &Application::get().getMaterialSystem());
-    m_scene->getRegistry().get<MeshRendererComponent>(monke).mesh = &m_monkeModel->getMesh(0);
+    auto monkeMeshes = assets.loadModel("resources/models/monke.fbx");
+    if (!monkeMeshes.empty()) {
+        m_scene->getRegistry().get<MeshRendererComponent>(monke).mesh = monkeMeshes[0];
+    }
 
     MaterialHandle matHandle3 = Application::get().getMaterialSystem().create({0.8f, 0.2f, 0.5f, 1.0f}, 0.7f, 0.9f);
     m_scene->getRegistry().get<MeshRendererComponent>(monke).material = matHandle3;
@@ -124,17 +125,19 @@ void EditorLayer::doPickingPass(int x, int y) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_SCISSOR_TEST);
 
+    auto& assets = Application::get().getAssetManager();
     auto view = m_scene->getRegistry().view<WorldTransformComponent, MeshRendererComponent>();
     for (auto entity : view) {
         auto [worldTransform, meshRenderer] = view.get(entity);
-        if (!meshRenderer.mesh) continue;
+        Mesh* mesh = assets.getMesh(meshRenderer.mesh);
+        if (!mesh) continue;
 
         glm::mat4 mvp = cam->getProjectionMatrix() * cam->getViewMatrix() * worldTransform.matrix;
         m_pickingShader->bind();
         m_pickingShader->bindUniform(mvp, "u_MVP");
         m_pickingShader->bindUniform(encodeEntityID(entity), "u_ID");
 
-        meshRenderer.mesh->draw();
+        mesh->draw();
     }
 
     GLubyte pixel[4];
@@ -262,8 +265,9 @@ void EditorLayer::onRender() {
     if (m_selectedEntity != entt::null && activeCamera) {
         auto* meshRenderer = m_scene->getRegistry().try_get<MeshRendererComponent>(m_selectedEntity);
         auto* worldTransform = m_scene->getRegistry().try_get<WorldTransformComponent>(m_selectedEntity);
-        if (meshRenderer && meshRenderer->mesh && worldTransform) {
-            drawOutline(meshRenderer->mesh, worldTransform->matrix, activeCamera);
+        Mesh* mesh = meshRenderer ? Application::get().getAssetManager().getMesh(meshRenderer->mesh) : nullptr;
+        if (mesh && worldTransform) {
+            drawOutline(mesh, worldTransform->matrix, activeCamera);
         }
     }
 

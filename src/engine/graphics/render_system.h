@@ -9,11 +9,12 @@
 namespace Karbon {
 
 class Scene;
+class AssetManager;
 
 class RenderSystem {
 
 public:
-    RenderSystem(entt::registry *registry, MaterialSystem *materials, LightingSystem *lights);
+    RenderSystem(entt::registry *registry, MaterialSystem *materials, LightingSystem *lights, AssetManager *assets);
     ~RenderSystem();
 
     // Renders the scene (skybox + PBR pass) from the given camera's view.
@@ -25,6 +26,7 @@ private:
     entt::registry *m_registry;
     MaterialSystem *m_materials;
     LightingSystem* m_lights;
+    AssetManager* m_assets;
     std::unique_ptr<Shader> m_pbrShader;
     std::unique_ptr<Shader> m_skyboxShader;
 };
