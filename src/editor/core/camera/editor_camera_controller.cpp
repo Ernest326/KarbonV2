@@ -4,6 +4,7 @@
 #include "input/inputsystem.h"
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <cmath>
 
 namespace Karbon {
 
@@ -40,6 +41,7 @@ void EditorCameraController::onUpdate(float deltaTime) {
     if (rmbDown && !m_capturing && m_viewportActive) {
         m_capturing = true;
         m_firstFrame = true;
+        m_capturedMovement = 0.0;
         glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // Consume any stale mouse delta accumulated while over UI panels.
@@ -49,7 +51,14 @@ void EditorCameraController::onUpdate(float deltaTime) {
 
     // Stop capturing
     if (!rmbDown && m_capturing) {
+        bool wasClick = m_capturedMovement < kClickMovementThreshold;
         release();
+        if (wasClick) {
+            auto [x, y] = InputSystem::get().getMousePosition();
+            m_rightClickReady = true;
+            m_rightClickX = x;
+            m_rightClickY = y;
+        }
         return;
     }
 
@@ -67,11 +76,21 @@ void EditorCameraController::onUpdate(float deltaTime) {
 
 void EditorCameraController::updateMouseLook() {
     auto [dx, dy] = InputSystem::get().getMouseDelta();
+    m_capturedMovement += std::abs(dx) + std::abs(dy);
+
     m_yaw   += static_cast<float>(dx) * m_mouseSensitivity;
     m_pitch -= static_cast<float>(dy) * m_mouseSensitivity;
     m_pitch  = glm::clamp(m_pitch, -89.0f, 89.0f);
 
     m_camera->setRotation(glm::vec3(m_pitch, m_yaw, 0.0f));
+}
+
+bool EditorCameraController::consumeRightClick(double& outX, double& outY) {
+    if (!m_rightClickReady) return false;
+    outX = m_rightClickX;
+    outY = m_rightClickY;
+    m_rightClickReady = false;
+    return true;
 }
 
 void EditorCameraController::updateMovement(float deltaTime) {

@@ -39,7 +39,10 @@ private:
     bool gizmoControls(KeyPressEvent& e);
 
     void drawOutline(Mesh* mesh, const glm::mat4& worldMatrix, Camera* camera);
-    
+
+    void focusSelectedEntity();
+    void drawViewportContextMenu();
+
     std::unique_ptr<Framebuffer> m_pickingFramebuffer;
     std::unique_ptr<Shader> m_pickingShader;
     std::unique_ptr<Shader> m_outlineShader;

@@ -1,0 +1,11 @@
+# Karbon material asset
+albedo = 1.0 0.5 0.31 1.0
+emissive = 0.0 0.0 0.0 0.0
+metallic = 0.5
+roughness = 0.5
+albedoMap =
+normalMap =
+metallicMap =
+roughnessMap =
+emissiveMap =
+aoMap =

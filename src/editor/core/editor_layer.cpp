@@ -9,6 +9,7 @@
 #include "scene/components/directional_light_component.h"
 #include "scene/components/spotlight_component.h"
 #include "scene/components/hierarchy_component.h"
+#include "scene/components/id_component.h"
 #include "scene/scene_serializer.h"
 #include "utils/math_utils.h"
 #include <iostream>
@@ -178,6 +179,46 @@ bool EditorLayer::onKeyRelease(KeyReleaseEvent& e) {
     return false;
 }
 
+void EditorLayer::focusSelectedEntity() {
+    if (m_selectedEntity == entt::null) return;
+    auto& worldTransform = m_scene->getRegistry().get<WorldTransformComponent>(m_selectedEntity);
+    auto& cameraTransform = m_scene->getRegistry().get<WorldTransformComponent>(m_editorCamera.getEntity());
+    cameraTransform.worldPosition = (worldTransform.worldPosition - cameraTransform.worldPosition) * 0.1f + cameraTransform.worldPosition; // Lerp to target for smoothness
+}
+
+void EditorLayer::drawViewportContextMenu() {
+    auto& registry = m_scene->getRegistry();
+
+    if (m_selectedEntity != entt::null && registry.valid(m_selectedEntity)) {
+        if (registry.all_of<TagComponent>(m_selectedEntity)) {
+            ImGui::TextDisabled("%s", registry.get<TagComponent>(m_selectedEntity).tag.c_str());
+            ImGui::Separator();
+        }
+
+        if (ImGui::MenuItem("Focus")) {
+            focusSelectedEntity();
+        }
+
+        bool hasParent = registry.all_of<HierarchyComponent>(m_selectedEntity)
+                       && registry.get<HierarchyComponent>(m_selectedEntity).parent != entt::null;
+        if (hasParent && ImGui::MenuItem("Unparent")) {
+            m_scene->unparent(m_selectedEntity);
+        }
+
+        ImGui::Separator();
+        if (ImGui::MenuItem("Delete Entity")) {
+            entt::entity toDelete = m_selectedEntity;
+            m_selectedEntity = entt::null;
+            m_scene->destroyEntity(toDelete);
+        }
+    } else if (ImGui::MenuItem("Create Empty")) {
+        entt::entity created = m_scene->createEntity("Entity");
+        // Place it a short distance in front of the editor camera instead of stacking at the origin
+        auto& cameraTransform = registry.get<WorldTransformComponent>(m_editorCamera.getEntity());
+        registry.get<TransformComponent>(created).position = cameraTransform.worldPosition + cameraTransform.forward() * 5.0f;
+    }
+}
+
 bool EditorLayer::gizmoControls(KeyPressEvent& e) {
     if(!m_editorCamera.isCapturingMouse()) {
         if (e.getKeyCode() == Key::W) {
@@ -201,11 +242,8 @@ bool EditorLayer::gizmoControls(KeyPressEvent& e) {
             return true;
         }
         if (e.getKeyCode() == Key::F) {
-            // Focus selected entity
             if (m_selectedEntity != entt::null) {
-                auto& worldTransform = m_scene->getRegistry().get<WorldTransformComponent>(m_selectedEntity);
-                auto& cameraTransform = m_scene->getRegistry().get<WorldTransformComponent>(m_editorCamera.getEntity());
-                cameraTransform.worldPosition = (worldTransform.worldPosition - cameraTransform.worldPosition)*0.1f + cameraTransform.worldPosition; // Lerp to target for smoothness
+                focusSelectedEntity();
                 return true;
             }
         }
@@ -249,6 +287,19 @@ void EditorLayer::onImGuiRender() {
     if (m_viewport.consumeClick(pickX, pickY) && !m_editorCamera.isCapturingMouse() && !ImGuizmo::IsUsing()) {
         doPickingPass(pickX, pickY);
         std::cout << "Clicked at (" << pickX << ", " << pickY << ")\n";
+    }
+
+    double rawRightClickX, rawRightClickY;
+    if (m_editorCamera.consumeRightClick(rawRightClickX, rawRightClickY)) {
+        int rightClickX, rightClickY;
+        if (m_viewport.windowToFramebuffer(rawRightClickX, rawRightClickY, rightClickX, rightClickY)) {
+            doPickingPass(rightClickX, rightClickY); // updates m_selectedEntity as a side effect
+            ImGui::OpenPopup("ViewportContextMenu");
+        }
+    }
+    if (ImGui::BeginPopup("ViewportContextMenu")) {
+        drawViewportContextMenu();
+        ImGui::EndPopup();
     }
 }
 

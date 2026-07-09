@@ -15,6 +15,7 @@ public:
     void onUpdate(float deltaTime, bool viewportActive);
     bool onKeyPress(KeyPressEvent& e);
     bool isCapturingMouse() const { return m_controller ? m_controller->isCapturingMouse() : false; }
+    bool consumeRightClick(double& outX, double& outY) { return m_controller ? m_controller->consumeRightClick(outX, outY) : false; }
 
     entt::entity getEntity() const { return m_entity; }
 

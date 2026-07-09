@@ -25,6 +25,7 @@ void EditorViewportPanel::draw(Scene* scene, const std::function<void()>& onDraw
 
     uint32_t textureID = m_framebuffer->getColorAttachment();
     ImVec2 imagePos = ImGui::GetCursorScreenPos();
+    m_imagePos = imagePos;
     ImGui::Image((void*)(uintptr_t)textureID, viewportPanelSize, ImVec2(0, 1), ImVec2(1, 0));
 
     //Click handling
@@ -41,6 +42,16 @@ void EditorViewportPanel::draw(Scene* scene, const std::function<void()>& onDraw
 
     ImGui::End();
     ImGui::PopStyleVar();
+}
+
+bool EditorViewportPanel::windowToFramebuffer(double windowX, double windowY, int& outX, int& outY) const {
+    if (m_size.x <= 0.0f || m_size.y <= 0.0f) {
+        return false;
+    }
+
+    outX = static_cast<int>(windowX - m_imagePos.x);
+    outY = static_cast<int>(m_size.y - (windowY - m_imagePos.y));
+    return outX >= 0 && outY >= 0 && outX < static_cast<int>(m_size.x) && outY < static_cast<int>(m_size.y);
 }
 
 bool EditorViewportPanel::consumeClick(int& outX, int& outY) {
